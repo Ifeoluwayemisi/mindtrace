@@ -1,0 +1,6 @@
+{
+  "name": "MindTrace — Offline-First Math Learning Diagnostic Platform",
+  "description": "AI-assisted, offline-first mathematics learning diagnostic platform for secondary school STEM education. Uncovers root cognitive misconceptions, provides targeted micro-interventions, and delivers class-wide teacher analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
