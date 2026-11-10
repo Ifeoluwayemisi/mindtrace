@@ -483,11 +483,11 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
               <span className="text-slate-400">Database Name:</span>
-              <p className="font-mono font-bold text-indigo-300">MindTraceOfflineDB (v1)</p>
+              <p className="font-mono font-bold text-indigo-300">MindTraceOfflineDB (v2)</p>
             </div>
             <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
               <span className="text-slate-400">IndexedDB Object Stores:</span>
-              <p className="font-mono text-slate-300">profiles, diagnoses, syncQueue, teacherAnalytics</p>
+              <p className="font-mono text-slate-300">profiles, diagnoses, syncQueue, teacherAnalytics, lessonPackages</p>
             </div>
           </div>
 

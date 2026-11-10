@@ -15,6 +15,7 @@ import {
   Sliders,
   Volume2,
   Eye,
+  Play,
 } from 'lucide-react';
 import { StudentProfile, Question } from '../../types';
 import { QUESTION_BANK } from '../../data/questionBank';
@@ -208,11 +209,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
         <button
           onClick={onViewRemedyLibrary}
-          className="p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-violet-500/50 text-left transition cursor-pointer space-y-1"
+          className="p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 text-left transition cursor-pointer space-y-1"
         >
-          <Zap className="w-5 h-5 text-violet-400" />
-          <h3 className="text-xs font-bold text-white">Visual Remedies</h3>
-          <p className="text-[11px] text-slate-400">2-min models & scales</p>
+          <Play className="w-5 h-5 text-indigo-400 fill-indigo-400/20" />
+          <h3 className="text-xs font-bold text-white">Motion Lessons</h3>
+          <p className="text-[11px] text-slate-400">Animated micro-remedies</p>
         </button>
 
         <button

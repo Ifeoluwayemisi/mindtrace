@@ -1,9 +1,10 @@
 /**
  * MindTrace Offline-First Service Worker
- * Ensures reliable caching and zero-bandwidth execution for secondary school learners.
+ * Version: mindtrace-v1.2
+ * Ensures reliable caching, motion lesson playback, and zero-bandwidth execution for secondary school learners.
  */
 
-const CACHE_NAME = 'mindtrace-v1.1';
+const CACHE_NAME = 'mindtrace-v1.2';
 const CORE_ASSETS = [
   '/',
   '/index.html',
@@ -35,8 +36,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
-
-  const url = new URL(event.request.url);
 
   // Stale-while-revalidate or Network-first with cache fallback
   event.respondWith(

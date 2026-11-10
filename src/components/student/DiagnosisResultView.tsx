@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Volume2,
   VolumeX,
+  Play,
 } from 'lucide-react';
 import { DiagnosisResult, Question } from '../../types';
 import { storageService } from '../../services/storageService';
@@ -217,8 +218,8 @@ export const DiagnosisResultView: React.FC<DiagnosisResultViewProps> = ({
             onClick={onStartIntervention}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02] cursor-pointer"
           >
-            <BookOpen className="w-4 h-4 text-indigo-200" />
-            <span>Launch 2-Minute Targeted Remedy (+10 XP)</span>
+            <Play className="w-4 h-4 text-white fill-white" />
+            <span>Launch Animated Motion Remedy (+10 XP)</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         )}
