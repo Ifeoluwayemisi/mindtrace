@@ -16,6 +16,7 @@ import {
 import { DiagnosisResult, Question } from '../../types';
 import { storageService } from '../../services/storageService';
 import { AudioPlayerControl } from '../common/AudioPlayerControl';
+import { BalanceScaleVisual, RainbowDistributionVisual } from '../common/MathVisuals';
 
 interface DiagnosisResultViewProps {
   diagnosis: DiagnosisResult;
@@ -134,6 +135,24 @@ export const DiagnosisResultView: React.FC<DiagnosisResultViewProps> = ({
           />
         </div>
       </div>
+
+      {/* Embedded Mathematical Visual Model for Cognitive Correction */}
+      {!isCorrect && diagnosis.misconceptionCode === 'ALG_SIGN_FLIP' && (
+        <BalanceScaleVisual
+          leftExpression={diagnosis.faultyExpression || '3x = 14 - 7'}
+          rightExpression="Equality Broken! (≠)"
+          isBalanced={false}
+          tiltAngle={-8}
+        />
+      )}
+
+      {!isCorrect && diagnosis.misconceptionCode === 'ALG_INVALID_DISTRIB' && (
+        <RainbowDistributionVisual
+          multiplier="2"
+          term1="4x"
+          term2="- 3"
+        />
+      )}
 
       {/* Evidence Comparison Card (If not correct and has faulty line) */}
       {!isCorrect && !isAmbiguous && diagnosis.faultyExpression && (

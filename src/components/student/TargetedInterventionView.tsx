@@ -13,6 +13,7 @@ import { TargetedIntervention, Question } from '../../types';
 import { TARGETED_INTERVENTIONS } from '../../data/questionBank';
 import { storageService } from '../../services/storageService';
 import { AudioPlayerControl } from '../common/AudioPlayerControl';
+import { BalanceScaleVisual, RainbowDistributionVisual } from '../common/MathVisuals';
 
 interface TargetedInterventionViewProps {
   misconceptionCode: string;
@@ -120,64 +121,17 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
         {/* Model 1: Balance Scale Simulation */}
         {intervention.interactiveModel === 'balance_scale' && (
           <div className="p-6 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-6">
-            <div className="flex flex-col items-center justify-center">
-              {/* Scale Visualization */}
-              <div className="w-full max-w-md py-6 flex items-center justify-between relative">
-                {/* Left Pan */}
-                <div
-                  className={`w-36 p-4 rounded-2xl border text-center transition-all duration-300 ${
-                    scaleLeft > scaleRight
-                      ? 'translate-y-4 bg-indigo-950/80 border-indigo-500'
-                      : scaleLeft < scaleRight
-                      ? '-translate-y-4 bg-slate-900 border-slate-700'
-                      : 'translate-y-0 bg-slate-900/90 border-emerald-500/80'
-                  }`}
-                >
-                  <span className="text-xs font-semibold text-slate-400 block mb-1">
-                    Left Side
-                  </span>
-                  <div className="font-mono text-xl font-bold text-white">
-                    3x - 7 {addedNumber !== null && <span className="text-indigo-400">+ 7</span>}
-                  </div>
-                  <span className="text-[11px] text-slate-400 mt-1 block">
-                    Weight: {scaleLeft}
-                  </span>
-                </div>
+            <BalanceScaleVisual
+              isBalanced={isBalanced}
+              leftExpression={scaleLeft === 21 ? '3x - 7 + 7' : '3x - 7'}
+              rightExpression={scaleRight === 21 ? '14 + 7' : scaleRight === 7 ? '14 - 7' : '14'}
+              tiltAngle={scaleLeft > scaleRight ? -6 : scaleLeft < scaleRight ? 6 : 0}
+            />
 
-                {/* Fulcrum Pivot */}
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-1 bg-slate-700 rounded-full" />
-                  <div className="w-0 h-0 border-l-[16px] border-l-transparent border-r-[16px] border-r-transparent border-b-[32px] border-b-indigo-500" />
-                  <span className="text-xs font-bold text-slate-300 mt-2">
-                    {isBalanced ? 'BALANCED (=)' : 'UNBALANCED (≠)'}
-                  </span>
-                </div>
-
-                {/* Right Pan */}
-                <div
-                  className={`w-36 p-4 rounded-2xl border text-center transition-all duration-300 ${
-                    scaleRight > scaleLeft
-                      ? 'translate-y-4 bg-indigo-950/80 border-indigo-500'
-                      : scaleRight < scaleLeft
-                      ? '-translate-y-4 bg-slate-900 border-slate-700'
-                      : 'translate-y-0 bg-slate-900/90 border-emerald-500/80'
-                  }`}
-                >
-                  <span className="text-xs font-semibold text-slate-400 block mb-1">
-                    Right Side
-                  </span>
-                  <div className="font-mono text-xl font-bold text-white">
-                    14 {addedNumber !== null && <span className="text-indigo-400">+ 7</span>}
-                  </div>
-                  <span className="text-[11px] text-slate-400 mt-1 block">
-                    Weight: {scaleRight}
-                  </span>
-                </div>
-              </div>
-
-              {/* Status Message */}
+            {/* Status Message */}
+            <div className="flex justify-center">
               <div
-                className={`text-xs px-3 py-1.5 rounded-xl font-medium mt-2 ${
+                className={`text-xs px-3 py-1.5 rounded-xl font-medium ${
                   isBalanced
                     ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800'
                     : 'text-amber-300 bg-amber-950/60 border border-amber-800'
@@ -185,7 +139,7 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
               >
                 {isBalanced
                   ? 'Equality holds: Adding +7 to BOTH sides leaves 3x = 21.'
-                  : 'Scale tilted! Subtracting only from one side breaks equality.'}
+                  : 'Scale tilted! Performing an operation on only one side breaks equality.'}
               </div>
             </div>
 
@@ -197,7 +151,7 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
                   setScaleRight(21);
                   setAddedNumber(7);
                 }}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition cursor-pointer min-h-[44px]"
               >
                 Apply Correct Action: Add +7 to BOTH Sides
               </button>
@@ -207,7 +161,7 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
                   setScaleRight(7);
                   setAddedNumber(null);
                 }}
-                className="px-4 py-2 rounded-xl bg-rose-950 hover:bg-rose-900/80 border border-rose-800 text-rose-200 text-xs font-semibold transition cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-rose-950 hover:bg-rose-900/80 border border-rose-800 text-rose-200 text-xs font-semibold transition cursor-pointer min-h-[44px]"
               >
                 Observe Sign Error: Subtract 7 from Right Only
               </button>
@@ -217,7 +171,7 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
                   setScaleRight(14);
                   setAddedNumber(null);
                 }}
-                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer"
+                className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer min-h-[44px]"
               >
                 Reset Scale
               </button>
@@ -228,14 +182,7 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
         {/* Model 2: Rainbow Expansion Visualizer */}
         {intervention.interactiveModel === 'rainbow_expansion' && (
           <div className="p-6 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-6 text-center">
-            <div className="font-mono text-2xl font-bold text-white flex items-center justify-center gap-2">
-              <span className="p-2 rounded-lg bg-indigo-600 text-white">4</span>
-              <span>(</span>
-              <span className="p-2 rounded-lg bg-violet-900/60 text-violet-200">2x</span>
-              <span className="p-2 rounded-lg bg-pink-900/60 text-pink-200">- 3</span>
-              <span>)</span>
-              <span>= 28</span>
-            </div>
+            <RainbowDistributionVisual />
 
             {/* Visual Expansion Arrows */}
             <div className="max-w-md mx-auto grid grid-cols-2 gap-3 text-xs">

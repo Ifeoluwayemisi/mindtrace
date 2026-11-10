@@ -15,6 +15,7 @@ import { QUESTION_BANK } from './data/questionBank';
 
 // Layout & Common Components
 import { Header } from './components/layout/Header';
+import { MobileBottomNav } from './components/layout/MobileBottomNav';
 import { NetworkStatusBar } from './components/common/NetworkStatusBar';
 
 // Auth & Onboarding Components
@@ -218,7 +219,7 @@ export default function App() {
       )}
 
       {/* 3. Main Dynamic Content Stage */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8 flex flex-col">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8 pb-24 lg:pb-8 flex flex-col">
         {/* ===================== AUTH & ONBOARDING VIEWS ===================== */}
         {activeView === 'splash' && (
           <SplashScreen onInitialized={() => changeView('welcome')} />
@@ -452,7 +453,7 @@ export default function App() {
       </main>
 
       {/* 4. Footer with zero fake telemetry tickers */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 px-4 sm:px-6 text-xs text-slate-500">
+      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 px-4 sm:px-6 text-xs text-slate-500 mb-14 lg:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-display font-semibold text-slate-300">MindTrace</span>
@@ -469,6 +470,17 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* 5. Mobile Bottom Navigation Bar (Persistent 1-tap mobile navigation) */}
+      {!isAuthOrOnboarding && (
+        <MobileBottomNav
+          currentRole={currentRole}
+          activeView={activeView}
+          onViewChange={changeView}
+          student={student}
+          teacher={teacher}
+        />
+      )}
     </div>
   );
 }

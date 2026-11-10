@@ -38,6 +38,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     { stepNumber: 2, actionDescription: 'Simplify expression', mathExpression: '' },
   ]);
   const [finalAnswer, setFinalAnswer] = useState('');
+  const [focusedField, setFocusedField] = useState<number | 'final'>(0);
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [activeHint, setActiveHint] = useState<string | null>(null);
 
@@ -52,6 +53,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
         mathExpression: '',
       },
     ]);
+    setFocusedField(steps.length);
   };
 
   // Remove step
@@ -62,6 +64,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
       stepNumber: i + 1,
     }));
     setSteps(updated);
+    if (focusedField === index) setFocusedField(Math.max(0, index - 1));
   };
 
   // Update step expression
@@ -71,13 +74,24 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     setSteps(updated);
   };
 
-  // Insert character from math symbol helper
-  const handleInsertSymbol = (symbol: string, targetStepIndex: number | 'final') => {
-    if (targetStepIndex === 'final') {
+  // Insert character from accessible virtual math keyboard
+  const handleInsertSymbol = (symbol: string) => {
+    if (symbol === 'CLEAR') {
+      if (focusedField === 'final') {
+        setFinalAnswer('');
+      } else {
+        const updated = [...steps];
+        updated[focusedField].mathExpression = '';
+        setSteps(updated);
+      }
+      return;
+    }
+
+    if (focusedField === 'final') {
       setFinalAnswer((prev) => prev + symbol);
     } else {
       const updated = [...steps];
-      updated[targetStepIndex].mathExpression = updated[targetStepIndex].mathExpression + symbol;
+      updated[focusedField].mathExpression = (updated[focusedField].mathExpression || '') + symbol;
       setSteps(updated);
     }
   };
@@ -334,52 +348,100 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
 
         {/* Steps List */}
         <div className="space-y-3">
-          {steps.map((step, idx) => (
-            <div
-              key={step.stepNumber}
-              className="flex items-center gap-3 p-3 rounded-2xl bg-slate-950/70 border border-slate-800 focus-within:border-indigo-500/80 transition"
-            >
-              <div className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xs font-bold text-indigo-400 font-mono shrink-0">
-                {step.stepNumber}
-              </div>
-
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={step.mathExpression}
-                  onChange={(e) => handleStepChange(idx, e.target.value)}
-                  placeholder={`e.g. ${
-                    idx === 0 ? '3x = 14 + 7' : idx === 1 ? '3x = 21' : 'x = 21 / 3'
+          {steps.map((step, idx) => {
+            const isFieldActive = focusedField === idx;
+            return (
+              <div
+                key={step.stepNumber}
+                className={`flex items-center gap-3 p-3 rounded-2xl transition ${
+                  isFieldActive
+                    ? 'bg-slate-900 border-2 border-indigo-500 shadow-md shadow-indigo-950/40'
+                    : 'bg-slate-950/70 border border-slate-800'
+                }`}
+              >
+                <div
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold font-mono shrink-0 ${
+                    isFieldActive
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-900 border border-slate-800 text-indigo-400'
                   }`}
-                  className="w-full bg-transparent text-sm font-mono text-white placeholder:text-slate-600 focus:outline-hidden"
-                />
-              </div>
-
-              {/* Quick Math Symbols for this line */}
-              <div className="hidden sm:flex items-center gap-1 text-xs">
-                {['+', '-', '=', 'x', '/'].map((sym) => (
-                  <button
-                    key={sym}
-                    type="button"
-                    onClick={() => handleInsertSymbol(sym, idx)}
-                    className="w-6 h-6 rounded bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-mono text-xs flex items-center justify-center cursor-pointer"
-                  >
-                    {sym}
-                  </button>
-                ))}
-              </div>
-
-              {steps.length > 1 && (
-                <button
-                  onClick={() => handleRemoveStep(idx)}
-                  className="p-1 text-slate-500 hover:text-rose-400 transition cursor-pointer"
-                  title="Remove step line"
                 >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          ))}
+                  {step.stepNumber}
+                </div>
+
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={step.mathExpression}
+                    onFocus={() => setFocusedField(idx)}
+                    onChange={(e) => handleStepChange(idx, e.target.value)}
+                    placeholder={`e.g. ${
+                      idx === 0 ? '3x = 14 + 7' : idx === 1 ? '3x = 21' : 'x = 21 / 3'
+                    }`}
+                    className="w-full bg-transparent text-sm sm:text-base font-mono text-white placeholder:text-slate-600 focus:outline-hidden"
+                  />
+                </div>
+
+                {isFieldActive && (
+                  <span className="text-[10px] uppercase font-mono font-bold text-indigo-400 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-800/60 hidden sm:inline">
+                    Editing
+                  </span>
+                )}
+
+                {steps.length > 1 && (
+                  <button
+                    onClick={() => handleRemoveStep(idx)}
+                    className="p-1.5 text-slate-500 hover:text-rose-400 transition cursor-pointer rounded-lg hover:bg-slate-800"
+                    title="Remove step line"
+                    aria-label={`Remove step ${step.stepNumber}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Accessible Virtual Mathematics Keypad (Touch Target >= 44px) */}
+        <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-slate-300">
+              Interactive Math Keypad:
+            </span>
+            <span className="text-[11px] font-mono text-indigo-400">
+              Inserting into {focusedField === 'final' ? 'Final Answer' : `Step ${focusedField + 1}`}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+            {[
+              { label: '+', val: ' + ' },
+              { label: '−', val: ' - ' },
+              { label: '×', val: ' * ' },
+              { label: '÷', val: ' / ' },
+              { label: '=', val: ' = ' },
+              { label: 'x', val: 'x' },
+              { label: '(', val: '(' },
+              { label: ')', val: ')' },
+              { label: '/', val: '/' },
+              { label: '⌫ Clear', val: 'CLEAR' },
+            ].map((btn) => (
+              <button
+                key={btn.label}
+                type="button"
+                onClick={() => handleInsertSymbol(btn.val)}
+                className={`min-h-[44px] rounded-xl font-mono text-sm font-bold flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                  btn.val === 'CLEAR'
+                    ? 'col-span-2 sm:col-span-1 bg-rose-950/60 text-rose-300 border border-rose-800 hover:bg-rose-900/60'
+                    : 'bg-slate-900 hover:bg-slate-800 text-white border border-slate-700/80 hover:border-indigo-500'
+                }`}
+                aria-label={`Insert mathematical symbol ${btn.label}`}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Final Answer Input */}
@@ -387,13 +449,20 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
           <label className="block text-xs font-bold text-slate-300 mb-2">
             Final Answer for {question.targetVariable}:
           </label>
-          <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-950/90 border border-indigo-900/60 focus-within:border-indigo-500">
+          <div
+            className={`flex items-center gap-3 p-3 rounded-2xl transition ${
+              focusedField === 'final'
+                ? 'bg-slate-900 border-2 border-indigo-500 shadow-md shadow-indigo-950/40'
+                : 'bg-slate-950/90 border border-indigo-900/60'
+            }`}
+          >
             <span className="font-mono text-sm font-bold text-indigo-400">
               {question.targetVariable} =
             </span>
             <input
               type="text"
               value={finalAnswer}
+              onFocus={() => setFocusedField('final')}
               onChange={(e) => setFinalAnswer(e.target.value)}
               placeholder="e.g. 7"
               className="flex-1 bg-transparent font-mono text-base font-bold text-white placeholder:text-slate-600 focus:outline-hidden"

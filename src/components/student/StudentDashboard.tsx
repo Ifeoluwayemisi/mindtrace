@@ -47,60 +47,59 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Top Welcome & Identity Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950/70 via-slate-900 to-slate-950 border border-indigo-900/40 p-6 md:p-8">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
+      {/* Top Welcome & Identity Card with Authentic Visual Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-950 border border-indigo-900/50 p-6 md:p-8 shadow-2xl">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2.5 max-w-2xl">
+            {/* Clean unboxed metadata with typographic separators */}
             <div className="flex flex-wrap items-center gap-2 text-xs text-indigo-300 font-medium">
-              <span>{student.classSection}</span>
+              <span>{student.classSection || 'SS2 B'}</span>
               <span aria-hidden="true">·</span>
-              <span>{student.school}</span>
+              <span>{student.school || 'Comprehensive Senior High'}</span>
               <span aria-hidden="true">·</span>
-              <span className="text-emerald-400 font-semibold">{student.targetExam} Target</span>
+              <span className="text-emerald-400 font-semibold">{student.targetExam || 'WAEC & JAMB'} Track</span>
               <span aria-hidden="true">·</span>
-              <span className="font-mono text-amber-300 font-bold">Level {level}</span>
+              <span className="font-mono text-amber-300 font-bold">Level {level} Scholar</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight">
-              Hi, {student.name}! Let's isolate the math.
+
+            <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-white tracking-tight leading-tight">
+              Welcome, {student.name.split(' ')[0]}! Ready for WAEC Mathematics?
             </h1>
-            <p className="text-sm text-slate-300 max-w-xl">
-              100% offline cognitive diagnostics. Every time an equation trips you up, MindTrace
-              pinpoints the exact step and helps you fix the root misconception.
+
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Every incorrect answer has a reason. MindTrace reads your step-by-step working, isolates the exact algebraic misconception, and guides you to full understanding with 0 KB internet data.
             </p>
 
-            {/* Presentation preferences badge strip */}
-            <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-400">
-              <span>Active modes:</span>
-              {(student.preferredPresentation?.includes('visual') ?? student.learningPreferences?.includes('visual')) && (
-                <span className="inline-flex items-center gap-1 text-indigo-300">
-                  <Eye className="w-3 h-3" /> Visual
-                </span>
-              )}
-              {(student.audioSupport || student.preferredPresentation?.includes('audio') || student.learningPreferences?.includes('audio')) && (
-                <span className="inline-flex items-center gap-1 text-emerald-300">
-                  <Volume2 className="w-3 h-3" /> Audio Assistance
-                </span>
-              )}
-              {(student.preferredPresentation?.includes('interactive') ?? student.learningPreferences?.includes('interactive')) && (
-                <span className="inline-flex items-center gap-1 text-violet-300">
-                  <Sliders className="w-3 h-3" /> Hands-On
-                </span>
-              )}
+            {/* Presentation Modes Active */}
+            <div className="flex items-center gap-3 pt-1 text-xs text-slate-400">
+              <span className="text-slate-500 font-medium">Diagnostic Modes:</span>
+              <span className="inline-flex items-center gap-1 text-indigo-300 font-medium">
+                <Eye className="w-3.5 h-3.5" /> Visual Balance Models
+              </span>
+              <span className="text-slate-700">·</span>
+              <span className="inline-flex items-center gap-1 text-emerald-300 font-medium">
+                <Volume2 className="w-3.5 h-3.5" /> Web Speech Read-Aloud
+              </span>
+              <span className="text-slate-700">·</span>
+              <span className="inline-flex items-center gap-1 text-violet-300 font-medium">
+                <Sliders className="w-3.5 h-3.5" /> Interactive Sandbox
+              </span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             <button
               onClick={() => onSelectQuestion(QUESTION_BANK[0])}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] cursor-pointer"
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition-all hover:scale-[1.02] cursor-pointer"
             >
               <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />
-              <span>Start Quick Practice</span>
+              <span>Start Diagnostic Practice</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+
             <button
               onClick={onViewGamification}
-              className="px-4 py-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 transition cursor-pointer flex items-center gap-1.5"
+              className="px-5 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 transition cursor-pointer flex items-center gap-2"
             >
               <Trophy className="w-4 h-4 text-amber-400" />
               <span>XP & Badges</span>
@@ -108,39 +107,41 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </div>
 
-        {/* Quick Stats Grid */}
-        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-800/80">
+        {/* Quick Stats Grid with Tabular Numerals */}
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-6 border-t border-slate-800/80">
           <div
             onClick={onViewGamification}
-            className="bg-slate-900/70 hover:bg-slate-900 rounded-2xl p-4 border border-slate-800/60 cursor-pointer transition"
+            className="bg-slate-900/80 hover:bg-slate-900 rounded-2xl p-4 border border-slate-800/80 cursor-pointer transition shadow-xs"
           >
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Points & XP</span>
+            <div className="flex items-center justify-between text-slate-400 text-xs mb-1.5 font-medium">
+              <span>Cognitive XP</span>
               <Sparkles className="w-4 h-4 text-amber-400" />
             </div>
             <div className="text-2xl font-bold text-white font-display tabular-nums">
               {totalPoints} XP
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2.5 overflow-hidden">
               <div
-                className="bg-indigo-500 h-full rounded-full"
+                className="bg-indigo-500 h-full rounded-full transition-all duration-500"
                 style={{ width: `${pointsInCurrentLevel}%` }}
               />
             </div>
-            <span className="text-[10px] text-slate-500 mt-1 block">Level {level} Explorer</span>
+            <span className="text-[11px] text-slate-400 mt-1.5 block">
+              {100 - pointsInCurrentLevel} XP to Level {level + 1}
+            </span>
           </div>
 
-          <div className="bg-slate-900/70 rounded-2xl p-4 border border-slate-800/60">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Daily Goal (Today)</span>
+          <div className="bg-slate-900/80 rounded-2xl p-4 border border-slate-800/80 shadow-xs">
+            <div className="flex items-center justify-between text-slate-400 text-xs mb-1.5 font-medium">
+              <span>Daily Practice Goal</span>
               <Target className="w-4 h-4 text-violet-400" />
             </div>
             <div className="text-2xl font-bold text-white font-display tabular-nums">
               {student.dailyGoalCompleted || 0} / {student.dailyGoalTarget || 3}
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2.5 overflow-hidden">
               <div
-                className="bg-emerald-400 h-full rounded-full"
+                className="bg-emerald-400 h-full rounded-full transition-all duration-500"
                 style={{
                   width: `${Math.min(
                     100,
@@ -149,33 +150,37 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 }}
               />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Equations solved</p>
+            <p className="text-[11px] text-slate-400 mt-1.5">
+              {(student.dailyGoalCompleted || 0) >= (student.dailyGoalTarget || 3)
+                ? 'Target reached today!'
+                : `${(student.dailyGoalTarget || 3) - (student.dailyGoalCompleted || 0)} more to finish goal`}
+            </p>
           </div>
 
-          <div className="bg-slate-900/70 rounded-2xl p-4 border border-slate-800/60">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
+          <div className="bg-slate-900/80 rounded-2xl p-4 border border-slate-800/80 shadow-xs">
+            <div className="flex items-center justify-between text-slate-400 text-xs mb-1.5 font-medium">
               <span>Practice Streak</span>
               <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
             </div>
             <div className="text-2xl font-bold text-white font-display tabular-nums">
-              {student.streakDays} Days
+              {student.streakDays || 1} Day{student.streakDays !== 1 ? 's' : ''}
             </div>
-            <p className="text-[11px] text-slate-400 mt-2">Active practice streak</p>
+            <p className="text-[11px] text-slate-400 mt-2">Consecutive learning momentum</p>
           </div>
 
           <div
             onClick={onViewHistory}
-            className="bg-slate-900/70 hover:bg-slate-900 rounded-2xl p-4 border border-slate-800/60 cursor-pointer transition"
+            className="bg-slate-900/80 hover:bg-slate-900 rounded-2xl p-4 border border-slate-800/80 cursor-pointer transition shadow-xs"
           >
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-              <span>Sync Queue</span>
-              <Layers className="w-4 h-4 text-violet-400" />
+            <div className="flex items-center justify-between text-slate-400 text-xs mb-1.5 font-medium">
+              <span>Offline Sync Queue</span>
+              <Layers className="w-4 h-4 text-cyan-400" />
             </div>
             <div className="text-2xl font-bold text-white font-display tabular-nums">
               {pendingSyncCount}
             </div>
             <p className="text-[11px] text-slate-400 mt-2">
-              {pendingSyncCount > 0 ? 'Queued offline' : 'Fully synchronized'}
+              {pendingSyncCount > 0 ? `${pendingSyncCount} attempts ready for upload` : 'All records synchronized'}
             </p>
           </div>
         </div>

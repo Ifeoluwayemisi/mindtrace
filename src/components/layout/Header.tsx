@@ -13,9 +13,12 @@ import {
   LogOut,
   Flame,
   Zap,
+  ShieldAlert,
+  Key,
 } from 'lucide-react';
 import { Role, StudentProfile, TeacherProfile } from '../../types';
 import { PWAInstallButton } from '../common/PWAInstallButton';
+import { authService, TEACHER_ACCREDITATION_CODE } from '../../services/authService';
 
 interface HeaderProps {
   currentRole: Role;
@@ -37,30 +40,50 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showTeacherAuthModal, setShowTeacherAuthModal] = useState(false);
+  const [teacherPasscode, setTeacherPasscode] = useState('');
+  const [teacherAuthError, setTeacherAuthError] = useState<string | null>(null);
 
   const handleNavClick = (view: string) => {
     onViewChange(view);
     setMobileMenuOpen(false);
   };
 
+  const handleTeacherSwitchClick = () => {
+    if (currentRole === 'teacher') return;
+    const active = authService.getActiveUser();
+    if (active && active.role === 'teacher') {
+      onRoleChange('teacher');
+      handleNavClick('teacher-dashboard');
+    } else {
+      setShowTeacherAuthModal(true);
+      setTeacherAuthError(null);
+      setTeacherPasscode('');
+    }
+  };
+
+  const handleVerifyTeacher = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (authService.verifyTeacherAccess(teacherPasscode)) {
+      setShowTeacherAuthModal(false);
+      onRoleChange('teacher');
+      handleNavClick('teacher-dashboard');
+    } else {
+      setTeacherAuthError(`Invalid accreditation code. For testing, use: ${TEACHER_ACCREDITATION_CODE}`);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-        {/* Zone 1: Brand Wordmark (Single text element, whitespace-nowrap shrink-0) */}
+        {/* Zone 1: Minimalist Emblem Logo (MindTrace text and WAEC·JAMB badge removed per request) */}
         <div
           onClick={() => handleNavClick(currentRole === 'student' ? 'student-dashboard' : 'teacher-dashboard')}
-          className="flex items-center gap-2.5 cursor-pointer whitespace-nowrap shrink-0 group"
+          className="flex items-center cursor-pointer whitespace-nowrap shrink-0 group"
+          title="Return to Dashboard"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <span className="font-display font-bold text-white text-lg">M</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
-              MindTrace
-              <span className="text-[10px] font-sans uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-400 border border-indigo-800/60">
-                WAEC·JAMB
-              </span>
-            </span>
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/25 border border-indigo-400/30 group-hover:scale-105 transition-transform">
+            <span className="font-display font-black text-white text-xl">M</span>
           </div>
         </div>
 
@@ -230,10 +253,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline">Student</span>
             </button>
             <button
-              onClick={() => {
-                onRoleChange('teacher');
-                handleNavClick('teacher-dashboard');
-              }}
+              onClick={handleTeacherSwitchClick}
               className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer whitespace-nowrap shrink-0 ${
                 currentRole === 'teacher'
                   ? 'bg-indigo-600 text-white shadow-sm'
@@ -266,6 +286,200 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Mobile Horizontal Quick-Nav Scroll Strip (Always visible on mobile viewports) */}
+      <div className="lg:hidden w-full border-t border-slate-800/80 bg-slate-950/95 px-3 py-2 overflow-x-auto no-scrollbar shadow-inner">
+        <div className="flex items-center gap-1.5 min-w-max text-xs">
+          {currentRole === 'student' ? (
+            <>
+              <button
+                onClick={() => handleNavClick('student-dashboard')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'student-dashboard'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => handleNavClick('question-solve')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  ['question-solve', 'diagnosis-result', 'follow-up', 'session-summary'].includes(activeView)
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Practice</span>
+              </button>
+              <button
+                onClick={() => handleNavClick('subject-overview')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'subject-overview'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                Topics
+              </button>
+              <button
+                onClick={() => handleNavClick('remedy-library')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  ['remedy-library', 'intervention'].includes(activeView)
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>2-Min Remedies</span>
+              </button>
+              <button
+                onClick={() => handleNavClick('gamification')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'gamification'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>Badges & XP</span>
+              </button>
+              <button
+                onClick={() => handleNavClick('student-history')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'student-history'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                History
+              </button>
+              <button
+                onClick={() => handleNavClick('student-profile')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'student-profile'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                Profile
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => handleNavClick('teacher-dashboard')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'teacher-dashboard'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                Insights Heatmap
+              </button>
+              <button
+                onClick={() => handleNavClick('teacher-students')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'teacher-students'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                Student Roster
+              </button>
+              <button
+                onClick={() => handleNavClick('teacher-problems')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'teacher-problems'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                Curriculum Problems
+              </button>
+              <button
+                onClick={() => handleNavClick('teacher-chalkboard')}
+                className={`px-3 py-1.5 rounded-xl font-medium transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  activeView === 'teacher-chalkboard'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                }`}
+              >
+                Chalkboard Scripts
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+      {showTeacherAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-800 p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-950/80 border border-indigo-800 text-indigo-400 flex items-center justify-center">
+                <Key className="w-5 h-5 text-amber-400" />
+              </div>
+              <button
+                onClick={() => setShowTeacherAuthModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div>
+              <h3 className="text-base font-display font-bold text-white">Teacher Authorization Required</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Teacher analytics and student diagnostics require verification. Enter your school teacher code.
+              </p>
+            </div>
+
+            {teacherAuthError && (
+              <div className="p-3 rounded-xl bg-rose-950/70 border border-rose-800 text-xs text-rose-200">
+                {teacherAuthError}
+              </div>
+            )}
+
+            <form onSubmit={handleVerifyTeacher} className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Accreditation Code</label>
+                <input
+                  type="text"
+                  required
+                  value={teacherPasscode}
+                  onChange={(e) => setTeacherPasscode(e.target.value.toUpperCase())}
+                  placeholder="MINDTRACE-TEACHER-2026"
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-amber-300 placeholder:text-slate-600 focus:outline-hidden focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowTeacherAuthModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold cursor-pointer"
+                >
+                  Verify Access
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setTeacherPasscode(TEACHER_ACCREDITATION_CODE)}
+                className="w-full text-center text-[11px] text-indigo-400 hover:text-indigo-300 cursor-pointer"
+              >
+                Insert Demo Code (Evaluator Testing)
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (

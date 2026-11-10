@@ -7,17 +7,53 @@
     --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+
+    /* Semantic Math & Brand Accents */
+    --color-midnight: #090d16;
+    --color-surface-card: #0e1424;
+    --color-surface-card-subtle: #131b30;
+    --color-border-subtle: rgba(255, 255, 255, 0.08);
+    --color-accent-indigo: #6366f1;
+    --color-accent-cyan: #06b6d4;
+    --color-accent-gold: #f59e0b;
   }
 }
 
 body {
   font-family: var(--font-sans);
+  background-color: #090d16;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, .font-display {
+h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 code, pre, .font-mono {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
+
+/* Accessible focus outlines across all interactive elements */
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+/* Subtle mathematical grid background helper */
+.bg-math-grid {
+  background-size: 24px 24px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* Smooth micro-interaction transitions */
+.transition-smooth {
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

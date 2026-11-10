@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, ArrowRight, BookOpen, ShieldCheck, Wifi, Zap } from 'lucide-react';
+import { ArrowRight, BookOpen, ShieldCheck, Zap } from 'lucide-react';
+import { HeroStudentIllustration } from '../common/MathVisuals';
 
 interface WelcomeScreenProps {
   onGetStarted: () => void;
@@ -11,74 +12,86 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onSignIn,
 }) => {
   return (
-    <div className="max-w-xl mx-auto my-auto min-h-[75vh] flex flex-col justify-center text-center px-4 animate-fade-in space-y-8">
-      {/* Brand & Badge */}
-      <div className="space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-800/60 text-xs font-semibold text-indigo-300">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>Wale Lab NextGen AI Hackathon · Track 1</span>
+    <div className="max-w-5xl mx-auto my-auto min-h-[75vh] flex flex-col justify-center px-4 py-8 animate-fade-in space-y-10">
+      {/* 2-Column Split Hero Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        {/* Left Column: Headlines & Academic Context */}
+        <div className="lg:col-span-7 space-y-5 text-left">
+          <div className="flex items-center gap-2 text-xs text-indigo-400 font-semibold tracking-wide">
+            <span>Wale Lab NextGen AI Hackathon</span>
+            <span aria-hidden="true">·</span>
+            <span>Track 1: Zero-Bandwidth & Localized Learning</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-[1.15]">
+            Master Secondary Mathematics Without Data Barriers.
+          </h1>
+
+          <p className="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
+            MindTrace is an AI-assisted, offline-first mathematics diagnostic platform for secondary school STEM students (SS1–SS3).
+            It parses your line-by-line working, pinpoints the root algebraic misconception, and guides you to mastery with interactive visual models — even with zero internet.
+          </p>
+
+          {/* Primary Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+            <button
+              onClick={onGetStarted}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition-all hover:scale-[1.02] cursor-pointer"
+            >
+              <span>Get Started as Student</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={onSignIn}
+              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-200 font-semibold text-sm transition cursor-pointer"
+            >
+              Sign In / Evaluator Demo
+            </button>
+          </div>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight">
-          Master Secondary Mathematics Without Data Barriers.
-        </h1>
-
-        <p className="text-sm sm:text-base text-slate-300 max-w-lg mx-auto leading-relaxed">
-          MindTrace is not another generic chatbot or multiple-choice quiz. It reads your step-by-step
-          reasoning, finds the silent mathematical misconception, and fixes it in 2 minutes — even with 0 KB of internet.
-        </p>
+        {/* Right Column: Hero Illustration */}
+        <div className="lg:col-span-5 flex justify-center lg:justify-end">
+          <div className="relative p-2 rounded-3xl bg-slate-900/40 border border-slate-800/80 shadow-2xl backdrop-blur-xs">
+            <HeroStudentIllustration className="w-full max-w-[380px] h-auto drop-shadow-lg" />
+          </div>
+        </div>
       </div>
 
-      {/* 3 Pillar Highlights */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
-          <div className="w-8 h-8 rounded-xl bg-indigo-950 text-indigo-400 flex items-center justify-center text-xs font-bold mb-2">
+      {/* 3 Academic Pillar Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-4 border-t border-slate-800/80">
+        <div className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800/80 space-y-2">
+          <div className="w-9 h-9 rounded-xl bg-indigo-950 text-indigo-400 flex items-center justify-center text-xs font-bold">
             <Zap className="w-4 h-4" />
           </div>
-          <h2 className="text-xs font-bold text-white">Cognitive Diagnosis</h2>
-          <p className="text-[11px] text-slate-400 leading-normal">
-            Identifies sign reversals, bracket distribution errors, and precedence slips.
+          <h2 className="text-sm font-display font-bold text-white">Cognitive Error Diagnosis</h2>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Diagnoses sign reversals on transposition, incomplete bracket distribution, and precedence slips in &lt;50ms.
           </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
-          <div className="w-8 h-8 rounded-xl bg-emerald-950 text-emerald-400 flex items-center justify-center text-xs font-bold mb-2">
+        <div className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800/80 space-y-2">
+          <div className="w-9 h-9 rounded-xl bg-emerald-950 text-emerald-400 flex items-center justify-center text-xs font-bold">
             <ShieldCheck className="w-4 h-4" />
           </div>
-          <h2 className="text-xs font-bold text-white">100% Offline Edge</h2>
-          <p className="text-[11px] text-slate-400 leading-normal">
-            Runs completely on your device in airplane mode with zero mobile data expenses.
+          <h2 className="text-sm font-display font-bold text-white">100% Offline Edge Execution</h2>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Runs entirely on-device via IndexedDB & Service Worker caching. Zero cellular data consumed during homework practice.
           </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-1">
-          <div className="w-8 h-8 rounded-xl bg-violet-950 text-violet-400 flex items-center justify-center text-xs font-bold mb-2">
+        <div className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800/80 space-y-2">
+          <div className="w-9 h-9 rounded-xl bg-violet-950 text-violet-400 flex items-center justify-center text-xs font-bold">
             <BookOpen className="w-4 h-4" />
           </div>
-          <h2 className="text-xs font-bold text-white">Targeted Remedies</h2>
-          <p className="text-[11px] text-slate-400 leading-normal">
-            2-minute visual explanations with balance scales and rainbow multipliers.
+          <h2 className="text-sm font-display font-bold text-white">Interactive Visual Models</h2>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Interactive balance scales and rainbow multiplier guides replace dry multiple-choice feedback with deep conceptual understanding.
           </p>
         </div>
-      </div>
-
-      {/* Primary Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-        <button
-          onClick={onGetStarted}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition-all hover:scale-[1.02] cursor-pointer"
-        >
-          <span>Get Started (New Learner)</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-
-        <button
-          onClick={onSignIn}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-semibold text-sm transition cursor-pointer"
-        >
-          Sign In / Demo Login
-        </button>
       </div>
     </div>
   );
 };
+

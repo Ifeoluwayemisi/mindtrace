@@ -11,23 +11,39 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
 }) => {
   const [identifier, setIdentifier] = useState('');
   const [demoPin, setDemoPin] = useState<string | null>(null);
+  const [enteredPin, setEnteredPin] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleRequestPin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
     const res = await authService.recoverPassword(identifier);
     setIsLoading(false);
     if (res.success && res.demoCode) {
       setDemoPin(res.demoCode);
+      setEnteredPin(res.demoCode);
+    } else {
+      setErrorMessage(res.message || 'Account not found. Please verify username or email.');
     }
   };
 
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSuccess(true);
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    const res = await authService.resetPassword(identifier, enteredPin, newPassword);
+    setIsLoading(false);
+
+    if (res.success) {
+      setIsSuccess(true);
+    } else {
+      setErrorMessage(res.message || 'Failed to update password.');
+    }
   };
 
   return (
@@ -42,6 +58,12 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
       </div>
 
       <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
+        {errorMessage && (
+          <div className="p-3.5 rounded-2xl bg-rose-950/70 border border-rose-800/80 text-rose-200 text-xs">
+            {errorMessage}
+          </div>
+        )}
+
         {!demoPin && !isSuccess && (
           <form onSubmit={handleRequestPin} className="space-y-4">
             <div>
@@ -75,7 +97,7 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
         {demoPin && !isSuccess && (
           <form onSubmit={handleResetPassword} className="space-y-4 animate-fade-in">
             <div className="p-3 rounded-xl bg-indigo-950/70 border border-indigo-800 text-xs text-indigo-300">
-              Recovery PIN generated for demo testing:{' '}
+              Recovery PIN generated for on-device verification:{' '}
               <strong className="text-amber-300 font-mono text-sm">{demoPin}</strong>
             </div>
 
@@ -86,14 +108,15 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
               <input
                 type="text"
                 required
-                defaultValue={demoPin}
+                value={enteredPin}
+                onChange={(e) => setEnteredPin(e.target.value)}
                 className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-center text-sm text-white focus:outline-hidden focus:border-indigo-500"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                New Password
+                New Password (at least 6 characters)
               </label>
               <input
                 type="password"
@@ -107,10 +130,11 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
 
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition cursor-pointer"
+              disabled={isLoading}
+              className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition cursor-pointer disabled:opacity-50"
             >
               <KeyRound className="w-4 h-4" />
-              <span>Confirm Password Reset</span>
+              <span>{isLoading ? 'Updating Password...' : 'Confirm Password Reset'}</span>
             </button>
           </form>
         )}
