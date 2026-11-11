@@ -117,16 +117,27 @@ export const teacherProfiles = pgTable(
 );
 
 // 5. CLASSROOMS
-export const classrooms = pgTable('classrooms', {
-  id: varchar('id', { length: 36 }).primaryKey(),
-  teacherId: varchar('teacher_id', { length: 36 })
-    .notNull()
-    .references(() => teacherProfiles.id, { onDelete: 'cascade' }),
-  name: varchar('name', { length: 100 }).notNull(),
-  gradeLevel: varchar('grade_level', { length: 10 }).notNull(),
-  inviteCode: varchar('invite_code', { length: 10 }).notNull().unique(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+export const classrooms = pgTable(
+  'classrooms',
+  {
+    id: varchar('id', { length: 36 }).primaryKey(),
+    teacherId: varchar('teacher_id', { length: 36 })
+      .notNull()
+      .references(() => teacherProfiles.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 100 }).notNull(),
+    gradeLevel: varchar('grade_level', { length: 10 }).notNull(),
+    subject: varchar('subject', { length: 50 }).default('Mathematics').notNull(),
+    status: varchar('status', { length: 20 }).default('active').notNull(), // 'active' | 'archived'
+    enrollmentMethod: varchar('enrollment_method', { length: 20 }).default('invite_code').notNull(), // 'invite_code' | 'open'
+    description: varchar('description', { length: 255 }),
+    inviteCode: varchar('invite_code', { length: 10 }).notNull().unique(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    statusCheck: check('chk_classroom_status', sql`${table.status} IN ('active', 'archived')`),
+    enrollmentMethodCheck: check('chk_classroom_enrollment', sql`${table.enrollmentMethod} IN ('invite_code', 'open')`),
+  })
+);
 
 // 6. CLASSROOM MEMBERSHIPS
 export const classroomMemberships = pgTable(
@@ -139,6 +150,7 @@ export const classroomMemberships = pgTable(
     studentId: varchar('student_id', { length: 36 })
       .notNull()
       .references(() => studentProfiles.id, { onDelete: 'cascade' }),
+    status: varchar('status', { length: 20 }).default('active').notNull(), // 'active' | 'removed' | 'left'
     joinedAt: timestamp('joined_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => ({

@@ -87,6 +87,10 @@ export const classrooms = sqliteTable('classrooms', {
   teacherId: text('teacher_id').notNull().references(() => teacherProfiles.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   gradeLevel: text('grade_level').notNull(),
+  subject: text('subject').default('Mathematics').notNull(),
+  status: text('status').default('active').notNull(),
+  enrollmentMethod: text('enrollment_method').default('invite_code').notNull(),
+  description: text('description'),
   inviteCode: text('invite_code').notNull().unique(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
@@ -96,6 +100,7 @@ export const classroomMemberships = sqliteTable('classroom_memberships', {
   id: text('id').primaryKey(),
   classroomId: text('classroom_id').notNull().references(() => classrooms.id, { onDelete: 'cascade' }),
   studentId: text('student_id').notNull().references(() => studentProfiles.id, { onDelete: 'cascade' }),
+  status: text('status').default('active').notNull(),
   joinedAt: text('joined_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 

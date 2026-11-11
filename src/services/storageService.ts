@@ -52,6 +52,15 @@ export const DEFAULT_TEACHER: TeacherProfile = {
   verificationStatus: 'pending',
 };
 
+export function getInitials(name: string): string {
+  if (!name || typeof name !== 'string') return 'SL';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+}
+
 class StorageService {
   private dbPromise: Promise<IDBDatabase> | null = null;
   private memoryFallback: Map<string, unknown> = new Map();
@@ -98,6 +107,7 @@ class StorageService {
       };
 
       request.onsuccess = () => resolve(request.result);
+
       request.onerror = () => {
         console.warn('IndexedDB failed to open, using memory fallback', request.error);
         reject(request.error);
@@ -129,6 +139,9 @@ class StorageService {
     }
 
     try {
+      if (profile.id) {
+        localStorage.setItem(`mindtrace_student_profile_${profile.id}`, JSON.stringify(profile));
+      }
       localStorage.setItem('mindtrace_student_profile', JSON.stringify(profile));
     } catch {
       // safe
@@ -139,17 +152,17 @@ class StorageService {
     try {
       const storedUser = localStorage.getItem('mindtrace_active_auth_user');
       const activeUser = storedUser ? JSON.parse(storedUser) : null;
-      const storedProfile = localStorage.getItem('mindtrace_student_profile');
 
       if (activeUser && activeUser.role === 'student') {
+        const studentName = activeUser.name || 'Student Learner';
         const defaultForActive: StudentProfile = {
           id: activeUser.id,
-          name: activeUser.name || 'Student Learner',
+          name: studentName,
           username: activeUser.username || 'student',
           email: activeUser.email || '',
-          grade: 'SS2',
+          grade: activeUser.grade || 'SS2',
           classSection: 'SS2 A',
-          school: 'Senior Secondary School',
+          school: activeUser.school || 'Independent Learner',
           targetExam: 'WAEC',
           preferredPresentation: ['visual', 'interactive'],
           audioSupport: false,
@@ -162,55 +175,46 @@ class StorageService {
           lastActiveDate: new Date().toISOString(),
           badgeAchievements: [],
           leaderboardOptIn: true,
-          avatarSeed: 'AD',
+          avatarSeed: getInitials(studentName),
           totalDiagnosed: 0,
           masteryPercentage: 0,
           createdAt: new Date().toISOString().split('T')[0],
         };
 
-        if (storedProfile) {
-          const parsed = JSON.parse(storedProfile);
-          if (parsed.id === activeUser.id || parsed.username === activeUser.username) {
-            return { ...defaultForActive, ...parsed };
+        // Check user-specific profile storage key first
+        const userSpecificProfile = localStorage.getItem(`mindtrace_student_profile_${activeUser.id}`);
+        if (userSpecificProfile) {
+          const parsed = JSON.parse(userSpecificProfile);
+          if (parsed.id === activeUser.id) {
+            return {
+              ...defaultForActive,
+              ...parsed,
+              school: parsed.school || defaultForActive.school,
+              avatarSeed: parsed.avatarSeed && parsed.avatarSeed !== 'AD' ? parsed.avatarSeed : getInitials(parsed.name || studentName),
+            };
           }
         }
-        return defaultForActive;
-      }
 
-      if (storedProfile) {
-        const parsed = JSON.parse(storedProfile);
-        if (parsed.username === 'aminat_diallo') {
-          return { ...DEFAULT_STUDENT, ...parsed };
+        // If active user is demo student Aminat Diallo
+        if (activeUser.username === 'aminat_diallo' || activeUser.id === DEFAULT_STUDENT.id) {
+          const storedProfile = localStorage.getItem('mindtrace_student_profile');
+          if (storedProfile) {
+            const parsed = JSON.parse(storedProfile);
+            if (parsed.username === 'aminat_diallo') {
+              return { ...DEFAULT_STUDENT, ...parsed };
+            }
+          }
+          return { ...DEFAULT_STUDENT };
         }
-        return {
-          id: parsed.id || 'stu-generic',
-          name: parsed.name || 'Student Learner',
-          username: parsed.username || 'student',
-          email: parsed.email || '',
-          grade: parsed.grade || 'SS2',
-          classSection: parsed.classSection || 'SS2 A',
-          school: parsed.school || 'Senior Secondary School',
-          targetExam: parsed.targetExam || 'WAEC',
-          preferredPresentation: parsed.preferredPresentation || ['visual', 'interactive'],
-          audioSupport: parsed.audioSupport ?? false,
-          learningPreferences: parsed.learningPreferences || ['visual', 'interactive'],
-          streakDays: parsed.streakDays || 0,
-          totalPoints: parsed.totalPoints || 0,
-          currentLevel: parsed.currentLevel || 1,
-          dailyGoalTarget: parsed.dailyGoalTarget || 3,
-          dailyGoalCompleted: parsed.dailyGoalCompleted || 0,
-          lastActiveDate: parsed.lastActiveDate || new Date().toISOString(),
-          badgeAchievements: parsed.badgeAchievements || [],
-          leaderboardOptIn: true,
-          avatarSeed: parsed.avatarSeed || 'AD',
-          totalDiagnosed: parsed.totalDiagnosed || 0,
-          masteryPercentage: parsed.masteryPercentage || 0,
-          createdAt: parsed.createdAt || new Date().toISOString().split('T')[0],
-        };
+
+        // Brand new independent student account: return pristine 0-XP profile
+        return defaultForActive;
       }
     } catch {
       // safe
     }
+
+    // Default generic pristine fallback
     return {
       id: 'stu-generic',
       name: 'Student Learner',
@@ -218,7 +222,7 @@ class StorageService {
       email: '',
       grade: 'SS2',
       classSection: 'SS2 A',
-      school: 'Senior Secondary School',
+      school: 'Independent Learner',
       targetExam: 'WAEC',
       preferredPresentation: ['visual', 'interactive'],
       audioSupport: false,
@@ -231,7 +235,7 @@ class StorageService {
       lastActiveDate: new Date().toISOString(),
       badgeAchievements: [],
       leaderboardOptIn: true,
-      avatarSeed: 'AD',
+      avatarSeed: 'SL',
       totalDiagnosed: 0,
       masteryPercentage: 0,
       createdAt: new Date().toISOString().split('T')[0],

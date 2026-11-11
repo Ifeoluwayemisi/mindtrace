@@ -24,7 +24,7 @@ authRouter.get('/csrf-token', (req: Request, res: Response) => {
  */
 authRouter.post('/register-student', authRateLimiter, async (req: Request, res: Response) => {
   try {
-    const { username, fullName, password, email, gradeLevel, targetExam } = req.body;
+    const { username, fullName, password, email, gradeLevel, targetExam, schoolName } = req.body;
 
     if (!username || !fullName || !password) {
       res.status(400).json({ error: 'Missing Required Fields', message: 'Username, full name, and password are required.' });
@@ -52,6 +52,14 @@ authRouter.post('/register-student', authRateLimiter, async (req: Request, res: 
 
     const userId = generateUUID();
     const passwordHash = await hashPassword(password);
+    const resolvedSchool = schoolName && schoolName.trim() ? schoolName.trim() : 'Independent Learner';
+    const computedInitials = (() => {
+      const parts = fullName.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return fullName.trim().substring(0, 2).toUpperCase();
+    })();
 
     // Insert user row
     await db.insert(users).values({
@@ -70,7 +78,8 @@ authRouter.post('/register-student', authRateLimiter, async (req: Request, res: 
     await db.insert(studentProfiles).values({
       id: userId,
       fullName: fullName.trim(),
-      avatarSeed: 'AD',
+      schoolName: resolvedSchool,
+      avatarSeed: computedInitials,
       gradeLevel: gradeLevel || 'SS2',
       targetExam: targetExam || 'WAEC',
       totalXp: 0,
@@ -98,6 +107,8 @@ authRouter.post('/register-student', authRateLimiter, async (req: Request, res: 
           username: username.trim(),
           fullName: fullName.trim(),
           role: 'student',
+          schoolName: resolvedSchool,
+          avatarSeed: computedInitials,
           gradeLevel: gradeLevel || 'SS2',
           targetExam: targetExam || 'WAEC',
           totalXp: 0,

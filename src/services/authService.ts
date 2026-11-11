@@ -331,7 +331,7 @@ class AuthService {
       passwordHash,
       salt,
       grade: input.grade || 'SS2',
-      school: input.school || 'Senior High School',
+      school: input.school || 'Independent Learner',
       createdAt: new Date().toISOString(),
     };
 

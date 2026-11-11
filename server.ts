@@ -66,12 +66,14 @@ import { syncRouter } from './src/routes/sync';
 import { teacherRouter } from './src/routes/teacher';
 import { aiRouter } from './src/routes/ai';
 import { adminRouter } from './src/routes/admin';
+import { studentRouter } from './src/routes/student';
 
 app.use('/api/auth', authRouter);
 app.use('/api/sync', syncRouter);
 app.use('/api/teacher', teacherRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/student', studentRouter);
 
 // 4. Health Check Endpoint
 app.get('/api/health', async (_req: Request, res: Response) => {

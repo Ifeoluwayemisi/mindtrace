@@ -23,7 +23,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [teacherCode, setTeacherCode] = useState('');
-  const [school, setSchool] = useState('Agege Comprehensive Senior High, Lagos');
+  const [school, setSchool] = useState('Independent Learner');
   const [grade, setGrade] = useState<GradeLevel>('SS2');
 
   const [isLoading, setIsLoading] = useState(false);

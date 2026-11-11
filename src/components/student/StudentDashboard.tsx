@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   ArrowRight,
@@ -16,10 +16,12 @@ import {
   Volume2,
   Eye,
   Play,
+  School,
 } from 'lucide-react';
 import { StudentProfile, Question } from '../../types';
 import { QUESTION_BANK } from '../../data/questionBank';
 import { gamificationService } from '../../services/gamificationService';
+import { StudentClassroomsModal } from './StudentClassroomsModal';
 
 interface StudentDashboardProps {
   student: StudentProfile;
@@ -42,12 +44,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onViewHistory,
   pendingSyncCount,
 }) => {
+  const [isClassroomsModalOpen, setIsClassroomsModalOpen] = useState(false);
   const totalPoints = gamificationService.calculateTotalPoints(student.id);
   const level = Math.floor(totalPoints / 100) + 1;
   const pointsInCurrentLevel = totalPoints % 100;
 
   return (
     <div className="space-y-8 animate-fade-in">
+      <StudentClassroomsModal
+        isOpen={isClassroomsModalOpen}
+        onClose={() => setIsClassroomsModalOpen(false)}
+      />
       {/* Top Welcome & Identity Card with Authentic Visual Header */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-950 border border-indigo-900/50 p-6 md:p-8 shadow-2xl">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -188,7 +195,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       </div>
 
       {/* Action Quick Links Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <button
+          onClick={() => setIsClassroomsModalOpen(true)}
+          className="p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 text-left transition cursor-pointer space-y-1"
+        >
+          <School className="w-5 h-5 text-indigo-400" />
+          <h3 className="text-xs font-bold text-white">My Classrooms</h3>
+          <p className="text-[11px] text-slate-400">Join with code</p>
+        </button>
+
         <button
           onClick={onViewSubjectOverview}
           className="p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/50 text-left transition cursor-pointer space-y-1"

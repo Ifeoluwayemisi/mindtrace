@@ -19,6 +19,7 @@ import { TeacherProfile, ClassAnalyticsSummary, StudentProfile } from '../../typ
 import { MOCK_STUDENT_ROSTER, StudentRosterItem } from '../../data/mockTeacherData';
 import { ChalkboardScriptModal } from './ChalkboardScriptModal';
 import { StudentDetailModal } from './StudentDetailModal';
+import { ClassroomManagerModal } from './ClassroomManagerModal';
 import { storageService } from '../../services/storageService';
 import { authService } from '../../services/authService';
 import { Download, ShieldCheck, Key } from 'lucide-react';
@@ -50,6 +51,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
 
   const [selectedClass, setSelectedClass] = useState(teacher.activeClass);
   const [isChalkboardOpen, setIsChalkboardOpen] = useState(openChalkboardOnMount);
+  const [isClassroomManagerOpen, setIsClassroomManagerOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentRosterItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'at-risk' | 'mastered'>('all');
@@ -163,6 +165,12 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
         onClose={() => setIsChalkboardOpen(false)}
       />
 
+      {/* Classroom Manager Modal */}
+      <ClassroomManagerModal
+        isOpen={isClassroomManagerOpen}
+        onClose={() => setIsClassroomManagerOpen(false)}
+      />
+
       {/* Student Detail Modal */}
       <StudentDetailModal
         student={selectedStudent}
@@ -268,6 +276,14 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
           >
             <FileText className="w-3.5 h-3.5" />
             <span>Chalkboard Script</span>
+          </button>
+
+          <button
+            onClick={() => setIsClassroomManagerOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition cursor-pointer"
+          >
+            <Users className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Manage Classrooms</span>
           </button>
 
           <button
