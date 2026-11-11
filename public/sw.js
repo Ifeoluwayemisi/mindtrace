@@ -11,7 +11,7 @@ const PRE_CACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.ico',
+  '/icon-512.jpg',
 ];
 
 // Patterns for assets that should be cached on-the-fly and served cache-first
