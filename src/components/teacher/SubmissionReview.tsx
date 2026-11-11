@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  CheckCircle2, 
-  AlertTriangle, 
-  ChevronLeft, 
-  ArrowRight,
+import {
+  CheckCircle2,
+  ChevronLeft,
   Clock,
-  History,
-  FileText
+  X,
+  FileText,
 } from 'lucide-react';
 import { apiRequest } from '../../services/apiClient';
 
@@ -16,9 +13,9 @@ interface SubmissionReviewProps {
   onBack: () => void;
 }
 
-export const SubmissionReview: React.FC<SubmissionReviewProps> = ({ 
-  assignmentId, 
-  onBack 
+export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
+  assignmentId,
+  onBack
 }) => {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [assignment, setAssignment] = useState<any>(null);
@@ -43,97 +40,101 @@ export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
   if (loading) {
     return (
       <div className="py-12 flex flex-col items-center justify-center gap-3">
-        <Clock className="w-8 h-8 text-indigo-500 animate-spin" />
-        <span className="text-xs text-slate-500 font-medium">Loading Submissions...</span>
+        <Clock className="w-8 h-8 text-[#2563EB] animate-spin" aria-hidden="true" />
+        <span className="text-[13px] text-[#475569] font-medium">Loading submissions…</span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={onBack}
-          className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
-        >
-          <ChevronLeft className="w-5 h-5" />
+    <div className="space-y-5 animate-fade-in">
+      <div className="flex items-center gap-3">
+        <button onClick={onBack} aria-label="Back to assignments" className="icon-btn shrink-0">
+          <ChevronLeft className="w-5 h-5" aria-hidden="true" />
         </button>
-        <div>
-          <h2 className="text-lg font-display font-extrabold text-white">{assignment?.title || 'Submission Review'}</h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Classwide Submission Summary</p>
+        <div className="min-w-0">
+          <h2 className="page-title truncate">{assignment?.title || 'Submission review'}</h2>
+          <p className="text-[11px] text-[#64748B] uppercase tracking-[0.08em] font-semibold">
+            Classwide submission summary
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Enrolled</span>
-          <div className="text-2xl font-display font-extrabold text-white">--</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="card-modern p-5 space-y-2">
+          <span className="eyebrow">Total enrolled</span>
+          <div className="text-2xl font-display font-bold text-[#0F172A]">--</div>
         </div>
-        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-          <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Submitted</span>
-          <div className="text-2xl font-display font-extrabold text-white">{submissions.length}</div>
+        <div className="card-modern p-5 space-y-2">
+          <span className="eyebrow text-[#047857]">Submitted</span>
+          <div className="text-2xl font-display font-bold text-[#0F172A] tabular-nums">
+            {submissions.length}
+          </div>
         </div>
-        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-          <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Avg. Score</span>
-          <div className="text-2xl font-display font-extrabold text-white">
-            {submissions.length > 0 
+        <div className="card-modern p-5 space-y-2">
+          <span className="eyebrow text-[#92400E]">Avg. score</span>
+          <div className="text-2xl font-display font-bold text-[#0F172A] tabular-nums">
+            {submissions.length > 0
               ? Math.round(submissions.reduce((acc, s) => acc + (s.score / s.totalMarks), 0) / submissions.length * 100) + '%'
               : '--'
             }
           </div>
         </div>
-        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
-          <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">At Risk</span>
-          <div className="text-2xl font-display font-extrabold text-white">
-             {submissions.filter(s => (s.score / s.totalMarks) < 0.6).length}
+        <div className="card-modern p-5 space-y-2 border-[#FDE68A]">
+          <span className="eyebrow text-[#92400E]">At risk</span>
+          <div className="text-2xl font-display font-bold text-[#0F172A] tabular-nums">
+            {submissions.filter(s => (s.score / s.totalMarks) < 0.6).length}
           </div>
         </div>
       </div>
 
-      <div className="rounded-3xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-xl">
+      <section className="card-modern overflow-hidden" aria-labelledby="submissions-heading">
+        <div className="p-5 border-b border-[#E2E8F0]">
+          <h3 id="submissions-heading" className="section-title">
+            Student submissions
+          </h3>
+        </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-[11px]">
-            <thead className="text-slate-500 font-bold uppercase tracking-widest border-b border-slate-800/50 bg-slate-950/20">
+          <table className="table-modern min-w-[640px]">
+            <thead>
               <tr>
-                <th className="py-4 px-6">Student</th>
-                <th className="py-4 px-4">Score</th>
-                <th className="py-4 px-4">Submission Date</th>
-                <th className="py-4 px-4">Status</th>
-                <th className="py-4 px-6 text-right">Action</th>
+                <th scope="col">Student</th>
+                <th scope="col">Score</th>
+                <th scope="col">Submitted</th>
+                <th scope="col">Status</th>
+                <th scope="col" className="text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/40">
+            <tbody>
               {submissions.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-20 text-center text-slate-500 italic font-medium bg-slate-950/10">
+                  <td colSpan={5} className="py-16 text-center text-[13px] text-[#64748B]">
                     No submissions recorded for this assignment yet.
                   </td>
                 </tr>
               ) : (
                 submissions.map((sub) => (
-                  <tr key={sub.id} className="hover:bg-slate-950/40 transition-colors group">
-                    <td className="py-4 px-6">
-                      <span className="font-bold text-slate-200 group-hover:text-white">
-                        {sub.studentName || 'Student'}
-                      </span>
+                  <tr key={sub.id}>
+                    <td className="font-semibold text-[#0F172A]">
+                      {sub.studentName || 'Student'}
                     </td>
-                    <td className="py-4 px-4 font-mono font-bold text-white tabular-nums">
+                    <td className="font-mono font-semibold text-[#0F172A] tabular-nums">
                       {Math.round((sub.score / sub.totalMarks) * 100)}%
                     </td>
-                    <td className="py-4 px-4 text-slate-500">
+                    <td className="text-[#64748B]">
                       {new Date(sub.submittedAt).toLocaleString()}
                     </td>
-                    <td className="py-4 px-4">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${sub.isLate ? 'bg-rose-950/50 text-rose-400 border border-rose-900/50' : 'bg-emerald-950/50 text-emerald-400 border border-emerald-900/50'}`}>
-                        {sub.isLate ? 'Late' : 'On Time'}
+                    <td>
+                      <span className={`badge ${sub.isLate ? 'badge-diagnostic' : 'badge-mastery'}`}>
+                        {sub.isLate ? 'Late' : 'On time'}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-right">
+                    <td className="text-right">
                       <button
                         onClick={() => setSelectedSubmission(sub)}
-                        className="px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-indigo-600 text-indigo-400 hover:text-white text-[10px] font-bold border border-slate-800 hover:border-indigo-500 transition-all cursor-pointer"
+                        className="btn-secondary min-h-[34px] px-3 text-[12px]"
                       >
-                        Review Work
+                        Review work
                       </button>
                     </td>
                   </tr>
@@ -142,70 +143,93 @@ export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      {/* Submission Detail Modal (Simplified for now) */}
+      {/* Submission Detail Modal */}
       {selectedSubmission && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-y-auto max-h-[90vh]">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-display font-extrabold text-white tracking-tight">Student Work Review</h3>
-                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{selectedSubmission.studentName}</p>
+        <div
+          className="modal-backdrop animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="work-review-title"
+        >
+          <div className="modal-surface max-w-2xl p-6 sm:p-7 space-y-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 id="work-review-title" className="section-title">
+                  Student work review
+                </h3>
+                <p className="text-[11px] text-[#64748B] font-semibold uppercase tracking-[0.08em] mt-0.5">
+                  {selectedSubmission.studentName}
+                </p>
               </div>
               <button
                 onClick={() => setSelectedSubmission(null)}
-                className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition"
+                aria-label="Close work review"
+                className="icon-btn shrink-0"
               >
-                <ChevronLeft className="w-5 h-5 rotate-180" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
-               <div className="flex justify-between items-center pb-4 border-b border-slate-800/60">
-                 <div className="text-xs text-slate-400 font-bold uppercase tracking-widest">Question Diagnostics</div>
-                 <div className="px-3 py-1 rounded-full bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 font-mono text-[10px] font-bold">
-                   Attempt #{selectedSubmission.attemptNumber || 1}
-                 </div>
-               </div>
-               
-               <div className="space-y-4">
-                 <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800/50">
-                   <div className="text-[10px] text-slate-500 font-bold uppercase mb-2">Equation Solved</div>
-                   <div className="font-mono text-xl font-bold text-white">3x - 7 = 14</div>
-                 </div>
+            <div className="p-5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4 overflow-y-auto">
+              <div className="flex flex-wrap justify-between items-center gap-2 pb-4 border-b border-[#E2E8F0]">
+                <div className="text-[11px] text-[#475569] font-semibold uppercase tracking-[0.08em]">
+                  Question diagnostics
+                </div>
+                <span className="badge badge-ai">
+                  Attempt #{selectedSubmission.attemptNumber || 1}
+                </span>
+              </div>
 
-                 <div className="space-y-3">
-                   <div className="text-[10px] text-slate-500 font-bold uppercase">Working Steps Provided</div>
-                   <div className="space-y-2">
-                     <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
-                        <span className="font-mono text-xs text-slate-300">3x = 14 + 7</span>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                     </div>
-                     <div className="p-3 rounded-xl bg-slate-900 border border-rose-900/40 flex justify-between items-center">
-                        <span className="font-mono text-xs text-rose-200">3x = 21</span>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                     </div>
-                     <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
-                        <span className="font-mono text-xs text-slate-300">x = 7</span>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                     </div>
-                   </div>
-                 </div>
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-[#E2E8F0]">
+                  <div className="text-[11px] text-[#64748B] font-semibold uppercase tracking-[0.08em] mb-2">
+                    Equation solved
+                  </div>
+                  <div className="font-mono text-xl font-semibold text-[#0F172A]">3x - 7 = 14</div>
+                </div>
 
-                 <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-900/40 flex items-center gap-3">
-                   <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                   <div className="text-xs text-emerald-300 font-bold">Mastery Confirmed: No Misconceptions Detected.</div>
-                 </div>
-               </div>
+                <div className="space-y-2.5">
+                  <div className="text-[11px] text-[#64748B] font-semibold uppercase tracking-[0.08em]">
+                    Working steps provided
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      '3x = 14 + 7',
+                      '3x = 21',
+                      'x = 7',
+                    ].map((step, idx) => (
+                      <div
+                        key={step}
+                        className="math-step math-step-completed px-3 py-2.5 flex justify-between items-center gap-2"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="math-step-badge math-step-badge-completed">{idx + 1}</span>
+                          <span className="font-mono text-[13px] text-[#0F172A] truncate">{step}</span>
+                        </div>
+                        <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0" aria-label="Step verified" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-[#059669] shrink-0" aria-hidden="true" />
+                  <div className="text-[13px] text-[#065F46] font-semibold">
+                    Mastery confirmed: no misconceptions detected.
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="flex justify-end pt-2">
-              <button
-                onClick={() => setSelectedSubmission(null)}
-                className="px-8 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow-lg shadow-indigo-600/20 transition-all"
-              >
-                Close Review
+            <div className="flex flex-wrap justify-between items-center gap-2">
+              <span className="text-[12px] text-[#64748B] inline-flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5" aria-hidden="true" />
+                Diagnostic working shown above
+              </span>
+              <button onClick={() => setSelectedSubmission(null)} className="btn-primary">
+                Close review
               </button>
             </div>
           </div>

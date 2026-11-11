@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
   CheckCircle2,
   ArrowRight,
-  Flame,
   Award,
-  RefreshCw,
+  AlertTriangle,
   Zap,
 } from 'lucide-react';
 import { Question, StudentProfile } from '../../types';
@@ -25,7 +23,6 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
   question,
   student,
   onMasteryAchieved,
-  onReturnToDashboard,
 }) => {
   const followUp = question.followUpQuestion || {
     equation: '4x - 9 = 15',
@@ -85,25 +82,22 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
-      <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 md:p-8 space-y-5 shadow-xl">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
-            Immediate Follow-Up Mastery Check
-          </span>
-          <span className="text-xs text-amber-300 font-mono font-bold">+25 XP Opportunity</span>
+      <section className="card-modern p-5 sm:p-7 space-y-5" aria-labelledby="followup-heading">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="eyebrow text-[#059669]">Immediate follow-up mastery check</span>
+          <span className="badge badge-diagnostic font-mono">+25 XP opportunity</span>
         </div>
 
-        <h2 className="text-xl font-display font-bold text-white">
-          Verify Concept Mastery
-        </h2>
-        <p className="text-xs text-slate-300">
-          Solve this follow-up equation independently to confirm that the algebraic principle is understood.
-        </p>
+        <div>
+          <h1 id="followup-heading" className="page-title">Verify concept mastery</h1>
+          <p className="body-text mt-1">
+            Solve this follow-up equation independently to confirm that the algebraic principle is understood.
+          </p>
+        </div>
 
-        {/* Audio Read-Aloud for Follow-up Equation */}
         <AudioPlayerControl
           textToSpeak={`Follow-up mastery check. Solve the equation: ${followUp.equation}. Instructions: ${followUp.prompt}`}
-          label="Listen to Follow-Up Equation"
+          label="Listen to follow-up equation"
           variant="card"
           hasAudioPreference={Boolean(
             student.audioSupport ||
@@ -112,10 +106,10 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
           )}
         />
 
-        {/* Follow-up Equation Card */}
-        <div className="py-4 px-6 rounded-2xl bg-slate-950 border border-emerald-950 text-center">
-          <p className="text-xs text-slate-400 mb-1">Solve for x:</p>
-          <div className="font-mono text-3xl font-extrabold text-white">
+        {/* Follow-up equation */}
+        <div className="py-5 px-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] bg-math-grid text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#64748B] mb-1">Solve for x</p>
+          <div className="math-expression text-3xl font-bold text-[#0F172A] break-words">
             {followUp.equation}
           </div>
         </div>
@@ -123,91 +117,90 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
         {/* Inputs */}
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1">
-              Your transition step (optional but recommended):
+            <label htmlFor="followup-step" className="label-modern">
+              Your transition step <span className="font-normal text-[#64748B]">(optional but recommended)</span>
             </label>
             <input
+              id="followup-step"
               type="text"
               value={workingStep}
               onChange={(e) => setWorkingStep(e.target.value)}
               placeholder="e.g. 4x = 15 + 9"
-              className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 font-mono text-sm text-white focus:outline-hidden focus:border-indigo-500"
+              className="input-modern input-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-200 mb-1">
-              Final value of x:
-            </label>
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-950 border border-indigo-900/60 focus-within:border-indigo-500">
-              <span className="font-mono font-bold text-indigo-400 text-sm">x =</span>
+            <label htmlFor="followup-answer" className="label-modern">Final value of x</label>
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-white border border-[#E2E8F0] focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/15">
+              <span className="math-expression font-bold text-[#2563EB] text-sm">x =</span>
               <input
+                id="followup-answer"
                 type="text"
                 value={finalAnswer}
                 onChange={(e) => setFinalAnswer(e.target.value)}
                 placeholder="e.g. 6"
-                className="flex-1 bg-transparent font-mono text-base font-bold text-white focus:outline-hidden"
+                className="flex-1 bg-transparent math-expression text-base font-bold text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
               />
             </div>
           </div>
         </div>
 
-        {/* Evaluation Output */}
+        {/* Result */}
         {isSuccess === true && (
-          <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-700/60 text-emerald-200 space-y-2 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-bold text-emerald-300">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                <span>Misconception Resolved. Correct Solution.</span>
+          <div role="status" className="rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] p-4 space-y-2 animate-fade-in">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-bold text-[#065F46]">
+                <CheckCircle2 className="w-5 h-5 text-[#059669]" aria-hidden="true" />
+                <span>Misconception resolved — correct solution</span>
               </div>
               {earnedBonusXp > 0 && (
-                <span className="text-xs font-mono font-bold text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-800">
-                  +{earnedBonusXp} XP Earned
-                </span>
+                <span className="badge badge-diagnostic font-mono">+{earnedBonusXp} XP earned</span>
               )}
             </div>
-            <p className="text-xs text-emerald-300/90 leading-relaxed">
+            <p className="text-[13px] text-[#047857] leading-relaxed">
               You applied the inverse sign transposition correctly. Your algebra mastery has
-              increased to <strong className="text-white">{student.masteryPercentage}%</strong> and
-              your practice streak is now <strong className="text-white">{student.streakDays} days</strong>.
+              increased to <strong className="text-[#064E3B]">{student.masteryPercentage}%</strong> and
+              your practice streak is now <strong className="text-[#064E3B]">{student.streakDays} days</strong>.
             </p>
           </div>
         )}
 
         {isSuccess === false && (
-          <div className="p-4 rounded-2xl bg-amber-950/60 border border-amber-800/60 text-amber-200 space-y-2 animate-fade-in">
-            <div className="flex items-center gap-2 text-sm font-bold text-amber-300">
-              <span>Check Step: Transposition Sign Reversal</span>
+          <div role="status" className="rounded-xl bg-[#FFFBEB] border border-[#FDE68A] p-4 space-y-2 animate-fade-in">
+            <div className="flex items-center gap-2 text-sm font-bold text-[#92400E]">
+              <AlertTriangle className="w-5 h-5 text-[#D97706]" aria-hidden="true" />
+              <span>Check step: transposition sign reversal</span>
             </div>
-            <p className="text-xs text-amber-300/90">
+            <p className="text-[13px] text-[#92400E]/90 leading-relaxed">
               In 4x - 9 = 15, applying the additive inverse (+9) to both sides yields 4x = 15 + 9 = 24. Dividing by coefficient 4 yields x = 6.
             </p>
           </div>
         )}
 
-        {/* Buttons */}
+        {/* Actions */}
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
           {isSuccess !== true ? (
             <button
               onClick={handleSubmit}
               disabled={isEvaluating || !finalAnswer.trim()}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition cursor-pointer disabled:opacity-50"
+              className="btn-primary w-full px-6 py-3 text-[13px]"
             >
-              <Zap className="w-4 h-4" />
-              <span>{isEvaluating ? 'Evaluating...' : 'Verify Answer'}</span>
+              <Zap className="w-4 h-4" aria-hidden="true" />
+              <span>{isEvaluating ? 'Evaluating…' : 'Verify answer'}</span>
             </button>
           ) : (
             <button
               onClick={onMasteryAchieved}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-[13px] shadow-sm transition-colors cursor-pointer"
             >
-              <Award className="w-4 h-4 text-amber-300" />
-              <span>Record Mastery & Complete Session</span>
-              <ArrowRight className="w-4 h-4" />
+              <Award className="w-4 h-4 text-[#FDE68A]" aria-hidden="true" />
+              <span>Record mastery & complete session</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </button>
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

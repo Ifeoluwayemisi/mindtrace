@@ -39,7 +39,6 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
   className = '',
 }) => {
   const {
-    state,
     isPlaying,
     isPaused,
     isSupported,
@@ -59,9 +58,9 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
       <div
         role="region"
         aria-label="Audio Read-Aloud Status"
-        className={`rounded-2xl bg-slate-900/60 border border-slate-800 p-3 text-xs text-slate-400 flex items-center gap-2.5 ${className}`}
+        className={`rounded-2xl bg-[#F1F5F9] border border-[#E2E8F0] p-3 text-xs text-[#475569] flex items-center gap-2.5 ${className}`}
       >
-        <VolumeX className="w-4 h-4 text-slate-500 shrink-0" aria-hidden="true" />
+        <VolumeX className="w-4 h-4 text-[#94A3B8] shrink-0" aria-hidden="true" />
         <span className="text-[11px] leading-relaxed">
           Audio Read-Aloud is unavailable on this browser. Mathematical text remains fully accessible.
         </span>
@@ -93,34 +92,34 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
               ? `Resume ${label}`
               : `Listen to ${label}`
           }
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer select-none focus:outline-hidden focus:ring-2 focus:ring-indigo-400 ${
+          className={`inline-flex min-h-[36px] items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#2563EB] focus-visible:outline-offset-2 ${
             isPlaying
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm shadow-amber-500/10'
+              ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
               : isPaused
-              ? 'bg-indigo-950 text-indigo-300 border border-indigo-700'
+              ? 'bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]'
               : hasAudioPreference
-              ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm'
-              : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700/80 hover:text-white'
+              ? 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm'
+              : 'bg-white hover:bg-[#F8FAFC] text-[#334155] border border-[#E2E8F0]'
           }`}
         >
           {isPlaying ? (
             <>
               {/* Equalizer Waveform indicator */}
               <span className="flex items-end gap-0.5 h-3 w-3.5 mr-0.5" aria-hidden="true">
-                <span className="w-0.5 h-3 bg-amber-400 rounded-full animate-bounce [animation-delay:0ms]" />
-                <span className="w-0.5 h-2 bg-amber-400 rounded-full animate-bounce [animation-delay:150ms]" />
-                <span className="w-0.5 h-3 bg-amber-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                <span className="w-0.5 h-3 bg-[#D97706] rounded-full animate-bounce [animation-delay:0ms]" />
+                <span className="w-0.5 h-2 bg-[#D97706] rounded-full animate-bounce [animation-delay:150ms]" />
+                <span className="w-0.5 h-3 bg-[#D97706] rounded-full animate-bounce [animation-delay:300ms]" />
               </span>
               <span>Pause</span>
             </>
           ) : isPaused ? (
             <>
-              <Play className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400" aria-hidden="true" />
+              <Play className="w-3.5 h-3.5 text-[#2563EB] fill-[#2563EB]" aria-hidden="true" />
               <span>Resume</span>
             </>
           ) : (
             <>
-              <Volume2 className="w-3.5 h-3.5 text-indigo-400" aria-hidden="true" />
+              <Volume2 className="w-3.5 h-3.5 text-[#2563EB]" aria-hidden="true" />
               <span>{label}</span>
             </>
           )}
@@ -134,7 +133,7 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
               onClick={replay}
               aria-label={`Replay ${label}`}
               title="Replay from beginning"
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
+              className="p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#475569] hover:text-[#0F172A] hover:bg-[#F8FAFC] transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
@@ -143,7 +142,7 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
               onClick={stop}
               aria-label={`Stop ${label}`}
               title="Stop playback"
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-rose-400 transition cursor-pointer"
+              className="p-1.5 min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg bg-white border border-[#E2E8F0] text-[#475569] hover:text-[#991B1B] hover:bg-[#FEF2F2] transition cursor-pointer"
             >
               <Square className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
             </button>
@@ -158,33 +157,29 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
     <section
       role="region"
       aria-label={`${label} audio controls`}
-      className={`rounded-2xl border transition-all p-3.5 sm:p-4 ${
+      className={`rounded-2xl border p-3.5 sm:p-4 transition-colors ${
         isPlaying
-          ? 'bg-gradient-to-r from-indigo-950/90 via-slate-900 to-amber-950/40 border-amber-500/50 shadow-lg shadow-indigo-950/40'
+          ? 'bg-[#FFFBEB] border-[#FDE68A]'
           : isPaused
-          ? 'bg-slate-900/90 border-indigo-700/60'
-          : hasAudioPreference
-          ? 'bg-slate-900/90 border-indigo-500/40'
-          : 'bg-slate-900/70 border-slate-800'
+          ? 'bg-[#EFF6FF] border-[#BFDBFE]'
+          : 'bg-[#F8FAFC] border-[#E2E8F0]'
       } ${className}`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Left: Indicator, Title & Waveform */}
         <div className="flex items-center gap-3">
           <div
-            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
               isPlaying
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                : isPaused
-                ? 'bg-indigo-950 text-indigo-400 border border-indigo-800'
-                : 'bg-indigo-950/70 text-indigo-400 border border-indigo-800/60'
+                ? 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]'
+                : 'bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE]'
             }`}
           >
             {isPlaying ? (
               <span className="flex items-end gap-0.5 h-4 w-4" aria-hidden="true">
-                <span className="w-1 bg-amber-400 rounded-full animate-bounce [animation-delay:0ms] h-full" />
-                <span className="w-1 bg-amber-400 rounded-full animate-bounce [animation-delay:150ms] h-2/3" />
-                <span className="w-1 bg-amber-400 rounded-full animate-bounce [animation-delay:300ms] h-4/5" />
+                <span className="w-1 bg-[#D97706] rounded-full animate-bounce [animation-delay:0ms] h-full" />
+                <span className="w-1 bg-[#D97706] rounded-full animate-bounce [animation-delay:150ms] h-2/3" />
+                <span className="w-1 bg-[#D97706] rounded-full animate-bounce [animation-delay:300ms] h-4/5" />
               </span>
             ) : isPaused ? (
               <Pause className="w-4 h-4 fill-current" aria-hidden="true" />
@@ -193,39 +188,39 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
             )}
           </div>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-white tracking-tight">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[13px] font-bold text-[#0F172A] tracking-tight">
                 {label}
               </span>
 
               {hasAudioPreference && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.2 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/80">
-                  <Sparkles className="w-2.5 h-2.5 text-amber-400" aria-hidden="true" />
-                  Your Preference Active
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#EEF2FF] text-[#4338CA] border border-[#C7D2FE]">
+                  <Sparkles className="w-2.5 h-2.5 text-[#6366F1]" aria-hidden="true" />
+                  Your preference active
                 </span>
               )}
 
               {isPlaying && (
                 <span
                   aria-live="polite"
-                  className="text-[10px] font-mono text-amber-300 font-semibold uppercase tracking-wider animate-pulse"
+                  className="text-[10px] font-mono text-[#92400E] font-semibold uppercase tracking-wider"
                 >
-                  Speaking Aloud...
+                  Speaking aloud…
                 </span>
               )}
 
               {isPaused && (
                 <span
                   aria-live="polite"
-                  className="text-[10px] font-mono text-indigo-300 font-semibold uppercase tracking-wider"
+                  className="text-[10px] font-mono text-[#1D4ED8] font-semibold uppercase tracking-wider"
                 >
                   Paused
                 </span>
               )}
             </div>
 
-            <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">
+            <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-1">
               Offline voice synthesis via native Web Speech API (0 KB network data used).
             </p>
           </div>
@@ -244,14 +239,10 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
                 ? `Resume ${label}`
                 : `Play ${label}`
             }
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md select-none focus:outline-hidden focus:ring-2 focus:ring-indigo-400 ${
+            className={`inline-flex items-center gap-2 min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer select-none shadow-sm ${
               isPlaying
-                ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-500/20'
-                : isPaused
-                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/30'
-                : hasAudioPreference
-                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/30 hover:scale-[1.02]'
-                : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                ? 'bg-[#D97706] hover:bg-[#B45309] text-white'
+                : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white'
             }`}
           >
             {isPlaying ? (
@@ -266,8 +257,8 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
               </>
             ) : (
               <>
-                <Play className="w-3.5 h-3.5 fill-current text-indigo-200" aria-hidden="true" />
-                <span>Listen Aloud</span>
+                <Play className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
+                <span>Listen aloud</span>
               </>
             )}
           </button>
@@ -279,7 +270,7 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
               onClick={replay}
               aria-label={`Replay ${label}`}
               title="Replay from start"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer"
+              className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-white hover:bg-[#F8FAFC] text-[#334155] border border-[#E2E8F0] transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
@@ -292,7 +283,7 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
               onClick={stop}
               aria-label={`Stop ${label}`}
               title="Stop playback"
-              className="p-2 rounded-xl bg-slate-800 hover:bg-rose-950 hover:text-rose-300 text-slate-300 border border-slate-700 transition cursor-pointer"
+              className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-white hover:bg-[#FEF2F2] text-[#475569] hover:text-[#991B1B] border border-[#E2E8F0] transition cursor-pointer"
             >
               <Square className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
             </button>
@@ -303,8 +294,9 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
             type="button"
             onClick={() => setShowVoiceInfo(!showVoiceInfo)}
             aria-label="Speech Synthesis Device Info"
+            aria-expanded={showVoiceInfo}
             title="Speech synthesis & offline voice details"
-            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition cursor-pointer"
+            className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl bg-white hover:bg-[#F8FAFC] text-[#64748B] hover:text-[#0F172A] border border-[#E2E8F0] transition cursor-pointer"
           >
             <Info className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
@@ -313,21 +305,21 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
 
       {/* Honest Voice Disclosure Accordion */}
       {showVoiceInfo && (
-        <div className="mt-3 pt-3 border-t border-slate-800/80 text-xs space-y-1.5 animate-fade-in">
-          <div className="flex items-center justify-between text-[11px] text-slate-300">
-            <span className="font-semibold text-slate-200">Device Speech Synthesizer:</span>
-            <span className="font-mono text-indigo-400">
-              {voiceStatus.selectedVoiceName || 'Default System Voice'}
+        <div className="mt-3 pt-3 border-t border-[#E2E8F0] text-xs space-y-1.5 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#475569]">
+            <span className="font-semibold text-[#334155]">Device speech synthesizer:</span>
+            <span className="font-mono text-[#1D4ED8]">
+              {voiceStatus.selectedVoiceName || 'Default system voice'}
             </span>
           </div>
 
-          <div className="text-[11px] text-slate-400 leading-relaxed">
+          <div className="text-[11px] text-[#64748B] leading-relaxed">
             {voiceStatus.hasVoices ? (
               <span>
                 Speech is generated locally on your device. Offline speech depends on installed OS voice packs. If your device has no installed offline voice, you can download one for free in your device's Accessibility / Text-to-Speech settings.
               </span>
             ) : (
-              <span className="text-amber-400 flex items-center gap-1">
+              <span className="text-[#92400E] flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 shrink-0" />
                 No local voice detected yet. The browser will use your default system voice synthesizer.
               </span>

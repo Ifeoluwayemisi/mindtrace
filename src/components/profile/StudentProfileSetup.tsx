@@ -8,26 +8,24 @@ import {
   Eye,
   Sliders,
   ArrowRight,
+  ArrowLeft,
 } from 'lucide-react';
 import { StudentProfile, LearningPreference, GradeLevel, ExamTrack } from '../../types';
 import { storageService } from '../../services/storageService';
 import { AudioPlayerControl } from '../common/AudioPlayerControl';
+import { AVATAR_PRESETS, resolveAvatarSrc, getInitials } from '../../utils/avatar';
 
 interface StudentProfileSetupProps {
   initialProfile: StudentProfile;
   onSetupCompleted: (updatedProfile: StudentProfile) => void;
 }
 
-const PRESET_AVATARS = [
-  { id: 'AVATAR_M1', label: 'Tunde', path: '/src/assets/images/student_avatar_male_1_1794394444739.jpg' },
-  { id: 'AVATAR_F1', label: 'Aminat', path: '/src/assets/images/student_avatar_female_1_1794394445859.jpg' },
-  { id: 'AVATAR_M2', label: 'Chidi', path: '/src/assets/images/student_avatar_male_2_1794394446145.jpg' },
-  { id: 'AVATAR_F2', label: 'Ngozi', path: '/src/assets/images/student_avatar_female_2_1794394447322.jpg' },
-  { id: 'AVATAR_M3', label: 'Segun', path: '/src/assets/images/student_avatar_male_3_1794394447398.jpg' },
-  { id: 'AVATAR_F3', label: 'Folashade', path: '/src/assets/images/student_avatar_female_3_1794394447853.jpg' },
-  { id: 'AVATAR_M4', label: 'Babatunde', path: '/src/assets/images/student_avatar_male_4_1794394448086.jpg' },
-  { id: 'AVATAR_F4', label: 'Zainab', path: '/src/assets/images/student_avatar_female_4_1794394449400.jpg' },
-];
+const STEPS = [
+  { id: 1, label: 'Avatar' },
+  { id: 2, label: 'Username & class' },
+  { id: 3, label: 'Preferences' },
+  { id: 4, label: 'Review' },
+] as const;
 
 export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
   initialProfile,
@@ -55,6 +53,9 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
 
   // Real-time username validation
   const isUsernameValid = username.trim().length >= 3 && /^[a-z0-9_]+$/.test(username.trim());
+
+  const avatarPreviewSrc = customAvatarUrl || resolveAvatarSrc(selectedAvatar);
+  const initials = getInitials(name);
 
   // Avatar Upload Handler with file validation & size limit (<1MB)
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,7 +117,7 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
       username,
       learningPreferences: finalPresentation,
       classSection: `${grade} B`,
-      avatarSeed: customAvatarUrl || (PRESET_AVATARS.find(a => a.id === selectedAvatar)?.path || selectedAvatar),
+      avatarSeed: customAvatarUrl || selectedAvatar,
     };
 
     await storageService.saveStudentProfile(updated);
@@ -124,177 +125,219 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
   };
 
   return (
-    <div className="max-w-xl mx-auto my-auto min-h-[75vh] flex flex-col justify-center px-4 animate-fade-in space-y-6">
+    <div className="max-w-xl mx-auto my-auto min-h-[75vh] flex flex-col justify-center px-4 py-8 animate-fade-in space-y-5">
       {/* Progress header */}
-      <div className="flex items-center justify-between text-xs text-[#74788E]">
-        <span className="font-mono font-bold text-[#6755E8]">Profile Customization</span>
-        <span className="font-semibold">Step {step} of 4</span>
-      </div>
-
-      <div className="w-full bg-[#E9EAF3] h-1.5 rounded-full overflow-hidden">
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between text-[12px]">
+          <span className="eyebrow">Profile setup</span>
+          <span className="font-semibold text-[#475569]">Step {step} of 4</span>
+        </div>
         <div
-          className="bg-gradient-to-r from-[#6755E8] to-[#5140CA] h-full rounded-full transition-all duration-300"
-          style={{ width: `${(step / 4) * 100}%` }}
-        />
+          className="progress-track h-1.5"
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={4}
+          aria-valuenow={step}
+          aria-label="Profile setup progress"
+        >
+          <div className="progress-fill" style={{ width: `${(step / 4) * 100}%` }} />
+        </div>
+        <ol className="flex items-center justify-between gap-1">
+          {STEPS.map((s) => (
+            <li
+              key={s.id}
+              aria-current={step === s.id ? 'step' : undefined}
+              className={`text-[10px] font-semibold truncate ${
+                step === s.id ? 'text-[#2563EB]' : step > s.id ? 'text-[#047857]' : 'text-[#94A3B8]'
+              }`}
+            >
+              {s.id}. {s.label}
+            </li>
+          ))}
+        </ol>
       </div>
 
       {/* Step 1: Avatar Selection & Upload */}
       {step === 1 && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-5 animate-fade-in">
+        <section className="card-modern p-6 sm:p-7 space-y-5 animate-fade-in" aria-labelledby="setup-avatar-heading">
           <div>
-            <h1 className="text-xl font-display font-bold text-[#252641]">Choose Your Avatar</h1>
-            <p className="text-xs text-[#74788E] mt-1">
-              Select a peer avatar or upload a custom image (max 1 MB).
+            <h1 id="setup-avatar-heading" className="page-title">
+              Pick your avatar
+            </h1>
+            <p className="body-text mt-1">
+              Choose illustrated artwork or upload your own photo (max 1 MB).
             </p>
           </div>
 
           {/* Current Avatar Preview */}
-          <div className="flex items-center justify-center py-2">
+          <div className="flex items-center justify-center py-1">
             <div className="relative">
-              {customAvatarUrl || (selectedAvatar && !PRESET_AVATARS.some(a => a.id === selectedAvatar)) ? (
-                <img
-                  src={customAvatarUrl || selectedAvatar}
-                  alt="Custom Avatar"
-                  className="w-24 h-24 rounded-3xl object-cover border-4 border-[#6755E8] shadow-lg shadow-[#6755E8]/20"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-3xl overflow-hidden border-4 border-[#6755E8] shadow-lg shadow-[#6755E8]/20 bg-[#F3F1FF]">
+              <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-[#2563EB] bg-[#EFF6FF] shadow-md flex items-center justify-center">
+                {avatarPreviewSrc ? (
                   <img
-                    src={PRESET_AVATARS.find((a) => a.id === selectedAvatar)?.path || ''}
-                    alt="Selected Avatar"
+                    src={avatarPreviewSrc}
+                    alt="Selected avatar preview"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
-                  {/* Fallback to initials if image fails or not found */}
-                  <div className="w-full h-full flex items-center justify-center font-display text-2xl font-bold text-white bg-[#6755E8]">
-                    {name.substring(0, 2).toUpperCase() || 'MT'}
-                  </div>
-                </div>
-              )}
+                ) : (
+                  <span className="font-display text-2xl font-bold text-[#1D4ED8]">{initials}</span>
+                )}
+              </div>
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 badge badge-primary shadow-sm">
+                Preview
+              </span>
             </div>
           </div>
 
           {/* Preset Grid */}
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-            {PRESET_AVATARS.map((av) => (
-              <button
-                key={av.id}
-                type="button"
-                onClick={() => {
-                  setSelectedAvatar(av.id);
-                  setCustomAvatarUrl(null);
-                }}
-                className={`group relative p-1 rounded-2xl border transition-all cursor-pointer ${
-                  selectedAvatar === av.id && !customAvatarUrl
-                    ? 'border-[#6755E8] bg-[#F3F1FF] ring-2 ring-[#6755E8]/30'
-                    : 'border-[#E9EAF3] bg-[#F8F9FF] hover:border-[#6755E8]/40'
-                }`}
-              >
-                <div className="aspect-square rounded-xl overflow-hidden bg-white shadow-2xs">
-                  <img
-                    src={av.path}
-                    alt={av.label}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-                {selectedAvatar === av.id && !customAvatarUrl && (
-                  <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#6755E8] flex items-center justify-center shadow-sm border border-white">
-                    <Check className="w-3 h-3 text-white" strokeWidth={4} />
-                  </div>
-                )}
-                <span className="text-[9px] font-bold text-[#74788E] mt-1.5 block truncate px-0.5">{av.label}</span>
-              </button>
-            ))}
-          </div>
+          <fieldset>
+            <legend className="label-modern">Illustrated presets</legend>
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5">
+              {AVATAR_PRESETS.map((av) => {
+                const active = selectedAvatar === av.id && !customAvatarUrl;
+                return (
+                  <button
+                    key={av.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedAvatar(av.id);
+                      setCustomAvatarUrl(null);
+                      setFileError(null);
+                    }}
+                    aria-pressed={active}
+                    aria-label={`Use ${av.label} avatar`}
+                    className={`group relative p-1 rounded-xl border transition-colors cursor-pointer ${
+                      active
+                        ? 'border-[#2563EB] bg-[#EFF6FF] ring-2 ring-[#2563EB]/25'
+                        : 'border-[#E2E8F0] bg-white hover:border-[#BFDBFE]'
+                    }`}
+                  >
+                    <div className="aspect-square rounded-lg overflow-hidden bg-[#F1F5F9]">
+                      <img
+                        src={av.path}
+                        alt=""
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    {active && (
+                      <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#2563EB] flex items-center justify-center shadow-sm border border-white">
+                        <Check className="w-3 h-3 text-white" strokeWidth={4} aria-hidden="true" />
+                      </span>
+                    )}
+                    <span className="text-[9px] font-semibold text-[#475569] mt-1 block truncate px-0.5 text-center">
+                      {av.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
           {/* Custom Upload */}
-          <div className="pt-2 border-t border-[#E9EAF3]">
-            <label className="block text-xs font-bold text-[#252641] mb-1.5">
-              Or Upload Custom Profile Picture
+          <div className="pt-4 border-t border-[#E2E8F0] space-y-2">
+            <label htmlFor="avatar-upload" className="label-modern">
+              Or upload a photo
             </label>
-            <div className="flex items-center gap-3">
-              <label className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-[#D4D7E8] hover:border-[#6755E8] bg-[#F8F9FF] hover:bg-[#F3F1FF] text-xs text-[#252641] font-medium cursor-pointer transition">
-                <Upload className="w-4 h-4 text-[#6755E8]" />
-                <span>Choose Image (PNG, JPG, max 1MB)</span>
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            {fileError && <p className="text-[11px] text-[#D64D31] font-semibold mt-1">{fileError}</p>}
+            <label
+              htmlFor="avatar-upload"
+              className="flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-xl border border-dashed border-[#CBD5E1] hover:border-[#2563EB] bg-[#F8FAFC] hover:bg-[#EFF6FF] text-[13px] text-[#0F172A] font-semibold cursor-pointer transition-colors"
+            >
+              <Upload className="w-4 h-4 text-[#2563EB]" aria-hidden="true" />
+              <span>Choose image (PNG, JPG, max 1 MB)</span>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handleFileUpload}
+                className="sr-only"
+              />
+            </label>
+            {fileError && (
+              <p role="alert" className="text-[12px] font-semibold text-[#92400E] bg-[#FEF3C7] border border-[#FDE68A] rounded-lg px-3 py-2">
+                {fileError}
+              </p>
+            )}
           </div>
 
-          <div className="flex justify-end pt-2">
-            <button
-              onClick={() => setStep(2)}
-              className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white text-xs font-bold shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
-            >
-              <span>Next: Username & Class</span>
-              <ArrowRight className="w-4 h-4" />
+          <div className="flex justify-end pt-1">
+            <button onClick={() => setStep(2)} className="btn-primary">
+              <span>Next: username & class</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Step 2: Username & Educational Level */}
       {step === 2 && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-5 animate-fade-in">
+        <section className="card-modern p-6 sm:p-7 space-y-5 animate-fade-in" aria-labelledby="setup-identity-heading">
           <div>
-            <h1 className="text-xl font-display font-bold text-[#252641]">Username & Educational Level</h1>
-            <p className="text-xs text-[#74788E] mt-1">
-              Your username acts as your pseudonym on class leaderboards.
+            <h1 id="setup-identity-heading" className="page-title">
+              Your name and class
+            </h1>
+            <p className="body-text mt-1">
+              Your username is the pseudonym shown on class leaderboards.
             </p>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">
-                Display Name
+              <label htmlFor="display-name" className="label-modern">
+                Display name
               </label>
               <input
+                id="display-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs text-[#252641] focus:outline-hidden focus:border-[#6755E8] focus:bg-white"
+                autoComplete="name"
+                className="input-modern"
               />
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-[#252641]">
-                  Username (@pseudonym)
+              <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                <label htmlFor="setup-username" className="label-modern mb-0">
+                  Username
                 </label>
                 {isUsernameValid ? (
-                  <span className="text-[10px] text-[#1B886B] font-bold flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Available
+                  <span className="text-[11px] text-[#047857] font-semibold inline-flex items-center gap-1">
+                    <Check className="w-3 h-3" aria-hidden="true" /> Looks good
                   </span>
                 ) : (
-                  <span className="text-[10px] text-[#B27B08] font-medium">Min 3 chars (letters, numbers, _)</span>
+                  <span className="text-[11px] text-[#92400E] font-medium">
+                    Min 3 characters (letters, numbers, _)
+                  </span>
                 )}
               </div>
-              <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white">
-                <span className="text-xs text-[#74788E] font-mono">@</span>
+              <div className="flex items-center gap-1.5 px-3 rounded-xl bg-white border border-[#E2E8F0] focus-within:border-[#2563EB] focus-within:shadow-[0_0_0_3px_rgba(37,99,235,0.14)] transition-shadow">
+                <span className="text-[14px] text-[#94A3B8] font-mono" aria-hidden="true">
+                  @
+                </span>
                 <input
+                  id="setup-username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                  className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden font-mono font-medium"
+                  autoComplete="username"
+                  className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none font-mono font-medium"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-[#252641] mb-1.5">Senior Class</label>
+                <label htmlFor="setup-grade" className="label-modern">
+                  Senior class
+                </label>
                 <select
+                  id="setup-grade"
                   value={grade}
                   onChange={(e) => setGrade(e.target.value as GradeLevel)}
-                  className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs font-semibold text-[#252641] focus:outline-hidden focus:border-[#6755E8] cursor-pointer"
+                  className="input-modern font-semibold cursor-pointer"
                 >
                   <option value="SS1">SS1 (Senior Sec 1)</option>
                   <option value="SS2">SS2 (Senior Sec 2)</option>
@@ -303,11 +346,14 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#252641] mb-1.5">Target Exam</label>
+                <label htmlFor="setup-exam" className="label-modern">
+                  Target exam
+                </label>
                 <select
+                  id="setup-exam"
                   value={targetExam}
                   onChange={(e) => setTargetExam(e.target.value as ExamTrack)}
-                  className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs font-semibold text-[#252641] focus:outline-hidden focus:border-[#6755E8] cursor-pointer"
+                  className="input-modern font-semibold cursor-pointer"
                 >
                   <option value="WAEC">WAEC General Math</option>
                   <option value="JAMB">JAMB UTME</option>
@@ -317,128 +363,133 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <button
-              onClick={() => setStep(1)}
-              className="text-xs font-bold text-[#74788E] hover:text-[#252641] transition cursor-pointer"
-            >
-              ← Back
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <button onClick={() => setStep(1)} className="btn-ghost">
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>Back</span>
             </button>
             <button
               onClick={() => setStep(3)}
               disabled={!isUsernameValid || name.trim().length < 2}
-              className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white text-xs font-bold shadow-md shadow-[#6755E8]/30 transition cursor-pointer disabled:opacity-50"
+              className="btn-primary"
             >
-              <span>Next: Learning Preferences</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Next: preferences</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Step 3: Learning Presentation Preferences */}
       {step === 3 && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-5 animate-fade-in">
+        <section className="card-modern p-6 sm:p-7 space-y-5 animate-fade-in" aria-labelledby="setup-prefs-heading">
           <div>
-            <h1 className="text-xl font-display font-bold text-[#252641]">Learning Presentation Preferences</h1>
-            <p className="text-xs text-[#74788E] mt-1">
-              Select one or multiple presentation styles. You can change these at any time in your settings.
+            <h1 id="setup-prefs-heading" className="page-title">
+              How you like to learn
+            </h1>
+            <p className="body-text mt-1">
+              Pick one or more presentation styles. You can change these any time in your profile.
             </p>
           </div>
 
           <div className="space-y-3">
             {/* Visual */}
-            <div
+            <button
+              type="button"
               onClick={() => togglePresentation('visual')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 ${
+              aria-pressed={preferredPresentation.includes('visual')}
+              className={`w-full text-left p-4 rounded-xl border transition-colors cursor-pointer flex items-start gap-3.5 ${
                 preferredPresentation.includes('visual')
-                  ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs'
-                  : 'bg-[#F8F9FF] border-[#E9EAF3] hover:border-[#D4D7E8]'
+                  ? 'bg-[#EFF6FF] border-[#2563EB]'
+                  : 'bg-white border-[#E2E8F0] hover:border-[#CBD5E1]'
               }`}
             >
-              <div className="w-10 h-10 rounded-xl bg-[#EAE6FE] text-[#6755E8] flex items-center justify-center shrink-0">
-                <Eye className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-lg bg-[#DBEAFE] text-[#1D4ED8] flex items-center justify-center shrink-0">
+                <Eye className="w-5 h-5" aria-hidden="true" />
               </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-[#252641]">Visual Explanations</h3>
-                  <div
-                    className={`w-4 h-4 rounded-md border flex items-center justify-center ${
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-[13px] font-semibold text-[#0F172A]">Visual explanations</h2>
+                  <span
+                    className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
                       preferredPresentation.includes('visual')
-                        ? 'bg-[#6755E8] border-[#6755E8] text-white'
-                        : 'border-[#D4D7E8]'
+                        ? 'bg-[#2563EB] border-[#2563EB] text-white'
+                        : 'border-[#CBD5E1]'
                     }`}
+                    aria-hidden="true"
                   >
-                    {preferredPresentation.includes('visual') && <Check className="w-3 h-3" />}
-                  </div>
+                    {preferredPresentation.includes('visual') && <Check className="w-3.5 h-3.5" />}
+                  </span>
                 </div>
-                <p className="text-[11px] text-[#74788E] mt-0.5">
+                <p className="text-[12px] text-[#475569] mt-0.5">
                   Diagrams, step comparison tables, and highlighted balance transformations.
                 </p>
               </div>
-            </div>
+            </button>
 
             {/* Audio Support (Dedicated Boolean Flag & Presentation Mode) */}
             <div
-              className={`p-4 rounded-2xl border transition-all space-y-3 ${
-                audioSupport
-                  ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs'
-                  : 'bg-[#F8F9FF] border-[#E9EAF3]'
+              className={`p-4 rounded-xl border transition-colors space-y-3 ${
+                audioSupport ? 'bg-[#ECFDF5] border-[#059669]' : 'bg-white border-[#E2E8F0]'
               }`}
             >
-              <div
-                onClick={() => togglePresentation('audio')}
-                className="flex items-start gap-3.5 cursor-pointer"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#E8F8F4] text-[#1B886B] flex items-center justify-center shrink-0">
-                  <Volume2 className="w-5 h-5" />
+              <div className="flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-lg bg-[#D1FAE5] text-[#047857] flex items-center justify-center shrink-0">
+                  <Volume2 className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-bold text-[#252641]">Audio Read-Aloud Assistance</h3>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#E8F8F4] text-[#1B886B] border border-[#CEEFE6]">
-                        Zero Data
-                      </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-[13px] font-semibold text-[#0F172A]">Audio read-aloud</h2>
+                      <span className="badge badge-mastery">Zero data</span>
                     </div>
 
-                    {/* Explicit Audio Assistance Toggle Switch */}
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${audioSupport ? 'text-[#1B886B]' : 'text-[#74788E]'}`}>
-                        {audioSupport ? 'Enabled' : 'Disabled'}
-                      </span>
-                      <div
-                        className={`w-9 h-5 rounded-full transition-colors relative p-0.5 ${
-                          audioSupport ? 'bg-[#6755E8]' : 'bg-[#D4D7E8]'
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={audioSupport}
+                      onClick={() => togglePresentation('audio')}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider ${
+                          audioSupport ? 'text-[#047857]' : 'text-[#64748B]'
                         }`}
                       >
-                        <div
-                          className={`w-4 h-4 rounded-full bg-white transition-transform ${
+                        {audioSupport ? 'Enabled' : 'Disabled'}
+                      </span>
+                      <span
+                        className={`w-9 h-5 rounded-full transition-colors relative p-0.5 block ${
+                          audioSupport ? 'bg-[#059669]' : 'bg-[#CBD5E1]'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <span
+                          className={`block w-4 h-4 rounded-full bg-white transition-transform ${
                             audioSupport ? 'translate-x-4' : 'translate-x-0'
                           }`}
                         />
-                      </div>
-                    </div>
+                      </span>
+                    </button>
                   </div>
-                  <p className="text-[11px] text-[#74788E] mt-0.5 leading-relaxed">
-                    Provides spoken read-aloud for question instructions, equation steps, and diagnostic feedback using your device's native speech engine.
+                  <p className="text-[12px] text-[#475569] mt-1 leading-relaxed">
+                    Spoken instructions, equation steps, and diagnostic feedback using your device's
+                    built-in speech engine.
                   </p>
                 </div>
               </div>
 
               {/* Interactive Audio Voice Preview Tester */}
-              <div className="pt-2 border-t border-[#E9EAF3]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                  <span className="text-[11px] text-[#252641] font-bold">
-                    Test your device voice:
-                  </span>
-                  <span className="text-[10px] text-[#74788E]">
-                    Works offline if local OS voice is installed
+              <div className="pt-3 border-t border-[#A7F3D0]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                  <span className="text-[12px] text-[#0F172A] font-semibold">Test your device voice</span>
+                  <span className="text-[11px] text-[#64748B]">
+                    Works offline with a local OS voice
                   </span>
                 </div>
                 <AudioPlayerControl
                   textToSpeak="Welcome to MindTrace. Audio read-aloud assistance is ready. I will read mathematics equations and step feedback aloud on your device."
-                  label="Sample Voice Preview"
+                  label="Sample voice preview"
                   variant="card"
                   hasAudioPreference={audioSupport}
                 />
@@ -446,114 +497,128 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
             </div>
 
             {/* Interactive */}
-            <div
+            <button
+              type="button"
               onClick={() => togglePresentation('interactive')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 ${
+              aria-pressed={preferredPresentation.includes('interactive')}
+              className={`w-full text-left p-4 rounded-xl border transition-colors cursor-pointer flex items-start gap-3.5 ${
                 preferredPresentation.includes('interactive')
-                  ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs'
-                  : 'bg-[#F8F9FF] border-[#E9EAF3] hover:border-[#D4D7E8]'
+                  ? 'bg-[#EFF6FF] border-[#2563EB]'
+                  : 'bg-white border-[#E2E8F0] hover:border-[#CBD5E1]'
               }`}
             >
-              <div className="w-10 h-10 rounded-xl bg-[#EBF8FB] text-[#167E96] flex items-center justify-center shrink-0">
-                <Sliders className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-lg bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center shrink-0">
+                <Sliders className="w-5 h-5" aria-hidden="true" />
               </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-[#252641]">Interactive Hands-On Activities</h3>
-                  <div
-                    className={`w-4 h-4 rounded-md border flex items-center justify-center ${
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-[13px] font-semibold text-[#0F172A]">Hands-on activities</h2>
+                  <span
+                    className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
                       preferredPresentation.includes('interactive')
-                        ? 'bg-[#6755E8] border-[#6755E8] text-white'
-                        : 'border-[#D4D7E8]'
+                        ? 'bg-[#2563EB] border-[#2563EB] text-white'
+                        : 'border-[#CBD5E1]'
                     }`}
+                    aria-hidden="true"
                   >
-                    {preferredPresentation.includes('interactive') && <Check className="w-3 h-3" />}
-                  </div>
+                    {preferredPresentation.includes('interactive') && (
+                      <Check className="w-3.5 h-3.5" />
+                    )}
+                  </span>
                 </div>
-                <p className="text-[11px] text-[#74788E] mt-0.5">
-                  Two-pan balance scale widgets, rainbow arrow builders, and interactive math keyboards.
+                <p className="text-[12px] text-[#475569] mt-0.5">
+                  Two-pan balance widgets, rainbow arrow builders, and interactive math keyboards.
                 </p>
               </div>
-            </div>
+            </button>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <button
-              onClick={() => setStep(2)}
-              className="text-xs font-bold text-[#74788E] hover:text-[#252641] transition cursor-pointer"
-            >
-              ← Back
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <button onClick={() => setStep(2)} className="btn-ghost">
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>Back</span>
             </button>
-            <button
-              onClick={() => setStep(4)}
-              className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white text-xs font-bold shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
-            >
-              <span>Review & Complete</span>
-              <ArrowRight className="w-4 h-4" />
+            <button onClick={() => setStep(4)} className="btn-primary">
+              <span>Review</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Step 4: Profile Completion & Celebration */}
       {step === 4 && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-6 text-center animate-fade-in">
-          <div className="w-16 h-16 rounded-full bg-[#E8F8F4] text-[#1B886B] border border-[#CEEFE6] flex items-center justify-center mx-auto shadow-xs">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
-
-          <div>
-            <h1 className="text-2xl font-display font-black text-[#252641]">Profile Configuration Complete</h1>
-            <p className="text-xs text-[#74788E] mt-1">
-              Your offline workspace is configured for your syllabus track and presentation preferences.
-            </p>
+        <section className="card-modern p-6 sm:p-7 space-y-5 animate-fade-in" aria-labelledby="setup-review-heading">
+          <div className="text-center space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0] flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-7 h-7" aria-hidden="true" />
+            </div>
+            <div>
+              <h1 id="setup-review-heading" className="page-title">
+                You're all set
+              </h1>
+              <p className="body-text mt-1">
+                Your offline workspace is configured for your syllabus track and presentation style.
+              </p>
+            </div>
           </div>
 
           {/* Profile Summary Card */}
-          <div className="p-5 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] text-left space-y-3">
-            <div className="flex items-center gap-3 pb-3 border-b border-[#E9EAF3]">
-              <div className="w-12 h-12 rounded-xl bg-white border border-[#E9EAF3] overflow-hidden shadow-xs shrink-0">
-                <img 
-                  src={customAvatarUrl || (PRESET_AVATARS.find(a => a.id === selectedAvatar)?.path || selectedAvatar)} 
-                  alt="" 
-                  className="w-full h-full object-cover" 
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                <div className="w-full h-full flex items-center justify-center font-bold text-white bg-[#6755E8] text-xs">
-                  {name.substring(0, 2).toUpperCase() || 'MT'}
-                </div>
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-left space-y-3">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#E2E8F0]">
+              <div className="w-12 h-12 rounded-xl bg-white border border-[#E2E8F0] overflow-hidden shrink-0 flex items-center justify-center">
+                {avatarPreviewSrc ? (
+                  <img
+                    src={avatarPreviewSrc}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <span className="font-display text-sm font-bold text-[#475569]">{initials}</span>
+                )}
               </div>
-              <div>
-                <span className="text-sm font-bold text-[#252641] block">{name}</span>
-                <span className="text-xs font-mono font-bold text-[#5140CA]">@{username}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <span className="text-[#74788E] block text-[11px] font-medium">Class & Target:</span>
-                <span className="text-[#252641] font-bold">{grade} · {targetExam}</span>
-              </div>
-              <div>
-                <span className="text-[#74788E] block text-[11px] font-medium">Presentation Styles:</span>
-                <span className="text-[#252641] font-bold capitalize">
-                  {[...preferredPresentation, ...(audioSupport && !preferredPresentation.includes('audio') ? ['audio'] : [])].join(', ')}
+              <div className="min-w-0">
+                <span className="text-[14px] font-semibold text-[#0F172A] block truncate">{name}</span>
+                <span className="text-[12px] font-mono font-semibold text-[#1D4ED8] truncate block">
+                  @{username}
                 </span>
               </div>
             </div>
+
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
+              <div>
+                <dt className="text-[#64748B] font-medium">Class & target</dt>
+                <dd className="text-[#0F172A] font-semibold mt-0.5">
+                  {grade} · {targetExam}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[#64748B] font-medium">Presentation styles</dt>
+                <dd className="text-[#0F172A] font-semibold mt-0.5 capitalize">
+                  {[
+                    ...preferredPresentation,
+                    ...(audioSupport && !preferredPresentation.includes('audio') ? ['audio'] : []),
+                  ].join(', ')}
+                </dd>
+              </div>
+            </dl>
           </div>
 
-          <button
-            onClick={handleFinish}
-            className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-sm shadow-xl shadow-[#6755E8]/30 transition cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-[#FFC85A] fill-[#FFC85A]" />
-            <span>Enter Mathematics Workspace</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+          <div className="flex items-center justify-between gap-3">
+            <button onClick={() => setStep(3)} className="btn-ghost">
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+              <span>Back</span>
+            </button>
+            <button onClick={handleFinish} className="btn-primary">
+              <Sparkles className="w-4 h-4" aria-hidden="true" />
+              <span>Enter math workspace</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+        </section>
       )}
     </div>
   );

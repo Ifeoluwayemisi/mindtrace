@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, AlertTriangle, Send, Clock, BookOpen, RefreshCw } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, Send, Clock, RefreshCw } from 'lucide-react';
 import { apiRequest } from '../../services/apiClient';
-import { StudentProfile, MisconceptionCode } from '../../types';
+import { resolveAvatarSrc, getInitials } from '../../utils/avatar';
 
 interface StudentDetailModalProps {
   studentId: string | null;
@@ -37,10 +37,12 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in">
-        <div className="w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl p-12 flex flex-col items-center justify-center gap-4">
-          <RefreshCw className="w-8 h-8 text-indigo-500 animate-spin" />
-          <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Fetching Student Diagnostics...</span>
+      <div className="modal-backdrop animate-fade-in">
+        <div className="modal-surface max-w-xl items-center justify-center gap-3 p-12">
+          <RefreshCw className="w-7 h-7 text-[#2563EB] animate-spin" aria-hidden="true" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#475569]">
+            Loading student diagnostics…
+          </span>
         </div>
       </div>
     );
@@ -49,129 +51,154 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
   const { student, attempts, misconceptions } = details || {};
   if (!student) return null;
 
+  const avatarSrc = resolveAvatarSrc(student.avatarSeed);
+  const safeAttempts = Array.isArray(attempts) ? attempts : [];
+  const safeMisconceptions = Array.isArray(misconceptions) ? misconceptions : [];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl p-6 space-y-5 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="modal-backdrop animate-fade-in">
+      <div className="modal-surface max-w-xl">
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shadow-sm">
-              <img 
-                src={student.avatarSeed} 
-                alt="" 
-                className="w-full h-full object-cover" 
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-              <span className="text-sm font-bold text-white bg-indigo-600 w-full h-full flex items-center justify-center">
-                {(student.fullName || 'ST').substring(0, 1).toUpperCase()}
-              </span>
+        <div className="flex items-start justify-between gap-3 border-b border-[#E2E8F0] p-5 sm:p-6">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-11 h-11 shrink-0 overflow-hidden rounded-full border border-[#E2E8F0] bg-[#F1F5F9] flex items-center justify-center">
+              {avatarSrc ? (
+                <img src={avatarSrc} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-[13px] font-bold text-[#475569]">
+                  {getInitials(student.fullName)}
+                </span>
+              )}
             </div>
-            <div>
-              <h2 className="text-base font-display font-bold text-white">{student.fullName}</h2>
-              <p className="text-xs text-slate-400">
+            <div className="min-w-0">
+              <h2 className="text-[17px] font-display font-bold text-[#0F172A] truncate">
+                {student.fullName}
+              </h2>
+              <p className="text-[12px] text-[#475569]">
                 Grade {student.gradeLevel} · Last active {student.lastActiveDate || 'Never'}
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={onClose} aria-label="Close student details" className="icon-btn shrink-0">
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto pr-1 space-y-5 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
           {/* Performance metrics */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Mastery</span>
-              <div className="text-xl font-bold text-white font-mono">{student.masteryPercentage ?? '--'}%</div>
+            <div className="card-muted p-3">
+              <span className="eyebrow block mb-1">Mastery</span>
+              <div className="text-xl font-display font-bold text-[#0F172A] tabular-nums">
+                {student.masteryPercentage ?? '--'}%
+              </div>
             </div>
-            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Total XP</span>
-              <div className="text-xl font-bold text-white font-mono">{student.totalXp}</div>
+            <div className="card-muted p-3">
+              <span className="eyebrow block mb-1">Total XP</span>
+              <div className="text-xl font-display font-bold text-[#0F172A] tabular-nums">
+                {student.totalXp ?? '--'}
+              </div>
             </div>
-            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Streak</span>
-              <div className="text-xl font-bold text-white font-mono">{student.streakDays}d</div>
+            <div className="card-muted p-3">
+              <span className="eyebrow block mb-1">Streak</span>
+              <div className="text-xl font-display font-bold text-[#0F172A] tabular-nums">
+                {student.streakDays ?? 0}d
+              </div>
             </div>
           </div>
 
           {/* Detected Misconceptions */}
           <div className="space-y-3">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-              <span>Identified Misconceptions</span>
+            <h3 className="section-title flex items-center gap-2 text-[13px] uppercase tracking-[0.08em] text-[#475569]">
+              <AlertTriangle className="w-4 h-4 text-[#D97706]" aria-hidden="true" />
+              <span>Identified misconceptions</span>
             </h3>
-            {misconceptions.length === 0 ? (
-              <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-900/30 text-xs text-emerald-300 flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <p>No active misconceptions detected. Student is performing at grade level.</p>
+
+            {safeMisconceptions.length === 0 ? (
+              <div className="flex items-start gap-3 rounded-xl border border-[#A7F3D0] bg-[#ECFDF5] p-4">
+                <CheckCircle2 className="w-5 h-5 shrink-0 text-[#059669]" aria-hidden="true" />
+                <p className="text-[13px] text-[#065F46]">
+                  No active misconceptions detected. Student is performing at grade level.
+                </p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {misconceptions.slice(0, 3).map((mis: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 text-xs"
+              <ul className="space-y-2">
+                {safeMisconceptions.slice(0, 3).map((mis: any, idx: number) => (
+                  <li
+                    key={mis.id ?? mis.code ?? idx}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-[#FDE68A] bg-[#FFFBEB] p-3.5"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-amber-950/40 border border-amber-900/30 flex items-center justify-center">
-                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 shrink-0 rounded-lg border border-[#FDE68A] bg-[#FEF3C7] flex items-center justify-center">
+                        <AlertTriangle className="w-4 h-4 text-[#D97706]" aria-hidden="true" />
                       </div>
-                      <div>
-                        <span className="font-bold text-slate-200 block">{mis.code.replace(/_/g, ' ')}</span>
-                        <span className="text-[10px] font-mono text-slate-500">Confidence: {mis.confidence}%</span>
+                      <div className="min-w-0">
+                        <span className="block text-[13px] font-semibold text-[#0F172A]">
+                          {String(mis.code || 'Misconception').replace(/_/g, ' ')}
+                        </span>
+                        <span className="text-[11px] font-mono text-[#64748B] tabular-nums">
+                          Confidence: {mis.confidence}%
+                        </span>
                       </div>
                     </div>
-
-                    <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-900/50 uppercase tracking-wider">
-                      Needs Review
-                    </span>
-                  </div>
+                    <span className="badge badge-diagnostic shrink-0">Needs review</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
 
           {/* Recent Activity */}
           <div className="space-y-3">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5" />
-              <span>Recent Diagnostic Activity</span>
+            <h3 className="section-title flex items-center gap-2 text-[13px] uppercase tracking-[0.08em] text-[#475569]">
+              <Clock className="w-4 h-4" aria-hidden="true" />
+              <span>Recent diagnostic activity</span>
             </h3>
-            <div className="space-y-2">
-              {attempts.length === 0 ? (
-                <p className="text-xs text-slate-600 italic px-4">No recent activity recorded.</p>
-              ) : (
-                attempts.map((att: any) => (
-                  <div key={att.id} className="p-3 rounded-xl bg-slate-950/50 border border-slate-800 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${att.serverIsCorrect ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                      <div>
-                        <div className="font-mono text-xs text-white">{att.equation}</div>
-                        <div className="text-[10px] text-slate-500">{new Date(att.clientTimestamp).toLocaleDateString()}</div>
+
+            {safeAttempts.length === 0 ? (
+              <p className="text-[13px] italic text-[#64748B]">No recent activity recorded.</p>
+            ) : (
+              <ul className="space-y-2">
+                {safeAttempts.map((att: any) => (
+                  <li
+                    key={att.id}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] bg-white p-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span
+                        aria-hidden="true"
+                        className={`w-2 h-2 shrink-0 rounded-full ${
+                          att.serverIsCorrect ? 'bg-[#059669]' : 'bg-[#94A3B8]'
+                        }`}
+                      />
+                      <div className="min-w-0">
+                        <div className="math-expression truncate text-[13px] font-medium text-[#0F172A]">
+                          {att.equation}
+                        </div>
+                        <div className="text-[11px] text-[#64748B]">
+                          {att.clientTimestamp
+                            ? new Date(att.clientTimestamp).toLocaleDateString()
+                            : '—'}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span
+                      className={`badge shrink-0 ${
+                        att.serverIsCorrect ? 'badge-mastery' : 'badge-neutral'
+                      }`}
+                    >
                       {att.serverIsCorrect ? 'Correct' : 'Incorrect'}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-between gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer"
-          >
+        <div className="flex items-center justify-between gap-3 border-t border-[#E2E8F0] bg-[#F8FAFC] p-4 sm:p-5">
+          <button onClick={onClose} className="btn-ghost">
             Close
           </button>
 
@@ -180,10 +207,10 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
               onPushRemedy(student.fullName);
               onClose();
             }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow-lg shadow-indigo-600/20 transition cursor-pointer"
+            className="btn-primary"
           >
-            <Send className="w-4 h-4" />
-            <span>Push Targeted Remedy</span>
+            <Send className="w-4 h-4" aria-hidden="true" />
+            <span>Push targeted remedy</span>
           </button>
         </div>
       </div>

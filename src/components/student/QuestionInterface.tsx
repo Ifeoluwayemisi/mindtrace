@@ -4,10 +4,11 @@ import {
   Plus,
   Trash2,
   Zap,
-  CheckCircle,
+  CheckCircle2,
   Lightbulb,
-  Volume2,
   Sparkles,
+  PenLine,
+  CircleDot,
 } from 'lucide-react';
 import { Question, StepSubmission, DiagnosisResult, StudentProfile } from '../../types';
 import { evaluateStudentSubmission } from '../../services/edgeRuleEngine';
@@ -164,15 +165,18 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     }, 180);
   };
 
+  const filledStepCount = steps.filter((s) => s.mathExpression.trim().length > 0).length;
+
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#74788E] hover:text-[#252641] transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 min-h-[40px] text-[13px] font-semibold text-[#475569] hover:text-[#0F172A] transition-colors cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Question Selection</span>
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+          <span>Back to question selection</span>
         </button>
         <div className="flex items-center gap-3">
           <AudioPlayerControl
@@ -181,104 +185,162 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
             variant="compact"
             hasAudioPreference={Boolean(student.audioSupport || student.preferredPresentation?.includes('audio') || student.learningPreferences?.includes('audio'))}
           />
-          <span className="text-xs text-[#6755E8] font-bold">
+          <span className="text-[12px] text-[#64748B] font-medium hidden sm:inline">
             {question.contextNote || 'WAEC Mathematics Section A'}
           </span>
         </div>
       </div>
 
-      <div className="card-modern p-6 md:p-8 space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-black uppercase tracking-wider text-[#6755E8]">
-            {question.topicTitle}
-          </span>
+      {/* Question card */}
+      <section className="card-modern p-5 sm:p-7 space-y-5" aria-labelledby="question-heading">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="eyebrow text-[#2563EB]">{question.topicTitle}</span>
           <div className="flex items-center gap-2">
-            <span className="text-xs px-3 py-1 rounded-full bg-[#F5F6FC] text-[#252641] font-bold">
-              Difficulty: {question.difficulty}
-            </span>
-            <span className="text-xs px-3 py-1 rounded-full bg-[#FFC85A]/20 text-[#B27B08] font-mono font-bold">
-              +15 XP
-            </span>
+            <span className="badge badge-neutral">Difficulty: {question.difficulty}</span>
+            <span className="badge badge-diagnostic font-mono">+15 XP</span>
           </div>
         </div>
 
-        <div className="py-6 px-6 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] text-center">
-          <p className="text-xs font-bold text-[#74788E] mb-2">Target Equation:</p>
-          <div className="font-mono text-4xl font-black text-[#252641] tracking-wide">
+        <div className="py-6 px-4 sm:px-6 rounded-2xl bg-white border border-[#E2E8F0] bg-math-grid text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.09em] text-[#64748B] mb-2">
+            Target equation
+          </p>
+          <div
+            id="question-heading"
+            className="math-expression text-3xl sm:text-4xl font-bold text-[#0F172A] tracking-wide break-words"
+          >
             {question.equation}
           </div>
         </div>
 
-        <p className="text-sm text-[#4A4D68] font-medium leading-relaxed">{question.prompt}</p>
+        <p className="body-text font-medium">{question.prompt}</p>
 
         <AudioPlayerControl
           textToSpeak={`Solve the equation: ${question.equation}. Instructions: ${question.prompt}. Focus on isolating variable ${question.targetVariable} step-by-step.`}
-          label="Listen to Question Instructions"
+          label="Listen to question instructions"
           variant="card"
           hasAudioPreference={Boolean(student.audioSupport || student.preferredPresentation?.includes('audio') || student.learningPreferences?.includes('audio'))}
         />
 
-        <div className="pt-2">
+        <div>
           {!activeHint ? (
             <button
               onClick={() => setActiveHint(`Hint: Isolate the term containing ${question.targetVariable} first by undoing operations to both sides.`)}
-              className="inline-flex items-center gap-1.5 text-xs text-[#B27B08] hover:text-[#5140CA] font-bold cursor-pointer"
+              className="inline-flex items-center gap-1.5 min-h-[40px] text-[13px] text-[#92400E] hover:text-[#B45309] font-semibold cursor-pointer"
             >
-              <Lightbulb className="w-4 h-4" />
+              <Lightbulb className="w-4 h-4" aria-hidden="true" />
               <span>Need a hint? (Recorded for teacher analytics)</span>
             </button>
           ) : (
-            <div className="p-4 rounded-xl bg-[#FFF9EB] border border-[#FCECC2] text-xs text-[#B27B08] font-medium flex items-start gap-3">
-              <Lightbulb className="w-4 h-4 text-[#B27B08] shrink-0 mt-0.5" />
-              <span>{activeHint}</span>
+            <div className="math-step math-step-ai p-4 flex items-start gap-3">
+              <span className="math-step-badge math-step-badge-ai" aria-hidden="true">
+                <Sparkles className="w-3.5 h-3.5" />
+              </span>
+              <div className="space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#4338CA]">
+                  AI guidance
+                </span>
+                <p className="text-[13px] text-[#3730A3] leading-relaxed">{activeHint}</p>
+              </div>
             </div>
           )}
         </div>
-      </div>
+      </section>
 
-      <div className="rounded-2xl bg-[#F3F1FF] border border-[#E4E0FD] p-5 space-y-3">
-        <span className="text-xs font-bold text-[#5140CA] flex items-center gap-2">
-          <Sparkles className="w-4 h-4" />
-          <span>Diagnostic Step Presets (Autofill sample working):</span>
+      {/* Sample working presets — demo aid, styled neutrally */}
+      <section className="card-flat bg-[#F8FAFC] p-4 sm:p-5 space-y-3" aria-label="Sample working presets">
+        <span className="text-[12px] font-bold text-[#334155] flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-[#6366F1]" aria-hidden="true" />
+          <span>Diagnostic step presets (autofill sample working)</span>
         </span>
         <div className="flex flex-wrap gap-2">
-          <button onClick={() => handleLoadPreset('sign_flip')} className="px-3 py-1.5 rounded-lg bg-white border border-[#E9EAF3] hover:border-[#6755E8] text-[#5140CA] text-xs font-bold transition cursor-pointer">Sign Reversal Error</button>
-          <button onClick={() => handleLoadPreset('distrib_error')} className="px-3 py-1.5 rounded-lg bg-white border border-[#E9EAF3] hover:border-[#6755E8] text-[#5140CA] text-xs font-bold transition cursor-pointer">Bracket Slip</button>
-          <button onClick={() => handleLoadPreset('correct')} className="px-3 py-1.5 rounded-lg bg-[#49C6A3] text-white text-xs font-bold transition cursor-pointer">Flawless Working</button>
-          <button onClick={() => handleLoadPreset('insufficient')} className="px-3 py-1.5 rounded-lg bg-[#E9EAF3] text-[#74788E] text-xs font-bold transition cursor-pointer">Empty Steps</button>
-        </div>
-      </div>
-
-      <div className="card-modern p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-display font-bold text-[#252641]">Your Working</h3>
-            <p className="text-xs text-[#74788E]">Enter step-by-step transformation.</p>
-          </div>
-          <button onClick={handleAddStep} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#F5F6FC] hover:bg-[#F3F1FF] text-[#6755E8] text-xs font-bold transition cursor-pointer">
-            <Plus className="w-4 h-4" /> <span>Add Line</span>
+          <button onClick={() => handleLoadPreset('sign_flip')} className="btn-secondary min-h-[36px] px-3 py-1.5 text-[12px]">Sign reversal error</button>
+          <button onClick={() => handleLoadPreset('distrib_error')} className="btn-secondary min-h-[36px] px-3 py-1.5 text-[12px]">Bracket slip</button>
+          <button onClick={() => handleLoadPreset('correct')} className="inline-flex items-center gap-1.5 min-h-[36px] px-3 py-1.5 rounded-xl bg-[#D1FAE5] text-[#065F46] border border-[#A7F3D0] text-[12px] font-bold transition hover:bg-[#A7F3D0] cursor-pointer">
+            <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
+            Flawless working
           </button>
+          <button onClick={() => handleLoadPreset('insufficient')} className="btn-secondary min-h-[36px] px-3 py-1.5 text-[12px] text-[#64748B]">Empty steps</button>
+        </div>
+      </section>
+
+      {/* Working area */}
+      <section className="card-modern p-5 sm:p-6 space-y-5" aria-labelledby="working-heading">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 id="working-heading" className="section-title">Your working</h2>
+            <p className="meta-text">Enter each step-by-step transformation.</p>
+          </div>
+          <button
+            onClick={handleAddStep}
+            className="inline-flex items-center gap-1.5 min-h-[40px] px-3.5 py-2 rounded-xl bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1D4ED8] border border-[#BFDBFE] text-[12px] font-bold transition cursor-pointer"
+          >
+            <Plus className="w-4 h-4" aria-hidden="true" /> <span>Add line</span>
+          </button>
+        </div>
+
+        {/* State legend: colour is reinforced with text and icons */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-[#64748B]" aria-hidden="true">
+          <span className="inline-flex items-center gap-1.5">
+            <CircleDot className="w-3.5 h-3.5 text-[#2563EB]" /> Current step
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" /> Completed step
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <PenLine className="w-3.5 h-3.5 text-[#94A3B8]" /> Not started
+          </span>
         </div>
 
         <div className="space-y-3">
           {steps.map((step, idx) => {
             const isFieldActive = focusedField === idx;
+            const isFilled = step.mathExpression.trim().length > 0;
+            const stateClass = isFieldActive
+              ? 'math-step-current'
+              : isFilled
+              ? 'math-step-completed'
+              : 'bg-white border border-[#E2E8F0]';
+
             return (
-              <div key={step.stepNumber} className={`flex items-center gap-3 p-3 rounded-2xl transition ${isFieldActive ? 'bg-[#F3F1FF] border-2 border-[#6755E8]' : 'bg-[#F8F9FF] border border-[#E9EAF3]'}`}>
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold font-mono shrink-0 ${isFieldActive ? 'bg-[#6755E8] text-white' : 'bg-white border border-[#E9EAF3] text-[#6755E8]'}`}>
-                  {step.stepNumber}
+              <div key={step.stepNumber} className={`math-step flex items-center gap-3 p-3 ${stateClass}`}>
+                <span
+                  className={`math-step-badge ${
+                    isFieldActive
+                      ? 'math-step-badge-current'
+                      : isFilled
+                      ? 'math-step-badge-completed'
+                      : 'bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]'
+                  }`}
+                  aria-hidden="true"
+                >
+                  {!isFieldActive && isFilled ? <CheckCircle2 className="w-4 h-4" /> : step.stepNumber}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <label htmlFor={`step-${idx}`} className="sr-only">
+                    Step {step.stepNumber} expression
+                  </label>
+                  <input
+                    id={`step-${idx}`}
+                    type="text"
+                    value={step.mathExpression}
+                    onFocus={() => setFocusedField(idx)}
+                    onChange={(e) => handleStepChange(idx, e.target.value)}
+                    placeholder="e.g. 3x = 14 + 7"
+                    aria-describedby={`step-state-${idx}`}
+                    className="w-full bg-transparent math-expression text-[15px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+                  />
+                  <span id={`step-state-${idx}`} className="sr-only">
+                    {isFieldActive ? 'Current step' : isFilled ? 'Completed step' : 'Not started'}
+                  </span>
                 </div>
-                <input
-                  type="text"
-                  value={step.mathExpression}
-                  onFocus={() => setFocusedField(idx)}
-                  onChange={(e) => handleStepChange(idx, e.target.value)}
-                  placeholder="e.g. 3x = 14 + 7"
-                  className="w-full bg-transparent text-sm font-mono text-[#252641] placeholder:text-[#B8BCD4] focus:outline-hidden"
-                />
                 {steps.length > 1 && (
-                  <button onClick={() => handleRemoveStep(idx)} className="p-1.5 text-[#B8BCD4] hover:text-[#D64D31] transition cursor-pointer rounded-lg hover:bg-[#FFF1EE]">
-                    <Trash2 className="w-4 h-4" />
+                  <button
+                    onClick={() => handleRemoveStep(idx)}
+                    aria-label={`Remove step ${step.stepNumber}`}
+                    className="p-2 rounded-lg text-[#94A3B8] hover:text-[#991B1B] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
                   </button>
                 )}
               </div>
@@ -286,35 +348,64 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
           })}
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-[#252641]">
-            <span>Math Keypad:</span>
-            <span className="text-[11px] text-[#6755E8]">Editing {focusedField === 'final' ? 'Final Answer' : `Step ${focusedField + 1}`}</span>
+        {/* Keypad */}
+        <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[12px] font-bold text-[#334155]">
+            <span>Math keypad</span>
+            <span className="text-[11px] text-[#2563EB]">
+              Editing {focusedField === 'final' ? 'final answer' : `step ${focusedField + 1}`}
+            </span>
           </div>
           <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
             {[ {label: '+', val: ' + '}, {label: '−', val: ' - '}, {label: '×', val: ' * '}, {label: '÷', val: ' / '}, {label: '=', val: ' = '}, {label: 'x', val: 'x'}, {label: '(', val: '('}, {label: ')', val: ')'}, {label: '/', val: '/'}, {label: '⌫', val: 'CLEAR'} ].map((btn) => (
-              <button key={btn.label} type="button" onClick={() => handleInsertSymbol(btn.val)} className={`min-h-[44px] rounded-xl font-mono text-sm font-bold flex items-center justify-center transition-all cursor-pointer active:scale-95 ${btn.val === 'CLEAR' ? 'bg-[#FFF1EE] text-[#D64D31] border border-[#FDDDD7]' : 'bg-white border border-[#E9EAF3] hover:border-[#6755E8] text-[#252641]'}`}>
+              <button
+                key={btn.label}
+                type="button"
+                onClick={() => handleInsertSymbol(btn.val)}
+                aria-label={btn.val === 'CLEAR' ? 'Clear current field' : `Insert ${btn.label}`}
+                className={`min-h-[44px] rounded-xl math-expression text-[15px] font-bold flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
+                  btn.val === 'CLEAR'
+                    ? 'bg-white text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9] hover:text-[#0F172A]'
+                    : 'bg-white border border-[#E2E8F0] hover:border-[#93C5FD] hover:bg-[#EFF6FF] text-[#0F172A]'
+                }`}
+              >
                 {btn.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="pt-2 border-t border-[#E9EAF3]">
-          <label className="block text-xs font-bold text-[#252641] mb-2">Final Answer:</label>
-          <div className={`flex items-center gap-3 p-3 rounded-2xl transition ${focusedField === 'final' ? 'bg-[#F3F1FF] border-2 border-[#6755E8]' : 'bg-[#F8F9FF] border border-[#E9EAF3]'}`}>
-            <span className="font-mono text-sm font-bold text-[#6755E8]">x =</span>
-            <input type="text" value={finalAnswer} onFocus={() => setFocusedField('final')} onChange={(e) => setFinalAnswer(e.target.value)} placeholder="e.g. 7" className="w-full bg-transparent font-mono text-base font-bold text-[#252641] placeholder:text-[#B8BCD4] focus:outline-hidden" />
+        {/* Final answer */}
+        <div className="pt-4 border-t border-[#E2E8F0]">
+          <label htmlFor="final-answer" className="label-modern">Final answer</label>
+          <div className={`math-step flex items-center gap-3 p-3 ${focusedField === 'final' ? 'math-step-current' : finalAnswer.trim() ? 'math-step-completed' : 'bg-white border border-[#E2E8F0]'}`}>
+            <span className="math-expression text-[15px] font-bold text-[#2563EB] pl-1">{question.targetVariable} =</span>
+            <input
+              id="final-answer"
+              type="text"
+              value={finalAnswer}
+              onFocus={() => setFocusedField('final')}
+              onChange={(e) => setFinalAnswer(e.target.value)}
+              placeholder="e.g. 7"
+              className="w-full bg-transparent math-expression text-lg font-bold text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+            />
           </div>
         </div>
 
-        <div className="pt-4 flex items-center justify-between gap-3">
-          <div className="text-xs text-[#74788E] font-medium">Deterministic engine: &lt;50ms response.</div>
-          <button onClick={handleDiagnose} disabled={isDiagnosing} className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white font-bold text-sm shadow-xl shadow-[#6755E8]/20 transition-all hover:scale-[1.02] cursor-pointer">
-            <Zap className="w-4 h-4" /> <span>{isDiagnosing ? 'Diagnosing...' : 'Diagnose Steps'}</span>
+        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="text-[12px] text-[#64748B] font-medium">
+            {filledStepCount} of {steps.length} lines filled · Deterministic engine: &lt;50ms response.
+          </div>
+          <button
+            onClick={handleDiagnose}
+            disabled={isDiagnosing}
+            className="btn-primary w-full sm:w-auto px-6 py-3 text-sm"
+          >
+            <Zap className="w-4 h-4" aria-hidden="true" />
+            <span>{isDiagnosing ? 'Diagnosing…' : 'Diagnose steps'}</span>
           </button>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

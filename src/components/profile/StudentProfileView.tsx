@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 import {
-  User,
-  Settings,
-  Shield,
-  Database,
-  Upload,
   Check,
   CheckCircle2,
-  Lock,
   Volume2,
   Eye,
   Sliders,
-  Sparkles,
   LogOut,
-  RefreshCw,
   Download,
+  Upload,
 } from 'lucide-react';
 import { StudentProfile, LearningPreference, GradeLevel, ExamTrack } from '../../types';
 import { storageService } from '../../services/storageService';
 import { AudioPlayerControl } from '../common/AudioPlayerControl';
+import { AVATAR_PRESETS, resolveAvatarSrc, getInitials } from '../../utils/avatar';
 
 interface StudentProfileViewProps {
   student: StudentProfile;
@@ -26,23 +20,14 @@ interface StudentProfileViewProps {
   onLogout: () => void;
 }
 
-const PRESET_AVATARS = [
-  { id: 'AVATAR_M1', label: 'Tunde', path: '/src/assets/images/student_avatar_male_1_1794394444739.jpg' },
-  { id: 'AVATAR_F1', label: 'Aminat', path: '/src/assets/images/student_avatar_female_1_1794394445859.jpg' },
-  { id: 'AVATAR_M2', label: 'Chidi', path: '/src/assets/images/student_avatar_male_2_1794394446145.jpg' },
-  { id: 'AVATAR_F2', label: 'Ngozi', path: '/src/assets/images/student_avatar_female_2_1794394447322.jpg' },
-  { id: 'AVATAR_M3', label: 'Segun', path: '/src/assets/images/student_avatar_male_3_1794394447398.jpg' },
-  { id: 'AVATAR_F3', label: 'Folashade', path: '/src/assets/images/student_avatar_female_3_1794394447853.jpg' },
-  { id: 'AVATAR_M4', label: 'Babatunde', path: '/src/assets/images/student_avatar_male_4_1794394448086.jpg' },
-  { id: 'AVATAR_F4', label: 'Zainab', path: '/src/assets/images/student_avatar_female_4_1794394449400.jpg' },
-];
+type ProfileSection = 'profile' | 'preferences' | 'privacy' | 'storage';
 
 export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
   student,
   onProfileUpdated,
   onLogout,
 }) => {
-  const [activeSection, setActiveSection] = useState<'profile' | 'preferences' | 'privacy' | 'storage'>('profile');
+  const [activeSection, setActiveSection] = useState<ProfileSection>('profile');
 
   // Form states
   const [name, setName] = useState(student.name);
@@ -67,6 +52,9 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
     setSaveToast(msg);
     setTimeout(() => setSaveToast(null), 3000);
   };
+
+  const avatarSrc = resolveAvatarSrc(avatarSeed);
+  const initials = getInitials(name);
 
   const togglePresentation = (pref: LearningPreference) => {
     if (pref === 'audio') {
@@ -131,120 +119,165 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
     reader.readAsDataURL(file);
   };
 
+  const sections: Array<{ key: ProfileSection; label: string }> = [
+    { key: 'profile', label: 'Personal info' },
+    { key: 'preferences', label: 'Presentation' },
+    { key: 'privacy', label: 'Privacy' },
+    { key: 'storage', label: 'Offline data' },
+  ];
+
+  const preferenceCards: Array<{
+    key: LearningPreference;
+    title: string;
+    description: string;
+    icon: typeof Eye;
+    tone: string;
+  }> = [
+    {
+      key: 'visual',
+      title: 'Visual diagrams & comparison tables',
+      description: 'Step transitions highlighted with side-by-side formulas.',
+      icon: Eye,
+      tone: 'bg-[#DBEAFE] text-[#1D4ED8]',
+    },
+    {
+      key: 'interactive',
+      title: 'Hands-on manipulatives',
+      description: 'Manipulate balance scale pans and rainbow brackets with sliders.',
+      icon: Sliders,
+      tone: 'bg-[#E0F2FE] text-[#0369A1]',
+    },
+  ];
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-12">
       {saveToast && (
-        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-[#6755E8] text-white shadow-xl text-xs font-bold flex items-center gap-2 animate-bounce">
-          <CheckCircle2 className="w-4 h-4 text-[#49C6A3]" />
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 px-4 py-3 rounded-xl bg-white border border-[#A7F3D0] shadow-lg text-[13px] font-semibold text-[#065F46] flex items-center gap-2 animate-fade-in"
+        >
+          <CheckCircle2 className="w-4 h-4 text-[#059669]" aria-hidden="true" />
           <span>{saveToast}</span>
         </div>
       )}
 
-      {/* Top Banner Overview */}
-      <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-[#F3F1FF] border-2 border-[#6755E8] flex items-center justify-center font-bold text-white text-xl overflow-hidden shadow-sm shrink-0">
-            <img 
-              src={avatarSeed} 
-              alt="" 
-              className="w-full h-full object-cover" 
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-            <div className="w-full h-full flex items-center justify-center font-display text-2xl font-bold text-white bg-[#6755E8]">
-              {name.substring(0, 2).toUpperCase() || 'MT'}
+      {/* Profile header */}
+      <section className="card-modern p-5 sm:p-7" aria-labelledby="profile-heading">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] overflow-hidden flex items-center justify-center shrink-0">
+              {avatarSrc ? (
+                <img
+                  src={avatarSrc}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <span className="font-display text-xl font-bold text-[#1D4ED8]">{initials}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <h1 id="profile-heading" className="page-title truncate">
+                {student.name}
+              </h1>
+              <p className="text-[13px] text-[#1D4ED8] font-mono font-semibold truncate">
+                @{student.username}
+              </p>
+              <p className="text-[13px] text-[#475569] mt-0.5 truncate">
+                {student.classSection} · {student.school} · {student.targetExam} track
+              </p>
             </div>
           </div>
-          <div>
-            <h1 className="text-xl font-display font-extrabold text-[#252641]">{student.name}</h1>
-            <p className="text-xs text-[#5140CA] font-mono font-bold">@{student.username}</p>
-            <p className="text-xs text-[#74788E] mt-0.5">
-              {student.classSection} · {student.school} · {student.targetExam} Target
-            </p>
-          </div>
+
+          <button onClick={onLogout} className="btn-secondary self-start sm:self-center shrink-0">
+            <LogOut className="w-4 h-4" aria-hidden="true" />
+            <span>Sign out</span>
+          </button>
         </div>
+      </section>
 
-        <button
-          onClick={onLogout}
-          className="self-start sm:self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F5F6FC] hover:bg-[#FFF1EE] hover:text-[#D64D31] hover:border-[#FF9078] border border-[#E9EAF3] text-xs font-bold text-[#74788E] transition cursor-pointer"
+      {/* Section navigation */}
+      <div className="overflow-x-auto -mx-1 px-1">
+        <div
+          role="tablist"
+          aria-label="Profile sections"
+          className="flex items-center gap-1 p-1 bg-[#F1F5F9] border border-[#E2E8F0] rounded-xl w-fit"
         >
-          <LogOut className="w-3.5 h-3.5" />
-          <span>Switch Profile / Sign Out</span>
-        </button>
-      </div>
-
-      {/* Settings Navigation Tabs */}
-      <div className="flex items-center gap-1 p-1 bg-[#F5F6FC] border border-[#E9EAF3] rounded-xl w-fit">
-        <button
-          onClick={() => setActiveSection('profile')}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
-            activeSection === 'profile' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
-          }`}
-        >
-          Personal Info
-        </button>
-        <button
-          onClick={() => setActiveSection('preferences')}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
-            activeSection === 'preferences' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
-          }`}
-        >
-          Presentation Styles
-        </button>
-        <button
-          onClick={() => setActiveSection('privacy')}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
-            activeSection === 'privacy' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
-          }`}
-        >
-          Privacy & Leaderboard
-        </button>
-        <button
-          onClick={() => setActiveSection('storage')}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
-            activeSection === 'storage' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
-          }`}
-        >
-          Offline Storage & Sync
-        </button>
+          {sections.map((section) => {
+            const active = activeSection === section.key;
+            return (
+              <button
+                key={section.key}
+                role="tab"
+                aria-selected={active}
+                onClick={() => setActiveSection(section.key)}
+                className={`px-3.5 min-h-[38px] text-[12px] font-semibold rounded-lg whitespace-nowrap transition-colors cursor-pointer ${
+                  active
+                    ? 'bg-white text-[#0F172A] shadow-sm border border-[#E2E8F0]'
+                    : 'text-[#475569] hover:text-[#0F172A] border border-transparent'
+                }`}
+              >
+                {section.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Section 1: Personal Info & Avatar */}
       {activeSection === 'profile' && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-5 animate-fade-in">
+        <section className="card-modern p-5 sm:p-7 space-y-5 animate-fade-in" aria-labelledby="personal-heading">
           <div>
-            <h2 className="text-base font-display font-bold text-[#252641]">Edit Student Details</h2>
-            <p className="text-xs text-[#74788E]">Update your school information and avatar.</p>
+            <h2 id="personal-heading" className="section-title">
+              Student details
+            </h2>
+            <p className="text-[13px] text-[#475569] mt-1">
+              Update your school information and avatar.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">Full Name</label>
+              <label htmlFor="profile-name" className="label-modern">
+                Full name
+              </label>
               <input
+                id="profile-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs text-[#252641] focus:outline-hidden focus:border-[#6755E8] focus:bg-white"
+                autoComplete="name"
+                className="input-modern"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">Username</label>
+              <label htmlFor="profile-username" className="label-modern">
+                Username
+              </label>
               <input
+                id="profile-username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] font-mono text-xs text-[#252641] font-bold focus:outline-hidden focus:border-[#6755E8] focus:bg-white"
+                autoComplete="username"
+                className="input-modern font-mono font-semibold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">Class Level</label>
+              <label htmlFor="profile-grade" className="label-modern">
+                Class level
+              </label>
               <select
+                id="profile-grade"
                 value={grade}
                 onChange={(e) => setGrade(e.target.value as GradeLevel)}
-                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs font-semibold text-[#252641] focus:outline-hidden focus:border-[#6755E8] cursor-pointer"
+                className="input-modern font-semibold cursor-pointer"
               >
                 <option value="SS1">SS1</option>
                 <option value="SS2">SS2</option>
@@ -253,11 +286,14 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">Target Exam</label>
+              <label htmlFor="profile-exam" className="label-modern">
+                Target exam
+              </label>
               <select
+                id="profile-exam"
                 value={targetExam}
                 onChange={(e) => setTargetExam(e.target.value as ExamTrack)}
-                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs font-semibold text-[#252641] focus:outline-hidden focus:border-[#6755E8] cursor-pointer"
+                className="input-modern font-semibold cursor-pointer"
               >
                 <option value="WAEC">WAEC General Mathematics</option>
                 <option value="JAMB">JAMB UTME</option>
@@ -267,247 +303,263 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
           </div>
 
           {/* Change Avatar */}
-          <div className="pt-3 border-t border-[#E9EAF3] space-y-3">
-            <label className="block text-xs font-bold text-[#252641]">Choose Peer Avatar</label>
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-              {PRESET_AVATARS.map((av) => (
-                <button
-                  key={av.id}
-                  onClick={() => setAvatarSeed(av.path)}
-                  className={`group relative p-1 rounded-2xl border transition-all cursor-pointer ${
-                    avatarSeed === av.path ? 'border-[#6755E8] bg-[#F3F1FF] ring-2 ring-[#6755E8]/30' : 'border-[#E9EAF3] bg-[#F8F9FF] hover:border-[#6755E8]/40'
-                  }`}
-                >
-                  <div className="aspect-square rounded-xl overflow-hidden bg-white shadow-2xs">
-                    <img
-                      src={av.path}
-                      alt={av.label}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  {avatarSeed === av.path && (
-                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#6755E8] flex items-center justify-center shadow-sm border border-white">
-                      <Check className="w-3 h-3 text-white" strokeWidth={4} />
-                    </div>
-                  )}
-                  <span className="text-[9px] font-bold text-[#74788E] mt-1.5 block truncate px-0.5">{av.label}</span>
-                </button>
-              ))}
-            </div>
+          <div className="pt-4 border-t border-[#E2E8F0] space-y-3">
+            <fieldset>
+              <legend className="label-modern">Choose an avatar</legend>
+              <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5">
+                {AVATAR_PRESETS.map((av) => {
+                  const active = avatarSrc === av.path;
+                  return (
+                    <button
+                      key={av.id}
+                      type="button"
+                      onClick={() => setAvatarSeed(av.id)}
+                      aria-pressed={active}
+                      aria-label={`Use ${av.label} avatar`}
+                      className={`group relative p-1 rounded-xl border transition-colors cursor-pointer ${
+                        active
+                          ? 'border-[#2563EB] bg-[#EFF6FF] ring-2 ring-[#2563EB]/25'
+                          : 'border-[#E2E8F0] bg-white hover:border-[#BFDBFE]'
+                      }`}
+                    >
+                      <div className="aspect-square rounded-lg overflow-hidden bg-[#F1F5F9]">
+                        <img
+                          src={av.path}
+                          alt=""
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      {active && (
+                        <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#2563EB] flex items-center justify-center shadow-sm border border-white">
+                          <Check className="w-3 h-3 text-white" strokeWidth={4} aria-hidden="true" />
+                        </span>
+                      )}
+                      <span className="text-[9px] font-semibold text-[#475569] mt-1 block truncate px-0.5 text-center">
+                        {av.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
 
             <div>
-              <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#D4D7E8] bg-[#F8F9FF] hover:bg-[#F3F1FF] text-xs font-semibold text-[#252641] cursor-pointer transition">
-                <Upload className="w-3.5 h-3.5 text-[#6755E8]" />
-                <span>Upload New Avatar Picture</span>
-                <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+              <label
+                htmlFor="profile-avatar-upload"
+                className="inline-flex items-center gap-2 min-h-[40px] px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[12px] font-semibold text-[#0F172A] cursor-pointer transition-colors"
+              >
+                <Upload className="w-3.5 h-3.5 text-[#2563EB]" aria-hidden="true" />
+                <span>Upload a new photo</span>
+                <input
+                  id="profile-avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="sr-only"
+                />
               </label>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-[#E9EAF3] flex justify-end">
-            <button
-              onClick={handleSaveProfile}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
-            >
-              Save Profile Changes
+          <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
+            <button onClick={handleSaveProfile} className="btn-primary">
+              Save changes
             </button>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Section 2: Presentation Preferences */}
       {activeSection === 'preferences' && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4 animate-fade-in">
+        <section className="card-modern p-5 sm:p-7 space-y-4 animate-fade-in" aria-labelledby="prefs-heading">
           <div>
-            <h2 className="text-base font-display font-bold text-[#252641]">Learning Presentation Preferences</h2>
-            <p className="text-xs text-[#74788E] mt-0.5">
-              Customize how mathematical explanations and step-by-step remedies are delivered to you.
+            <h2 id="prefs-heading" className="section-title">
+              Presentation preferences
+            </h2>
+            <p className="text-[13px] text-[#475569] mt-1">
+              Choose how explanations and step-by-step remedies are delivered.
             </p>
           </div>
 
           <div className="space-y-3">
-            <div
-              onClick={() => togglePresentation('visual')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                preferredPresentation.includes('visual') ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs' : 'bg-[#F8F9FF] border-[#E9EAF3] hover:border-[#D4D7E8]'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#EAE6FE] text-[#6755E8] flex items-center justify-center shrink-0">
-                  <Eye className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold text-[#252641]">Visual Diagrams & Comparison Tables</h3>
-                  <p className="text-[11px] text-[#74788E]">Step transitions highlighted with side-by-side math formulas.</p>
-                </div>
-              </div>
-              <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${preferredPresentation.includes('visual') ? 'bg-[#6755E8] border-[#6755E8] text-white' : 'border-[#D4D7E8]'}`}>
-                {preferredPresentation.includes('visual') && <Check className="w-3 h-3" />}
-              </div>
-            </div>
-
-            {/* Audio Read-Aloud Assistance Card with Explicit Toggle */}
-            <div
-              className={`p-4 rounded-2xl border transition-all space-y-3 ${
-                audioSupport
-                  ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs'
-                  : 'bg-[#F8F9FF] border-[#E9EAF3]'
-              }`}
-            >
-              <div
-                onClick={() => togglePresentation('audio')}
-                className="flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#E8F8F4] text-[#1B886B] flex items-center justify-center shrink-0">
-                    <Volume2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-bold text-[#252641]">Audio Read-Aloud Assistance</h3>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#E8F8F4] text-[#1B886B] border border-[#CEEFE6]">
-                        Zero Data
-                      </span>
+            {preferenceCards.map(({ key, title, description, icon: Icon, tone }) => {
+              const active = preferredPresentation.includes(key);
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => togglePresentation(key)}
+                  aria-pressed={active}
+                  className={`w-full text-left p-4 rounded-xl border transition-colors cursor-pointer flex items-center justify-between gap-3 ${
+                    active
+                      ? 'bg-[#EFF6FF] border-[#2563EB]'
+                      : 'bg-white border-[#E2E8F0] hover:border-[#CBD5E1]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${tone}`}>
+                      <Icon className="w-5 h-5" aria-hidden="true" />
                     </div>
-                    <p className="text-[11px] text-[#74788E] mt-0.5">
-                      Spoken problem statements, step directions, and diagnostic explanations using browser speech.
+                    <div className="min-w-0">
+                      <h3 className="text-[13px] font-semibold text-[#0F172A]">{title}</h3>
+                      <p className="text-[12px] text-[#475569]">{description}</p>
+                    </div>
+                  </div>
+                  <span
+                    className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                      active ? 'bg-[#2563EB] border-[#2563EB] text-white' : 'border-[#CBD5E1]'
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {active && <Check className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
+              );
+            })}
+
+            {/* Audio read-aloud */}
+            <div
+              className={`p-4 rounded-xl border transition-colors space-y-3 ${
+                audioSupport ? 'bg-[#ECFDF5] border-[#059669]' : 'bg-white border-[#E2E8F0]'
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-lg bg-[#D1FAE5] text-[#047857] flex items-center justify-center shrink-0">
+                    <Volume2 className="w-5 h-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-[13px] font-semibold text-[#0F172A]">Audio read-aloud</h3>
+                      <span className="badge badge-mastery">Zero data</span>
+                    </div>
+                    <p className="text-[12px] text-[#475569] mt-0.5">
+                      Spoken problems, step directions, and explanations using browser speech.
                     </p>
                   </div>
                 </div>
 
-                {/* Explicit Audio Assistance Toggle Switch */}
-                <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${audioSupport ? 'text-[#1B886B]' : 'text-[#74788E]'}`}>
-                    {audioSupport ? 'Enabled' : 'Disabled'}
-                  </span>
-                  <div
-                    className={`w-9 h-5 rounded-full transition-colors relative p-0.5 ${
-                      audioSupport ? 'bg-[#6755E8]' : 'bg-[#D4D7E8]'
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={audioSupport}
+                  onClick={() => togglePresentation('audio')}
+                  className="flex items-center gap-2 cursor-pointer shrink-0"
+                >
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider ${
+                      audioSupport ? 'text-[#047857]' : 'text-[#64748B]'
                     }`}
                   >
-                    <div
-                      className={`w-4 h-4 rounded-full bg-white transition-transform ${
+                    {audioSupport ? 'On' : 'Off'}
+                  </span>
+                  <span
+                    className={`w-9 h-5 rounded-full transition-colors relative p-0.5 block ${
+                      audioSupport ? 'bg-[#059669]' : 'bg-[#CBD5E1]'
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className={`block w-4 h-4 rounded-full bg-white transition-transform ${
                         audioSupport ? 'translate-x-4' : 'translate-x-0'
                       }`}
                     />
-                  </div>
-                </div>
+                  </span>
+                </button>
               </div>
 
-              {/* Live Audio Read-Aloud Tester */}
-              <div className="pt-2 border-t border-[#E9EAF3]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                  <span className="text-[11px] text-[#252641] font-bold">
-                    Voice Preview & Controls Test:
-                  </span>
-                  <span className="text-[10px] text-[#74788E]">
-                    Tested via native Web Speech API
-                  </span>
+              <div className="pt-3 border-t border-[#A7F3D0]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                  <span className="text-[12px] text-[#0F172A] font-semibold">Voice preview</span>
+                  <span className="text-[11px] text-[#64748B]">Native Web Speech API</span>
                 </div>
                 <AudioPlayerControl
                   textToSpeak="MindTrace audio read-aloud assistance is enabled. You can pause, resume, and replay explanations at any time during practice."
-                  label="Test Audio Playback"
+                  label="Test audio playback"
                   variant="card"
                   hasAudioPreference={audioSupport}
                 />
               </div>
             </div>
-
-            <div
-              onClick={() => togglePresentation('interactive')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                preferredPresentation.includes('interactive') ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs' : 'bg-[#F8F9FF] border-[#E9EAF3] hover:border-[#D4D7E8]'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#EBF8FB] text-[#167E96] flex items-center justify-center shrink-0">
-                  <Sliders className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold text-[#252641]">Interactive Hands-On Manipulatives</h3>
-                  <p className="text-[11px] text-[#74788E]">Manipulate balance scale pans and rainbow brackets with sliders.</p>
-                </div>
-              </div>
-              <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${preferredPresentation.includes('interactive') ? 'bg-[#6755E8] border-[#6755E8] text-white' : 'border-[#D4D7E8]'}`}>
-                {preferredPresentation.includes('interactive') && <Check className="w-3 h-3" />}
-              </div>
-            </div>
           </div>
 
-          <div className="pt-3 border-t border-[#E9EAF3] flex justify-end">
-            <button
-              onClick={handleSaveProfile}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
-            >
-              Save Preferences
+          <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
+            <button onClick={handleSaveProfile} className="btn-primary">
+              Save preferences
             </button>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Section 3: Privacy & Leaderboard */}
       {activeSection === 'privacy' && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4 animate-fade-in">
+        <section className="card-modern p-5 sm:p-7 space-y-4 animate-fade-in" aria-labelledby="privacy-heading">
           <div>
-            <h2 className="text-base font-display font-bold text-[#252641]">Privacy & Leaderboard Visibility</h2>
-            <p className="text-xs text-[#74788E] mt-0.5">Control how your learning activity is displayed to classmates.</p>
+            <h2 id="privacy-heading" className="section-title">
+              Privacy & leaderboard
+            </h2>
+            <p className="text-[13px] text-[#475569] mt-1">
+              Control how your learning activity appears to classmates.
+            </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-[#252641]">Show on Class Leaderboard</h3>
-                <p className="text-[11px] text-[#74788E] mt-0.5">
-                  When disabled, your score is hidden or displayed as "Anonymous Student".
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setLeaderboardOptIn(!leaderboardOptIn)}
-                className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-                  leaderboardOptIn ? 'bg-[#6755E8]' : 'bg-[#D4D7E8]'
-                }`}
-              >
-                <div
-                  className={`w-4 h-4 rounded-full bg-white transition-transform absolute top-1 ${
-                    leaderboardOptIn ? 'left-6' : 'left-1'
-                  }`}
-                />
-              </button>
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-[13px] font-semibold text-[#0F172A]">Show on class leaderboard</h3>
+              <p className="text-[12px] text-[#475569] mt-0.5">
+                When off, your score is hidden or shown as “Anonymous Student”.
+              </p>
             </div>
-          </div>
-
-          <div className="pt-3 border-t border-[#E9EAF3] flex justify-end">
             <button
-              onClick={handleSaveProfile}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
+              type="button"
+              role="switch"
+              aria-checked={leaderboardOptIn}
+              aria-label="Show on class leaderboard"
+              onClick={() => setLeaderboardOptIn(!leaderboardOptIn)}
+              className={`w-11 h-6 rounded-full transition-colors relative shrink-0 cursor-pointer ${
+                leaderboardOptIn ? 'bg-[#2563EB]' : 'bg-[#CBD5E1]'
+              }`}
             >
-              Save Privacy Settings
+              <span
+                className={`block w-4 h-4 rounded-full bg-white transition-transform absolute top-1 ${
+                  leaderboardOptIn ? 'left-6' : 'left-1'
+                }`}
+              />
             </button>
           </div>
-        </div>
+
+          <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
+            <button onClick={handleSaveProfile} className="btn-primary">
+              Save privacy settings
+            </button>
+          </div>
+        </section>
       )}
 
       {/* Section 4: Offline Storage & Sync */}
       {activeSection === 'storage' && (
-        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4 animate-fade-in">
+        <section className="card-modern p-5 sm:p-7 space-y-4 animate-fade-in" aria-labelledby="storage-heading">
           <div>
-            <h2 className="text-base font-display font-bold text-[#252641]">Offline Data & IndexedDB Health</h2>
-            <p className="text-xs text-[#74788E] mt-0.5">
-              Inspect on-device diagnostic records and micro-sync queue status.
+            <h2 id="storage-heading" className="section-title">
+              Offline data
+            </h2>
+            <p className="text-[13px] text-[#475569] mt-1">
+              Inspect on-device diagnostic records and the micro-sync queue.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-1">
-              <span className="text-[#74788E]">Database Name:</span>
-              <p className="font-mono font-bold text-[#5140CA]">MindTraceOfflineDB (v2)</p>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
+              <dt className="text-[#64748B]">Database name</dt>
+              <dd className="font-mono font-semibold text-[#1D4ED8]">MindTraceOfflineDB (v2)</dd>
             </div>
-            <div className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-1">
-              <span className="text-[#74788E]">IndexedDB Object Stores:</span>
-              <p className="font-mono text-[#252641] font-semibold">profiles, diagnoses, syncQueue, teacherAnalytics, lessonPackages</p>
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-1">
+              <dt className="text-[#64748B]">IndexedDB object stores</dt>
+              <dd className="font-mono text-[#0F172A] font-semibold break-words">
+                profiles, diagnoses, syncQueue, teacherAnalytics, lessonPackages
+              </dd>
             </div>
-          </div>
+          </dl>
 
           <div className="pt-2 flex flex-wrap gap-3">
             <button
@@ -520,13 +572,13 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
                 a.download = `mindtrace-profile-${student.username}.json`;
                 a.click();
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F5F6FC] hover:bg-[#F3F1FF] border border-[#E9EAF3] text-xs font-bold text-[#252641] transition cursor-pointer"
+              className="btn-secondary"
             >
-              <Download className="w-3.5 h-3.5 text-[#6755E8]" />
-              <span>Export Offline Profile Backup</span>
+              <Download className="w-4 h-4" aria-hidden="true" />
+              <span>Export profile backup</span>
             </button>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

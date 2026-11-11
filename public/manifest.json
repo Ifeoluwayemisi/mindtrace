@@ -1,25 +1,39 @@
 {
+  "id": "/",
   "name": "MindTrace — Offline-First Math Learning Diagnostics",
   "short_name": "MindTrace",
   "description": "Understand the mistake. Fix the misconception. Keep learning. 100% offline math diagnostic platform for WAEC & JAMB.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#4f46e5",
-  "orientation": "portrait",
+  "background_color": "#F8F9FF",
+  "theme_color": "#6755E8",
+  "orientation": "portrait-primary",
   "categories": ["education", "math", "productivity"],
   "icons": [
     {
-      "src": "/icon-512.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.jpg",
-      "sizes": "192x192",
-      "type": "image/jpeg",
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

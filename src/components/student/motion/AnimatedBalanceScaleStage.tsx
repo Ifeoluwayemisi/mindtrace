@@ -20,18 +20,16 @@ export const AnimatedBalanceScaleStage: React.FC<AnimatedBalanceScaleStageProps>
   highlightLeft = false,
   highlightRight = false,
   activeOperation,
-  scaleLeftWeight = 14,
-  scaleRightWeight = 14,
 }) => {
   const angle = isBalanced ? 0 : tiltAngle || -6;
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-950/90 border border-slate-800/80">
+    <div className="w-full flex flex-col items-center justify-center p-4 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm">
       {/* Operation announcement pill */}
       {activeOperation && (
-        <div className="mb-2 px-3 py-1 rounded-full bg-indigo-950 border border-indigo-700/80 text-indigo-300 font-mono text-xs font-bold animate-fade-in flex items-center gap-1.5 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Active Transformation: {activeOperation}</span>
+        <div className="mb-2 px-3 py-1 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#1D4ED8] font-mono text-[11px] font-bold animate-fade-in flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" aria-hidden="true" />
+          <span>Active transformation: {activeOperation}</span>
         </div>
       )}
 
@@ -39,62 +37,42 @@ export const AnimatedBalanceScaleStage: React.FC<AnimatedBalanceScaleStageProps>
         <svg
           viewBox="0 0 380 190"
           className="w-full h-full overflow-visible transition-transform"
-          aria-hidden="true"
+          role="img"
+          aria-label={`Balance scale: ${leftExpression} ${isBalanced ? 'equals' : 'is not equal to'} ${rightExpression}`}
         >
-          {/* Fulcrum Base Platform */}
-          <polygon
-            points="190,120 170,175 210,175"
-            fill="#1e293b"
-            stroke="#475569"
-            strokeWidth="2"
-          />
-          <rect x="150" y="173" width="80" height="8" rx="4" fill="#0f172a" stroke="#334155" strokeWidth="1" />
+          {/* Fulcrum base platform */}
+          <polygon points="190,120 170,175 210,175" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="2" />
+          <rect x="150" y="173" width="80" height="8" rx="4" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="1" />
 
-          {/* Central Pivot Hub */}
-          <circle cx="190" cy="120" r="9" fill="#6366f1" stroke="#a5b4fc" strokeWidth="2.5" />
-          <circle cx="190" cy="120" r="3" fill="#ffffff" />
+          {/* Central pivot hub */}
+          <circle cx="190" cy="120" r="9" fill="#2563EB" stroke="#BFDBFE" strokeWidth="2.5" />
+          <circle cx="190" cy="120" r="3" fill="#FFFFFF" />
 
-          {/* Rotating Beam Assembly */}
-          <g
-            transform={`rotate(${angle}, 190, 120)`}
-            className="transition-transform duration-700 ease-out"
-          >
-            {/* The Main Beam */}
-            <line
-              x1="35"
-              y1="120"
-              x2="345"
-              y2="120"
-              stroke="#e2e8f0"
-              strokeWidth="5"
-              strokeLinecap="round"
-            />
+          {/* Rotating beam */}
+          <g transform={`rotate(${angle}, 190, 120)`} className="transition-transform duration-700 ease-out">
+            <line x1="35" y1="120" x2="345" y2="120" stroke="#94A3B8" strokeWidth="5" strokeLinecap="round" />
+            <circle cx="35" cy="120" r="5" fill="#60A5FA" />
+            <circle cx="345" cy="120" r="5" fill="#60A5FA" />
 
-            {/* Left Beam Extension Marker */}
-            <circle cx="35" cy="120" r="5" fill="#818cf8" />
-            {/* Right Beam Extension Marker */}
-            <circle cx="345" cy="120" r="5" fill="#818cf8" />
-
-            {/* Left Pan Chains & Plate */}
+            {/* Left pan */}
             <g transform="translate(35, 120)">
-              <line x1="0" y1="0" x2="-22" y2="45" stroke="#94a3b8" strokeWidth="1.5" />
-              <line x1="0" y1="0" x2="22" y2="45" stroke="#94a3b8" strokeWidth="1.5" />
+              <line x1="0" y1="0" x2="-22" y2="45" stroke="#94A3B8" strokeWidth="1.5" />
+              <line x1="0" y1="0" x2="22" y2="45" stroke="#94A3B8" strokeWidth="1.5" />
               <path
                 d="M -35 45 Q 0 58, 35 45 Z"
-                fill={highlightLeft ? '#4338ca' : '#1e1b4b'}
-                stroke={highlightLeft ? '#818cf8' : '#6366f1'}
+                fill={highlightLeft ? '#DBEAFE' : '#EFF6FF'}
+                stroke={highlightLeft ? '#2563EB' : '#93C5FD'}
                 strokeWidth="2"
                 className="transition-colors duration-300"
               />
 
-              {/* Left Expression Label on Pan */}
               <foreignObject x="-65" y="8" width="130" height="36">
                 <div className="flex items-center justify-center h-full">
                   <span
-                    className={`px-3 py-1 rounded-xl text-xs font-mono font-bold shadow-md transition-all ${
+                    className={`px-3 py-1 rounded-xl math-expression text-xs font-bold shadow-sm transition-all ${
                       highlightLeft
-                        ? 'bg-indigo-600 text-white ring-2 ring-indigo-400 scale-105'
-                        : 'bg-slate-900/90 text-indigo-200 border border-slate-700'
+                        ? 'bg-[#2563EB] text-white ring-2 ring-[#BFDBFE] scale-105'
+                        : 'bg-white text-[#1E40AF] border border-[#BFDBFE]'
                     }`}
                   >
                     {leftExpression}
@@ -103,26 +81,25 @@ export const AnimatedBalanceScaleStage: React.FC<AnimatedBalanceScaleStageProps>
               </foreignObject>
             </g>
 
-            {/* Right Pan Chains & Plate */}
+            {/* Right pan */}
             <g transform="translate(345, 120)">
-              <line x1="0" y1="0" x2="-22" y2="45" stroke="#94a3b8" strokeWidth="1.5" />
-              <line x1="0" y1="0" x2="22" y2="45" stroke="#94a3b8" strokeWidth="1.5" />
+              <line x1="0" y1="0" x2="-22" y2="45" stroke="#94A3B8" strokeWidth="1.5" />
+              <line x1="0" y1="0" x2="22" y2="45" stroke="#94A3B8" strokeWidth="1.5" />
               <path
                 d="M -35 45 Q 0 58, 35 45 Z"
-                fill={highlightRight ? '#065f46' : '#022c22'}
-                stroke={highlightRight ? '#34d399' : '#10b981'}
+                fill={highlightRight ? '#D1FAE5' : '#ECFDF5'}
+                stroke={highlightRight ? '#059669' : '#6EE7B7'}
                 strokeWidth="2"
                 className="transition-colors duration-300"
               />
 
-              {/* Right Expression Label on Pan */}
               <foreignObject x="-65" y="8" width="130" height="36">
                 <div className="flex items-center justify-center h-full">
                   <span
-                    className={`px-3 py-1 rounded-xl text-xs font-mono font-bold shadow-md transition-all ${
+                    className={`px-3 py-1 rounded-xl math-expression text-xs font-bold shadow-sm transition-all ${
                       highlightRight
-                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 scale-105'
-                        : 'bg-slate-900/90 text-emerald-200 border border-slate-700'
+                        ? 'bg-[#059669] text-white ring-2 ring-[#A7F3D0] scale-105'
+                        : 'bg-white text-[#065F46] border border-[#A7F3D0]'
                     }`}
                   >
                     {rightExpression}
@@ -132,12 +109,12 @@ export const AnimatedBalanceScaleStage: React.FC<AnimatedBalanceScaleStageProps>
             </g>
           </g>
 
-          {/* Fulcrum Equals Symbol Pivot Indicator */}
+          {/* Equality indicator */}
           <text
             x="190"
             y="95"
             textAnchor="middle"
-            fill={isBalanced ? '#34d399' : '#f43f5e'}
+            fill={isBalanced ? '#059669' : '#D97706'}
             fontSize="18"
             fontWeight="bold"
             fontFamily="monospace"
@@ -147,17 +124,17 @@ export const AnimatedBalanceScaleStage: React.FC<AnimatedBalanceScaleStageProps>
         </svg>
       </div>
 
-      {/* Equality Status Banner */}
+      {/* Equality status banner — icon + text, not colour alone */}
       <div
-        className={`mt-1 text-xs px-3 py-1 rounded-xl font-medium transition-colors ${
+        className={`mt-1 text-[12px] px-3 py-1.5 rounded-xl font-medium border transition-colors ${
           isBalanced
-            ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800/80'
-            : 'text-rose-300 bg-rose-950/60 border border-rose-800/80'
+            ? 'text-[#065F46] bg-[#ECFDF5] border-[#A7F3D0]'
+            : 'text-[#92400E] bg-[#FFFBEB] border-[#FDE68A]'
         }`}
       >
         {isBalanced
-          ? 'Equal Mathematical Weight Maintained on Both Sides (=)'
-          : 'Scale Tilted: Operation performed on only one side breaks equality!'}
+          ? 'Equal mathematical weight maintained on both sides (=)'
+          : 'Scale tilted: an operation on only one side breaks equality'}
       </div>
     </div>
   );

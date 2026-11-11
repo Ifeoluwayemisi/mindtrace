@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
   ArrowRight,
   Scale,
   CheckCircle2,
   Play,
   Sliders,
-  Clock,
-  BookOpen,
+  AlertTriangle,
 } from 'lucide-react';
 import { TargetedIntervention } from '../../types';
 import { TARGETED_INTERVENTIONS } from '../../data/questionBank';
@@ -50,35 +48,43 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
 
   return (
     <div className="space-y-4">
-      {/* Top Experience Switcher: Animated Motion Lesson vs Free Sandbox */}
-      <div className="max-w-3xl mx-auto flex items-center justify-between gap-3 px-2">
-        <div className="flex items-center p-1 rounded-2xl bg-slate-900 border border-slate-800 text-xs">
+      {/* Experience switcher */}
+      <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div
+          className="inline-flex items-center p-1 rounded-xl bg-[#F1F5F9] border border-[#E2E8F0] text-[12px]"
+          role="tablist"
+          aria-label="Intervention mode"
+        >
           <button
+            role="tab"
+            aria-selected={viewMode === 'animated_lesson'}
             onClick={() => setViewMode('animated_lesson')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 min-h-[36px] px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
               viewMode === 'animated_lesson'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-white text-[#1D4ED8] shadow-sm border border-[#E2E8F0]'
+                : 'text-[#64748B] hover:text-[#0F172A]'
             }`}
           >
-            <Play className="w-3.5 h-3.5" />
-            <span>Animated Motion Lesson</span>
+            <Play className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Animated lesson</span>
           </button>
           <button
+            role="tab"
+            aria-selected={viewMode === 'manual_sandbox'}
             onClick={() => setViewMode('manual_sandbox')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 min-h-[36px] px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
               viewMode === 'manual_sandbox'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-white text-[#1D4ED8] shadow-sm border border-[#E2E8F0]'
+                : 'text-[#64748B] hover:text-[#0F172A]'
             }`}
           >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>Interactive Sandbox</span>
+            <Sliders className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Interactive sandbox</span>
           </button>
         </div>
 
-        <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">
-          WAEC Syllabus Aligned Micro-Module
+        <span className="text-[11px] font-mono text-[#64748B] hidden sm:inline">
+          WAEC syllabus aligned micro-module
         </span>
       </div>
 
@@ -90,21 +96,19 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
           onBack={onCancel}
         />
       ) : (
-        /* Manual Sandbox Mode */
+        /* Manual sandbox */
         <div className="max-w-3xl mx-auto space-y-6 animate-fade-in pb-8">
-          <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 space-y-5">
+          <section className="card-modern p-5 sm:p-6 space-y-5" aria-labelledby="sandbox-heading">
             <div>
-              <h2 className="text-base font-display font-bold text-white flex items-center gap-2">
-                <Scale className="w-5 h-5 text-indigo-400" />
-                <span>Manual Sandbox: {legacyIntervention.metaphorTitle}</span>
+              <h2 id="sandbox-heading" className="section-title flex items-center gap-2">
+                <Scale className="w-5 h-5 text-[#2563EB]" aria-hidden="true" />
+                <span>Manual sandbox: {legacyIntervention.metaphorTitle}</span>
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                {legacyIntervention.metaphorDescription}
-              </p>
+              <p className="body-text mt-1">{legacyIntervention.metaphorDescription}</p>
             </div>
 
             {legacyIntervention.interactiveModel === 'balance_scale' && (
-              <div className="p-6 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-6">
+              <div className="p-4 sm:p-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-6">
                 <BalanceScaleVisual
                   isBalanced={isBalanced}
                   leftExpression={scaleLeft === 21 ? '3x - 7 + 7' : '3x - 7'}
@@ -114,28 +118,36 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
 
                 <div className="flex justify-center">
                   <div
-                    className={`text-xs px-3 py-1.5 rounded-xl font-medium ${
+                    role="status"
+                    className={`text-[13px] px-3.5 py-2 rounded-xl font-medium inline-flex items-start gap-2 border ${
                       isBalanced
-                        ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800'
-                        : 'text-amber-300 bg-amber-950/60 border border-amber-800'
+                        ? 'text-[#065F46] bg-[#ECFDF5] border-[#A7F3D0]'
+                        : 'text-[#92400E] bg-[#FFFBEB] border-[#FDE68A]'
                     }`}
                   >
-                    {isBalanced
-                      ? 'Equality holds: Adding +7 to BOTH sides leaves 3x = 21.'
-                      : 'Scale tilted! Performing an operation on only one side breaks equality.'}
+                    {isBalanced ? (
+                      <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+                    )}
+                    <span>
+                      {isBalanced
+                        ? 'Equality holds: adding +7 to BOTH sides leaves 3x = 21.'
+                        : 'Scale tilted! Performing an operation on only one side breaks equality.'}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
                   <button
                     onClick={() => {
                       setScaleLeft(21);
                       setScaleRight(21);
                       setAddedNumber(7);
                     }}
-                    className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition cursor-pointer min-h-[44px]"
+                    className="btn-primary text-[12px] px-4"
                   >
-                    Apply Correct Action: Add +7 to BOTH Sides
+                    Apply correct action: add +7 to BOTH sides
                   </button>
                   <button
                     onClick={() => {
@@ -143,9 +155,10 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
                       setScaleRight(7);
                       setAddedNumber(null);
                     }}
-                    className="px-4 py-2.5 rounded-xl bg-rose-950 hover:bg-rose-900/80 border border-rose-800 text-rose-200 text-xs font-semibold transition cursor-pointer min-h-[44px]"
+                    className="inline-flex items-center justify-center gap-1.5 min-h-[44px] px-4 py-2.5 rounded-xl bg-[#FEF3C7] hover:bg-[#FDE68A] border border-[#FDE68A] text-[#92400E] text-[12px] font-semibold transition cursor-pointer"
                   >
-                    Observe Sign Error: Subtract 7 from Right Only
+                    <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
+                    Observe sign error: subtract 7 from right only
                   </button>
                   <button
                     onClick={() => {
@@ -153,40 +166,40 @@ export const TargetedInterventionView: React.FC<TargetedInterventionViewProps> =
                       setScaleRight(14);
                       setAddedNumber(null);
                     }}
-                    className="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer min-h-[44px]"
+                    className="btn-secondary min-h-[44px] px-4 text-[12px]"
                   >
-                    Reset Scale
+                    Reset scale
                   </button>
                 </div>
               </div>
             )}
 
             {legacyIntervention.interactiveModel === 'rainbow_expansion' && (
-              <div className="p-6 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-6 text-center">
+              <div className="p-4 sm:p-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-6 text-center">
                 <RainbowDistributionVisual />
-                <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/40 text-xs text-indigo-300 font-medium">
+                <div className="p-3 rounded-xl bg-[#EEF2FF] border border-[#C7D2FE] text-[12px] text-[#4338CA] font-medium">
                   Resulting equation:{' '}
-                  <span className="font-mono font-bold text-white">8x - 12 = 28</span> (Not 8x - 3!)
+                  <span className="math-expression font-bold text-[#0F172A]">8x - 12 = 28</span> (not 8x - 3!)
                 </div>
               </div>
             )}
-          </div>
+          </section>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
             <button
               onClick={onCancel}
-              className="text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+              className="text-[13px] font-semibold text-[#475569] hover:text-[#0F172A] transition-colors cursor-pointer min-h-[40px]"
             >
-              ← Return to Dashboard
+              ← Return to dashboard
             </button>
 
             <button
               onClick={onProceedToFollowUp}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-600/30 transition hover:scale-[1.02] cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[13px] shadow-sm transition-colors cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Prove Mastery: Take Single Follow-Up Check</span>
-              <ArrowRight className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+              <span>Prove mastery: take single follow-up check</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>

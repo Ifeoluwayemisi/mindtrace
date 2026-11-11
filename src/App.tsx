@@ -17,6 +17,8 @@ import { QUESTION_BANK } from './data/questionBank';
 import { Header } from './components/layout/Header';
 import { MobileBottomNav } from './components/layout/MobileBottomNav';
 import { NetworkStatusBar } from './components/common/NetworkStatusBar';
+import { PWAInstallButton } from './components/common/PWAInstallButton';
+import { PWAInstallBanner } from './components/common/PWAInstallBanner';
 
 // Auth & Onboarding Components
 import { SplashScreen } from './components/auth/SplashScreen';
@@ -179,7 +181,7 @@ export default function App() {
   ].includes(activeView);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FF] text-[#252641] selection:bg-[#6755E8] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#0F172A] selection:bg-[#2563EB] selection:text-white">
       {/* 1. Offline / Airplane Mode Simulation Bar (Zero-Bandwidth Verification) */}
       <NetworkStatusBar
         onSyncCompleted={() => {
@@ -199,28 +201,29 @@ export default function App() {
         />
       ) : (
         /* Minimal header during auth/onboarding or password change */
-        <div className="w-full bg-white/95 backdrop-blur-md border-b border-[#E9EAF3] py-3.5 px-4 sm:px-6">
+        <div className="w-full bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] py-3.5 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div
               onClick={() => changeView('welcome')}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6755E8] to-[#5140CA] flex items-center justify-center font-display font-black text-white text-base shadow-sm shadow-[#6755E8]/20 group-hover:scale-105 transition-transform">
+              <div className="w-8 h-8 rounded-xl bg-[#2563EB] flex items-center justify-center font-display font-black text-white text-base shadow-sm shadow-[#2563EB]/25 group-hover:scale-105 transition-transform">
                 M
               </div>
-              <span className="font-display font-black text-[#252641] text-lg tracking-tight">
+              <span className="font-display font-black text-[#0F172A] text-lg tracking-tight">
                 MindTrace
               </span>
             </div>
 
             {!currentUser?.mustChangePassword && (
               <div className="flex items-center gap-2">
+                <PWAInstallButton />
                 <button
                   onClick={() => {
                     authService.setOnboardingCompleted(true);
                     changeView('student-dashboard');
                   }}
-                  className="text-xs text-[#74788E] hover:text-[#6755E8] transition cursor-pointer px-3 py-1.5 rounded-xl bg-[#F5F6FC] hover:bg-[#F3F1FF] border border-[#E9EAF3] hover:border-[#6755E8]/30 font-medium"
+                  className="text-xs text-[#475569] hover:text-[#2563EB] transition cursor-pointer px-3 py-1.5 rounded-xl bg-[#F1F5F9] hover:bg-[#EFF6FF] border border-[#E2E8F0] hover:border-[#2563EB]/30 font-medium"
                 >
                   Skip to Demo Learner →
                 </button>
@@ -488,18 +491,18 @@ export default function App() {
       </main>
 
       {/* 4. Footer */}
-      <footer className="border-t border-[#E9EAF3] bg-white py-6 px-4 sm:px-6 text-xs text-[#74788E] mb-14 lg:mb-0 shadow-sm">
+      <footer className="border-t border-[#E2E8F0] bg-white py-6 px-4 sm:px-6 text-xs text-[#475569] mb-14 lg:mb-0 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-[#252641]">MindTrace</span>
-            <span className="text-[#E9EAF3]">|</span>
-            <span className="text-[#74788E]">Secondary Mathematics Diagnostic Platform</span>
+            <span className="font-display font-bold text-[#0F172A]">MindTrace</span>
+            <span className="text-[#E2E8F0]">|</span>
+            <span className="text-[#475569]">Secondary Mathematics Diagnostic Platform</span>
           </div>
 
-          <div className="flex items-center gap-3 text-[11px] text-[#74788E]">
-            <span className="px-2 py-0.5 rounded-md bg-[#F5F6FC] border border-[#E9EAF3] font-mono text-[#5140CA] font-medium">Edge Parser &lt;50ms</span>
-            <span className="px-2 py-0.5 rounded-md bg-[#F5F6FC] border border-[#E9EAF3] font-mono text-[#49C6A3] font-medium">100% Offline IndexedDB</span>
-            <span className="px-2 py-0.5 rounded-md bg-[#F5F6FC] border border-[#E9EAF3] font-mono text-[#36B8D8] font-medium">Micro-Sync &le;15KB</span>
+          <div className="flex items-center gap-3 text-[11px]">
+            <span className="px-2 py-0.5 rounded-md bg-[#EEF2FF] border border-[#C7D2FE] font-mono text-[#4338CA] font-medium">Edge Parser &lt;50ms</span>
+            <span className="px-2 py-0.5 rounded-md bg-[#D1FAE5] border border-[#A7F3D0] font-mono text-[#065F46] font-medium">100% Offline IndexedDB</span>
+            <span className="px-2 py-0.5 rounded-md bg-[#E0F2FE] border border-[#BAE6FD] font-mono text-[#0369A1] font-medium">Micro-Sync &le;15KB</span>
           </div>
         </div>
       </footer>
@@ -514,6 +517,9 @@ export default function App() {
           teacher={teacher}
         />
       )}
+
+      {/* 6. PWA Installation Prompt Banner / Modal */}
+      <PWAInstallBanner />
     </div>
   );
 }

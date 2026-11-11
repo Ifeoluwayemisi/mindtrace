@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Copy, Check, Download, BookOpen, Sparkles } from 'lucide-react';
+import { X, Copy, Check, BookOpen } from 'lucide-react';
 import { MisconceptionCode } from '../../types';
 
 interface ChalkboardScriptModalProps {
@@ -68,53 +68,50 @@ Expected Student Response: "Add 9 to both sides!"
 Targeted remediation complete in 4 minutes. Proceed with curriculum.`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 animate-fade-in">
-      <div className="w-full max-w-2xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="modal-backdrop animate-fade-in">
+      <div className="modal-surface max-w-2xl">
         {/* Modal Header */}
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
-              <BookOpen className="w-5 h-5" />
+        <div className="flex items-start justify-between gap-3 border-b border-[#E2E8F0] p-5 sm:p-6">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 shrink-0 rounded-xl border border-[#C7D2FE] bg-[#EEF2FF] text-[#4338CA] flex items-center justify-center">
+              <BookOpen className="w-5 h-5" aria-hidden="true" />
             </div>
-            <div>
-              <h2 className="text-base font-display font-bold text-white">
+            <div className="min-w-0">
+              <h2 className="text-[17px] font-display font-bold text-[#0F172A]">
                 5-Minute Chalkboard Intervention Script
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-[12px] text-[#475569]">
                 Pre-formatted pedagogical guide ready for tomorrow's morning lesson
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
-          >
-            <X className="w-5 h-5" />
+          <button onClick={onClose} aria-label="Close chalkboard script" className="icon-btn shrink-0">
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
         {/* Script Content */}
-        <div className="p-6 overflow-y-auto flex-1 font-mono text-xs text-slate-200 leading-relaxed bg-slate-950/80 m-4 rounded-2xl border border-slate-800/80 whitespace-pre-wrap select-all">
-          {scriptContent}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+          <pre className="select-all whitespace-pre-wrap rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 sm:p-5 font-mono text-[12px] leading-relaxed text-[#0F172A]">
+            {scriptContent}
+          </pre>
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 border-t border-slate-800 flex items-center justify-between gap-3">
-          <span className="text-xs text-slate-400">
-            Targets 42% class misconception gap in under 5 minutes.
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E2E8F0] bg-[#F8FAFC] p-4 sm:p-5">
+          <span className="text-[12px] text-[#475569]">
+            Targets the class misconception gap in under 5 minutes.
           </span>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleCopy}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
-            >
-              {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-              <span>{copied ? 'Copied to Clipboard' : 'Copy Script'}</span>
+            <button onClick={handleCopy} className="btn-primary">
+              {copied ? (
+                <Check className="w-4 h-4" aria-hidden="true" />
+              ) : (
+                <Copy className="w-4 h-4" aria-hidden="true" />
+              )}
+              <span>{copied ? 'Copied to clipboard' : 'Copy script'}</span>
             </button>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer"
-            >
+            <button onClick={onClose} className="btn-ghost">
               Close
             </button>
           </div>

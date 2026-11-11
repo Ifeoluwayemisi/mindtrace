@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, ArrowRight, CheckCircle2, KeyRound } from 'lucide-react';
+import { Mail, ArrowRight, CheckCircle2, KeyRound, ArrowLeft } from 'lucide-react';
 import { authService } from '../../services/authService';
 
 interface PasswordRecoveryScreenProps {
@@ -47,19 +47,24 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto my-auto min-h-[70vh] flex flex-col justify-center px-4 animate-fade-in space-y-6">
-      <div className="text-center space-y-1">
-        <h1 className="text-2xl font-display font-extrabold text-[#252641]">
-          Reset Your Password
-        </h1>
-        <p className="text-xs text-[#74788E]">
-          Enter your registered student email or username to reset your access
+    <div className="max-w-md mx-auto my-auto min-h-[70vh] flex flex-col justify-center px-4 py-8 animate-fade-in space-y-5">
+      <div className="text-center space-y-1.5">
+        <span className="badge badge-primary inline-flex">
+          <KeyRound className="w-3.5 h-3.5" aria-hidden="true" />
+          <span>Account recovery</span>
+        </span>
+        <h1 className="page-title">Reset your password</h1>
+        <p className="body-text">
+          Enter your registered student email or username to regain access.
         </p>
       </div>
 
-      <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4">
+      <div className="card-modern p-6 sm:p-7 space-y-4">
         {errorMessage && (
-          <div className="p-3.5 rounded-2xl bg-[#FFF1EE] border border-[#FDDDD7] text-[#D64D31] text-xs">
+          <div
+            role="alert"
+            className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-[13px]"
+          >
             {errorMessage}
           </div>
         )}
@@ -67,101 +72,97 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
         {!demoPin && !isSuccess && (
           <form onSubmit={handleRequestPin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">
-                Student Email or Username
+              <label htmlFor="recovery-identifier" className="label-modern">
+                Student email or username
               </label>
-              <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
-                <Mail className="w-4 h-4 text-[#74788E]" />
+              <div className="flex items-center gap-2.5 px-3 rounded-xl bg-white border border-[#E2E8F0] focus-within:border-[#2563EB] focus-within:shadow-[0_0_0_3px_rgba(37,99,235,0.14)] transition-shadow">
+                <Mail className="w-4 h-4 text-[#94A3B8] shrink-0" aria-hidden="true" />
                 <input
+                  id="recovery-identifier"
                   type="text"
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="e.g. aminat_diallo"
-                  className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
+                  autoComplete="username"
+                  className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
                 />
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer disabled:opacity-50"
-            >
-              <span>{isLoading ? 'Generating PIN...' : 'Send Recovery PIN'}</span>
-              <ArrowRight className="w-4 h-4" />
+            <button type="submit" disabled={isLoading} className="btn-primary w-full">
+              <span>{isLoading ? 'Generating PIN…' : 'Send recovery PIN'}</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </form>
         )}
 
         {demoPin && !isSuccess && (
           <form onSubmit={handleResetPassword} className="space-y-4 animate-fade-in">
-            <div className="p-3.5 rounded-xl bg-[#F3F1FF] border border-[#E4E0FD] text-xs text-[#5140CA] leading-relaxed">
+            <div className="p-3.5 rounded-xl bg-[#EEF2FF] border border-[#C7D2FE] text-[13px] text-[#4338CA] leading-relaxed">
               Recovery PIN generated for on-device verification:{' '}
-              <strong className="text-[#B27B08] font-mono text-sm font-bold">{demoPin}</strong>
+              <strong className="text-[#92400E] font-mono text-sm font-bold">{demoPin}</strong>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">
-                Enter 6-Digit PIN
+              <label htmlFor="recovery-pin" className="label-modern">
+                Enter 6-digit PIN
               </label>
               <input
+                id="recovery-pin"
                 type="text"
                 required
                 value={enteredPin}
                 onChange={(e) => setEnteredPin(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] font-mono text-center text-sm text-[#252641] font-bold focus:outline-hidden focus:border-[#6755E8] focus:bg-white"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                className="input-modern input-mono text-center tracking-[0.3em]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#252641] mb-1.5">
-                New Password (at least 6 characters)
+              <label htmlFor="recovery-new-password" className="label-modern">
+                New password (at least 6 characters)
               </label>
               <input
+                id="recovery-new-password"
                 type="password"
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter new password"
-                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs text-[#252641] focus:outline-hidden focus:border-[#6755E8] focus:bg-white"
+                autoComplete="new-password"
+                className="input-modern"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#49C6A3] to-[#1B886B] hover:opacity-95 text-white font-bold text-xs shadow-md shadow-[#49C6A3]/30 transition cursor-pointer disabled:opacity-50"
-            >
-              <KeyRound className="w-4 h-4" />
-              <span>{isLoading ? 'Updating Password...' : 'Confirm Password Reset'}</span>
+            <button type="submit" disabled={isLoading} className="btn-primary w-full">
+              <KeyRound className="w-4 h-4" aria-hidden="true" />
+              <span>{isLoading ? 'Updating password…' : 'Confirm password reset'}</span>
             </button>
           </form>
         )}
 
         {isSuccess && (
-          <div className="p-5 rounded-2xl bg-[#E8F8F4] border border-[#CEEFE6] text-center space-y-3 animate-fade-in">
-            <CheckCircle2 className="w-8 h-8 text-[#1B886B] mx-auto" />
-            <h3 className="text-sm font-bold text-[#252641]">Password Updated!</h3>
-            <p className="text-xs text-[#1B886B] leading-relaxed">
-              Your password has been reset successfully. You can now log in with your updated credentials.
+          <div className="p-5 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-center space-y-3 animate-fade-in">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-[#A7F3D0] mx-auto flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6 text-[#059669]" aria-hidden="true" />
+            </div>
+            <h2 className="text-[15px] font-semibold text-[#0F172A]">Password updated</h2>
+            <p className="text-[13px] text-[#065F46] leading-relaxed">
+              Your password has been reset. You can now sign in with your new credentials.
             </p>
-            <button
-              onClick={onBackToLogin}
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white text-xs font-bold transition cursor-pointer shadow-sm shadow-[#6755E8]/30"
-            >
-              Back to Sign In
+            <button onClick={onBackToLogin} className="btn-primary w-full">
+              Back to sign in
             </button>
           </div>
         )}
       </div>
 
       <div className="text-center">
-        <button
-          onClick={onBackToLogin}
-          className="text-xs font-semibold text-[#74788E] hover:text-[#252641] transition cursor-pointer"
-        >
-          ← Return to Login
+        <button onClick={onBackToLogin} className="btn-ghost">
+          <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
+          <span>Return to login</span>
         </button>
       </div>
     </div>

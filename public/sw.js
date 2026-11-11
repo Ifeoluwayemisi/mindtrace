@@ -4,13 +4,17 @@
  * Ensures reliable caching, motion lesson playback, and zero-bandwidth execution for secondary school learners.
  */
 
-const CACHE_NAME = 'mindtrace-v1.3';
+const CACHE_NAME = 'mindtrace-v1.4';
 
 // Core assets to pre-cache immediately
 const PRE_CACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
+  '/favicon.ico',
   '/icon-512.jpg',
 ];
 

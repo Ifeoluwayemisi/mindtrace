@@ -4,12 +4,10 @@ import {
   ArrowRight,
   Flame,
   Award,
-  Clock,
   BookOpen,
   Zap,
   Target,
   Layers,
-  Trophy,
   History,
   Sliders,
   Volume2,
@@ -21,6 +19,7 @@ import { StudentProfile, Question } from '../../types';
 import { QUESTION_BANK } from '../../data/questionBank';
 import { gamificationService } from '../../services/gamificationService';
 import { StudentClassroomsModal } from './StudentClassroomsModal';
+import { resolveAvatarSrc, getInitials } from '../../utils/avatar';
 
 interface StudentDashboardProps {
   student: StudentProfile;
@@ -47,6 +46,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const totalPoints = gamificationService.calculateTotalPoints(student.id);
   const level = Math.floor(totalPoints / 100) + 1;
   const pointsInCurrentLevel = totalPoints % 100;
+  const avatarSrc = resolveAvatarSrc(student.avatarSeed);
+  const dailyPercent = Math.min(
+    100,
+    ((student.dailyGoalCompleted || 0) / (student.dailyGoalTarget || 3)) * 100
+  );
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -54,38 +58,49 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         isOpen={isClassroomsModalOpen}
         onClose={() => setIsClassroomsModalOpen(false)}
       />
-      {/* Top Welcome & Identity Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#6755E8] to-[#5140CA] p-6 md:p-8 shadow-2xl shadow-[#6755E8]/20 text-white">
+
+      {/* Welcome hero */}
+      <section className="relative overflow-hidden rounded-3xl border border-[#BFDBFE] bg-gradient-to-br from-[#EFF6FF] via-white to-[#E0F2FE] p-6 md:p-8">
+        <div className="absolute inset-0 bg-math-grid opacity-60 pointer-events-none" aria-hidden="true" />
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            {/* Metadata */}
-            <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#F3F1FF]">
-              <span className="bg-white/10 px-2 py-0.5 rounded-md">{student.classSection || 'SS2 B'}</span>
-              <span>{student.school || 'Comprehensive Senior High'}</span>
-              <span aria-hidden="true">·</span>
-              <span className="text-[#49C6A3]">{student.targetExam || 'WAEC & JAMB'} Track</span>
-              <span aria-hidden="true">·</span>
-              <span className="text-[#FFC85A]">Level {level} Scholar</span>
+          <div className="space-y-4 max-w-2xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="badge badge-primary">{student.classSection || 'SS2 B'}</span>
+              <span className="text-[12px] text-[#475569] font-medium">{student.school || 'Comprehensive Senior High'}</span>
+              <span className="text-[#CBD5E1]" aria-hidden="true">·</span>
+              <span className="badge badge-mastery">{student.targetExam || 'WAEC & JAMB'} track</span>
+              <span className="badge badge-diagnostic">
+                <Sparkles className="w-3 h-3" aria-hidden="true" />
+                Level {level} scholar
+              </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-display font-black tracking-tight leading-tight">
-              Ready to level up your Mathematics, {student.name ? student.name.split(' ')[0] : 'Scholar'}?
-            </h1>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-white border border-[#BFDBFE] overflow-hidden shrink-0 flex items-center justify-center shadow-sm">
+                {avatarSrc ? (
+                  <img src={avatarSrc} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-sm font-bold text-[#2563EB]">{getInitials(student.name)}</span>
+                )}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight leading-tight text-[#0F172A]">
+                Ready to level up your Mathematics, {student.name ? student.name.split(' ')[0] : 'Scholar'}?
+              </h1>
+            </div>
 
-            <p className="text-sm text-[#F3F1FF]/90 leading-relaxed max-w-xl">
-              MindTrace analyzes each line of your mathematical working to reveal the exact misconception and helps you turn weak areas into confident mastery — completely offline.
+            <p className="body-text max-w-xl">
+              MindTrace analyses each line of your mathematical working to reveal the exact misconception, then helps you turn weak areas into confident mastery — completely offline.
             </p>
 
-            {/* Presentation Modes */}
-            <div className="flex items-center gap-4 pt-1 text-xs text-[#F3F1FF]/80 font-medium">
+            <div className="flex flex-wrap items-center gap-4 pt-1 text-[12px] text-[#475569] font-medium">
               <span className="inline-flex items-center gap-1.5">
-                <Eye className="w-4 h-4" /> Visual Models
+                <Eye className="w-4 h-4 text-[#2563EB]" aria-hidden="true" /> Visual models
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Volume2 className="w-4 h-4" /> Audio Assist
+                <Volume2 className="w-4 h-4 text-[#0EA5E9]" aria-hidden="true" /> Audio assist
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Sliders className="w-4 h-4" /> Interactive
+                <Sliders className="w-4 h-4 text-[#6366F1]" aria-hidden="true" /> Interactive
               </span>
             </div>
           </div>
@@ -93,116 +108,130 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <button
               onClick={() => onSelectQuestion(QUESTION_BANK[0])}
-              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white text-[#6755E8] font-bold text-sm shadow-xl transition-all hover:scale-[1.02] cursor-pointer"
+              className="btn-primary px-6 py-3.5 text-sm shadow-md"
             >
-              <Zap className="w-4 h-4 text-[#FFC85A] fill-[#FFC85A]" />
-              <span>Start Diagnostic Practice</span>
-              <ArrowRight className="w-4 h-4" />
+              <Zap className="w-4 h-4" aria-hidden="true" />
+              <span>Start diagnostic practice</span>
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Quick Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="card-modern p-5 cursor-pointer card-interactive" onClick={onViewGamification}>
-          <div className="flex items-center justify-between text-[#74788E] text-xs font-bold mb-2">
+      {/* Quick stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <button onClick={onViewGamification} className="card-modern card-interactive p-4 sm:p-5 text-left">
+          <div className="flex items-center justify-between text-[#64748B] text-[11px] font-bold uppercase tracking-wide mb-2">
             <span>Cognitive XP</span>
-            <Sparkles className="w-4 h-4 text-[#FFC85A]" />
+            <span className="w-7 h-7 rounded-lg bg-[#FEF3C7] text-[#92400E] flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+            </span>
           </div>
-          <div className="text-2xl font-black text-[#252641] font-display tabular-nums">
-            {totalPoints} <span className="text-sm font-bold text-[#74788E]">XP</span>
+          <div className="text-2xl font-bold text-[#0F172A] font-display tabular-nums">
+            {totalPoints} <span className="text-[13px] font-semibold text-[#64748B]">XP</span>
           </div>
-          <div className="w-full bg-[#E9EAF3] h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-[#6755E8] h-full rounded-full transition-all duration-500" style={{ width: `${pointsInCurrentLevel}%` }} />
+          <div className="progress-track mt-3" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pointsInCurrentLevel} aria-label="Progress to next level">
+            <div className="progress-fill" style={{ width: `${pointsInCurrentLevel}%` }} />
+          </div>
+        </button>
+
+        <div className="card-modern p-4 sm:p-5">
+          <div className="flex items-center justify-between text-[#64748B] text-[11px] font-bold uppercase tracking-wide mb-2">
+            <span>Daily goal</span>
+            <span className="w-7 h-7 rounded-lg bg-[#E0F2FE] text-[#0369A1] flex items-center justify-center">
+              <Target className="w-3.5 h-3.5" aria-hidden="true" />
+            </span>
+          </div>
+          <div className="text-2xl font-bold text-[#0F172A] font-display tabular-nums">
+            {student.dailyGoalCompleted || 0} <span className="text-[13px] font-semibold text-[#64748B]">/ {student.dailyGoalTarget || 3}</span>
+          </div>
+          <div className="progress-track mt-3" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(dailyPercent)} aria-label="Daily goal progress">
+            <div className="progress-fill progress-fill-mastery" style={{ width: `${dailyPercent}%` }} />
           </div>
         </div>
 
-        <div className="card-modern p-5">
-          <div className="flex items-center justify-between text-[#74788E] text-xs font-bold mb-2">
-            <span>Daily Goal</span>
-            <Target className="w-4 h-4 text-[#36B8D8]" />
-          </div>
-          <div className="text-2xl font-black text-[#252641] font-display tabular-nums">
-            {student.dailyGoalCompleted || 0} <span className="text-sm font-bold text-[#74788E]">/ {student.dailyGoalTarget || 3}</span>
-          </div>
-          <div className="w-full bg-[#E9EAF3] h-1.5 rounded-full mt-3 overflow-hidden">
-            <div className="bg-[#49C6A3] h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, ((student.dailyGoalCompleted || 0) / (student.dailyGoalTarget || 3)) * 100)}%` }} />
-          </div>
-        </div>
-
-        <div className="card-modern p-5">
-          <div className="flex items-center justify-between text-[#74788E] text-xs font-bold mb-2">
+        <div className="card-modern p-4 sm:p-5">
+          <div className="flex items-center justify-between text-[#64748B] text-[11px] font-bold uppercase tracking-wide mb-2">
             <span>Streak</span>
-            <Flame className="w-4 h-4 text-[#FF9078] fill-[#FF9078]" />
+            <span className="w-7 h-7 rounded-lg bg-[#FEF3C7] text-[#92400E] flex items-center justify-center">
+              <Flame className="w-3.5 h-3.5" aria-hidden="true" />
+            </span>
           </div>
-          <div className="text-2xl font-black text-[#252641] font-display tabular-nums">
-            {student.streakDays || 1} <span className="text-sm font-bold text-[#74788E]">Days</span>
+          <div className="text-2xl font-bold text-[#0F172A] font-display tabular-nums">
+            {student.streakDays || 1} <span className="text-[13px] font-semibold text-[#64748B]">days</span>
           </div>
-          <p className="text-[11px] text-[#74788E] mt-2 font-medium">Consecutive learning momentum</p>
+          <p className="text-[11px] text-[#64748B] mt-2 font-medium">Consecutive learning momentum</p>
         </div>
 
-        <div className="card-modern p-5 cursor-pointer card-interactive" onClick={onViewHistory}>
-          <div className="flex items-center justify-between text-[#74788E] text-xs font-bold mb-2">
-            <span>Sync Queue</span>
-            <Layers className="w-4 h-4 text-[#6755E8]" />
+        <button onClick={onViewHistory} className="card-modern card-interactive p-4 sm:p-5 text-left">
+          <div className="flex items-center justify-between text-[#64748B] text-[11px] font-bold uppercase tracking-wide mb-2">
+            <span>Sync queue</span>
+            <span className="w-7 h-7 rounded-lg bg-[#EFF6FF] text-[#1D4ED8] flex items-center justify-center">
+              <Layers className="w-3.5 h-3.5" aria-hidden="true" />
+            </span>
           </div>
-          <div className="text-2xl font-black text-[#252641] font-display tabular-nums">
+          <div className="text-2xl font-bold text-[#0F172A] font-display tabular-nums">
             {pendingSyncCount}
           </div>
-          <p className="text-[11px] text-[#74788E] mt-2 font-medium">
+          <p className="text-[11px] text-[#64748B] mt-2 font-medium">
             {pendingSyncCount > 0 ? 'Upload pending' : 'All synced'}
           </p>
-        </div>
+        </button>
       </div>
 
-      {/* Action Quick Links Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      {/* Quick links */}
+      <nav aria-label="Quick links" className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { icon: School, title: 'My Classrooms', desc: 'Join with code', onClick: () => setIsClassroomsModalOpen(true) },
-          { icon: BookOpen, title: 'WAEC Syllabus', desc: 'All math modules', onClick: onViewSubjectOverview },
-          { icon: Award, title: 'Badges & Ranks', desc: 'Leaderboard', onClick: onViewGamification },
-          { icon: Play, title: 'Motion Lessons', desc: 'Micro-remedies', onClick: onViewRemedyLibrary },
+          { icon: School, title: 'My classrooms', desc: 'Join with code', onClick: () => setIsClassroomsModalOpen(true) },
+          { icon: BookOpen, title: 'WAEC syllabus', desc: 'All math modules', onClick: onViewSubjectOverview },
+          { icon: Award, title: 'Badges & ranks', desc: 'Leaderboard', onClick: onViewGamification },
+          { icon: Play, title: 'Motion lessons', desc: 'Micro-remedies', onClick: onViewRemedyLibrary },
           { icon: History, title: 'History', desc: 'Diagnostic logs', onClick: onViewHistory },
-        ].map((item, i) => (
-          <button key={i} onClick={item.onClick} className="card-modern p-4 text-left transition-all card-interactive flex flex-col gap-2 cursor-pointer">
-            <item.icon className="w-5 h-5 text-[#6755E8]" />
+        ].map((item) => (
+          <button key={item.title} onClick={item.onClick} className="card-modern card-interactive p-4 text-left flex flex-col gap-2">
+            <item.icon className="w-5 h-5 text-[#2563EB]" aria-hidden="true" />
             <div>
-              <h3 className="text-xs font-bold text-[#252641]">{item.title}</h3>
-              <p className="text-[10px] text-[#74788E]">{item.desc}</p>
+              <h3 className="text-[13px] font-bold text-[#0F172A]">{item.title}</h3>
+              <p className="text-[11px] text-[#64748B]">{item.desc}</p>
             </div>
           </button>
         ))}
-      </div>
+      </nav>
 
-      {/* Available Practice Topics */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-display font-bold text-[#252641]">Practice Sets</h2>
+      {/* Practice sets */}
+      <section className="space-y-4" aria-labelledby="practice-sets">
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="practice-sets" className="section-title">Practice sets</h2>
+          <button onClick={onViewProgress} className="btn-ghost text-[12px]">
+            View progress
+            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {QUESTION_BANK.map((q) => (
-            <div
+            <button
               key={q.id}
               onClick={() => onSelectQuestion(q)}
-              className="card-modern p-6 cursor-pointer card-interactive group"
+              className="card-modern card-interactive p-5 sm:p-6 text-left group"
             >
-              <div className="flex items-center justify-between mb-3 text-xs">
-                <span className="font-bold text-[#6755E8]">{q.topicTitle}</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#F3F1FF] text-[10px] font-bold text-[#5140CA]">
-                  {q.difficulty}
-                </span>
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <span className="text-[12px] font-bold text-[#2563EB]">{q.topicTitle}</span>
+                <span className="badge badge-neutral">{q.difficulty}</span>
               </div>
-              <div className="my-4 py-4 px-6 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-center font-mono text-2xl font-bold text-[#252641]">
+              <div className="my-4 py-4 px-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-center math-expression text-2xl font-bold text-[#0F172A] group-hover:border-[#BFDBFE] transition-colors">
                 {q.equation}
               </div>
-              <p className="text-xs text-[#74788E] mb-5 line-clamp-2">{q.prompt}</p>
-              <div className="flex items-center justify-between pt-4 border-t border-[#E9EAF3] text-xs font-bold text-[#6755E8]">
-                <span>{q.contextNote || 'WAEC Standard'}</span>
-                <span className="group-hover:translate-x-1 transition-transform">Solve Now →</span>
+              <p className="text-[13px] text-[#475569] mb-5 line-clamp-2">{q.prompt}</p>
+              <div className="flex items-center justify-between pt-4 border-t border-[#E2E8F0] text-[12px] font-bold text-[#2563EB]">
+                <span className="text-[#64748B] font-medium">{q.contextNote || 'WAEC standard'}</span>
+                <span className="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                  Solve now <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                </span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

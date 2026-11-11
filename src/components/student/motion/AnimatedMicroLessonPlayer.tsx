@@ -2,20 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Sparkles,
   Play,
-  Pause,
-  RotateCcw,
   CheckCircle2,
-  Clock,
   Download,
-  Check,
-  Volume2,
-  VolumeX,
   HelpCircle,
   Lightbulb,
   ArrowRight,
   ShieldCheck,
-  Eye,
-  Scale,
+  AlertTriangle,
+  BookOpen,
+  ListChecks,
 } from 'lucide-react';
 import { AnimatedMicroLesson } from '../../../types/lesson';
 import { LessonPlaybackControls } from './LessonPlaybackControls';
@@ -32,6 +27,15 @@ interface AnimatedMicroLessonPlayerProps {
   onBack: () => void;
 }
 
+type PlayerTab = 'animated' | 'breakdown' | 'why_fails' | 'check';
+
+const TAB_ITEMS: Array<{ id: PlayerTab; label: string; icon: React.ComponentType<{ className?: string }> }> = [
+  { id: 'animated', label: 'Animated lesson', icon: Play },
+  { id: 'breakdown', label: 'Step breakdown', icon: Lightbulb },
+  { id: 'why_fails', label: 'Why it fails', icon: AlertTriangle },
+  { id: 'check', label: 'Quick check', icon: HelpCircle },
+];
+
 export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps> = ({
   lesson,
   hasAudioPreference = false,
@@ -42,7 +46,7 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [autoPlay, setAutoPlay] = useState(false);
-  const [activeTab, setActiveTab] = useState<'animated' | 'breakdown' | 'why_fails' | 'check'>('animated');
+  const [activeTab, setActiveTab] = useState<PlayerTab>('animated');
 
   // Offline status & toast
   const [isSavedOffline, setIsSavedOffline] = useState(true);
@@ -126,41 +130,43 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
   const stepSpeechText = `${currentStep.title}. Equation: ${currentStep.equationLhs} equals ${currentStep.equationRhs}. ${currentStep.actionText}. ${currentStep.explanation}`;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 animate-fade-in pb-8">
-      {/* Toast Feedback */}
+    <div className="max-w-3xl mx-auto space-y-5 animate-fade-in pb-8">
+      {/* Toast feedback */}
       {saveToast && (
-        <div className="fixed bottom-20 right-6 z-50 p-4 rounded-2xl bg-indigo-600 text-white shadow-xl text-xs font-semibold flex items-center gap-2 animate-bounce">
-          <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+        <div
+          role="status"
+          className="fixed bottom-20 right-4 sm:right-6 z-50 p-4 rounded-2xl bg-white border border-[#A7F3D0] shadow-xl text-[12px] font-semibold text-[#065F46] flex items-center gap-2 animate-fade-in"
+        >
+          <CheckCircle2 className="w-4 h-4 text-[#059669]" aria-hidden="true" />
           <span>{saveToast}</span>
         </div>
       )}
 
-      {/* Top Header Card */}
-      <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-br from-indigo-950/90 via-slate-900 to-slate-950 border border-indigo-800/60 shadow-2xl space-y-3">
+      {/* Lesson header */}
+      <section className="p-5 sm:p-7 rounded-3xl bg-white border border-[#E2E8F0] shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
-              Motion Micro-Remedy · {lesson.durationMinutes} Min
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="eyebrow text-[#2563EB]">
+              Motion micro-remedy · {lesson.durationMinutes} min
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3" />
-              <span>100% Offline Ready</span>
+            <span className="badge badge-mastery">
+              <ShieldCheck className="w-3 h-3" aria-hidden="true" />
+              100% offline ready
             </span>
           </div>
 
-          {/* Offline Save & Audio Quick Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={handleSaveOffline}
-              className={`text-xs px-2.5 py-1.5 rounded-xl border transition cursor-pointer flex items-center gap-1.5 ${
+              className={`text-[11px] px-2.5 py-1.5 min-h-[36px] rounded-xl border transition cursor-pointer flex items-center gap-1.5 font-semibold ${
                 isSavedOffline
-                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
-                  : 'bg-slate-900 text-slate-300 border-slate-700 hover:text-white'
+                  ? 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]'
+                  : 'bg-white text-[#475569] border-[#E2E8F0] hover:bg-[#F8FAFC]'
               }`}
               title="Save lesson to on-device memory"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>{isSavedOffline ? 'Saved On-Device' : `Save Offline (${lesson.downloadSizeKb}KB)`}</span>
+              <Download className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{isSavedOffline ? 'Saved on-device' : `Save offline (${lesson.downloadSizeKb}KB)`}</span>
             </button>
 
             <AudioPlayerControl
@@ -172,70 +178,56 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
           </div>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight">
-          {lesson.title}
-        </h1>
-        <p className="text-sm text-slate-300 leading-relaxed">
-          {lesson.subtitle}
-        </p>
+        <div>
+          <h1 className="page-title">{lesson.title}</h1>
+          <p className="body-text mt-1">{lesson.subtitle}</p>
+        </div>
 
-        {/* The MindTrace Axiom Card */}
-        <div className="p-4 rounded-2xl bg-indigo-900/30 border border-indigo-700/50 flex items-start gap-3">
-          <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+        {/* MindTrace axiom */}
+        <div className="math-step math-step-ai p-4 flex items-start gap-3">
+          <Sparkles className="w-5 h-5 text-[#6366F1] shrink-0 mt-0.5" aria-hidden="true" />
           <div>
-            <strong className="text-xs uppercase font-bold text-amber-300 block mb-0.5">
-              The MindTrace Axiom:
+            <strong className="text-[11px] uppercase tracking-[0.08em] font-bold text-[#4338CA] block mb-0.5">
+              The MindTrace axiom
             </strong>
-            <p className="text-xs sm:text-sm text-white font-medium leading-relaxed">
+            <p className="text-[13px] sm:text-sm text-[#3730A3] font-medium leading-relaxed">
               {lesson.axiom}
             </p>
           </div>
         </div>
+      </section>
+
+      {/* Tabs */}
+      <div
+        className="flex items-center gap-1 p-1 bg-[#F1F5F9] border border-[#E2E8F0] rounded-2xl overflow-x-auto no-scrollbar"
+        role="tablist"
+        aria-label="Lesson sections"
+      >
+        {TAB_ITEMS.map((tab) => {
+          const Icon = tab.icon;
+          const selected = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={selected}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 min-w-[120px] min-h-[40px] py-2 px-3 text-[12px] font-semibold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                selected
+                  ? 'bg-white text-[#1D4ED8] shadow-sm border border-[#E2E8F0]'
+                  : 'text-[#64748B] hover:text-[#0F172A]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Segmented Mode Navigation (Motion Stage, 8-Step Walkthrough, Why Wrong Fails, Check) */}
-      <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl overflow-x-auto no-scrollbar">
-        <button
-          onClick={() => setActiveTab('animated')}
-          className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'animated' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <Play className="w-3.5 h-3.5" />
-          <span>Animated Lesson</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('breakdown')}
-          className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'breakdown' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <Lightbulb className="w-3.5 h-3.5" />
-          <span>Step Breakdown</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('why_fails')}
-          className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'why_fails' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <span>Why It Fails</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('check')}
-          className={`flex-1 min-w-[120px] py-2 px-3 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 ${
-            activeTab === 'check' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
-          <span>Quick Check</span>
-        </button>
-      </div>
-
-      {/* MODE 1: Animated Interactive Lesson Stage */}
+      {/* MODE 1: animated stage */}
       {activeTab === 'animated' && (
         <div className="space-y-4">
-          {/* Visual Model Canvas */}
           {lesson.visualModel === 'balance_scale' && (
             <AnimatedBalanceScaleStage
               leftExpression={currentStep.equationLhs}
@@ -259,23 +251,23 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
             />
           )}
 
-          {/* Step Narrative Card */}
-          <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-3 shadow-xl">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-indigo-400">
+          {/* Step narrative */}
+          <section className="p-5 sm:p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[12px] font-mono font-bold text-[#2563EB]">
                 Step {currentStep.stepNumber} of {totalSteps}: {currentStep.title}
               </span>
 
               {currentStep.operationBadge && (
                 <span
-                  className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
+                  className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-full border ${
                     currentStep.operationBadge.type === 'add'
-                      ? 'bg-indigo-950 text-indigo-300 border border-indigo-700'
+                      ? 'bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]'
                       : currentStep.operationBadge.type === 'divide'
-                      ? 'bg-violet-950 text-violet-300 border border-violet-700'
+                      ? 'bg-[#EEF2FF] text-[#4338CA] border-[#C7D2FE]'
                       : currentStep.operationBadge.type === 'cancel'
-                      ? 'bg-rose-950 text-rose-300 border border-rose-700'
-                      : 'bg-emerald-950 text-emerald-300 border border-emerald-700'
+                      ? 'bg-[#F1F5F9] text-[#334155] border-[#CBD5E1]'
+                      : 'bg-[#D1FAE5] text-[#065F46] border-[#A7F3D0]'
                   }`}
                 >
                   {currentStep.operationBadge.text}
@@ -283,34 +275,30 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
               )}
             </div>
 
-            {/* Current equation row with high contrast font */}
-            <div className="py-3 px-4 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-center gap-3 font-mono text-xl sm:text-2xl font-bold text-white">
+            {/* Current equation */}
+            <div className="py-4 px-4 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex flex-wrap items-center justify-center gap-3 math-expression text-xl sm:text-2xl font-bold text-[#0F172A]">
               <span>{currentStep.equationLhs}</span>
-              <span className="text-indigo-400">=</span>
+              <span className="text-[#2563EB]">=</span>
               <span>{currentStep.equationRhs}</span>
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+              <h2 className="text-[11px] font-bold text-[#334155] uppercase tracking-[0.08em]">
                 Action: {currentStep.actionText}
-              </h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                {currentStep.explanation}
-              </p>
+              </h2>
+              <p className="body-text">{currentStep.explanation}</p>
             </div>
 
-            {/* In-Step Audio Player */}
-            <div className="pt-2 border-t border-slate-800/80">
+            <div className="pt-2 border-t border-[#E2E8F0]">
               <AudioPlayerControl
                 textToSpeak={stepSpeechText}
-                label="Listen to Step Explanation"
+                label="Listen to step explanation"
                 variant="card"
                 hasAudioPreference={hasAudioPreference}
               />
             </div>
-          </div>
+          </section>
 
-          {/* Playback Scrubber and Action Controls */}
           <LessonPlaybackControls
             isPlaying={isPlaying}
             currentStep={currentStep.stepNumber}
@@ -328,72 +316,86 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
         </div>
       )}
 
-      {/* MODE 2: Complete 8-Step Walkthrough Grid */}
+      {/* MODE 2: full walkthrough */}
       {activeTab === 'breakdown' && (
-        <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4">
-          <h2 className="text-base font-display font-bold text-white">
-            Full 8-Step Mathematical Proof Sequence
-          </h2>
-          <div className="space-y-3">
-            {lesson.steps.map((st, idx) => (
-              <div
-                key={idx}
-                onClick={() => {
-                  setCurrentStepIndex(idx);
-                  setActiveTab('animated');
-                }}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                  idx === currentStepIndex
-                    ? 'bg-indigo-950/70 border-indigo-500 shadow-md'
-                    : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-slate-800 text-[10px] font-mono font-bold text-slate-300 flex items-center justify-center">
-                      {st.stepNumber}
-                    </span>
-                    <h3 className="text-xs font-bold text-white">{st.title}</h3>
-                  </div>
-                  <p className="text-xs text-slate-400 pl-7">{st.explanation}</p>
-                </div>
-
-                <div className="pl-7 sm:pl-0 font-mono text-sm font-bold text-indigo-300 shrink-0">
-                  {st.equationLhs} = {st.equationRhs}
-                </div>
-              </div>
-            ))}
+        <section className="p-5 sm:p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-4">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#2563EB]" aria-hidden="true" />
+            <h2 className="section-title">Full step-by-step proof sequence</h2>
           </div>
-        </div>
+          <div className="space-y-2.5">
+            {lesson.steps.map((st, idx) => {
+              const isCurrent = idx === currentStepIndex;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setCurrentStepIndex(idx);
+                    setActiveTab('animated');
+                  }}
+                  className={`w-full text-left p-4 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    isCurrent
+                      ? 'bg-[#EFF6FF] border-[#2563EB] shadow-sm'
+                      : 'bg-white border-[#E2E8F0] hover:border-[#93C5FD] hover:bg-[#F8FAFC]'
+                  }`}
+                >
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`w-6 h-6 rounded-lg text-[11px] font-mono font-bold flex items-center justify-center shrink-0 ${
+                          isCurrent
+                            ? 'bg-[#2563EB] text-white'
+                            : 'bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]'
+                        }`}
+                      >
+                        {st.stepNumber}
+                      </span>
+                      <h3 className="text-[13px] font-bold text-[#0F172A]">{st.title}</h3>
+                      {isCurrent && <span className="badge badge-primary">Current</span>}
+                    </div>
+                    <p className="text-[12px] text-[#475569] pl-8">{st.explanation}</p>
+                  </div>
+
+                  <div className="pl-8 sm:pl-0 math-expression text-sm font-bold text-[#1D4ED8] shrink-0">
+                    {st.equationLhs} = {st.equationRhs}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
       )}
 
-      {/* MODE 3: Why Incorrect Approach Fails */}
+      {/* MODE 3: why the misconception fails */}
       {activeTab === 'why_fails' && (
-        <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4 animate-fade-in">
-          <h2 className="text-base font-display font-bold text-white flex items-center gap-2 text-rose-300">
-            <span>Deconstructing the Misconception</span>
-          </h2>
+        <section className="p-5 sm:p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-4 animate-fade-in">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-[#D97706]" aria-hidden="true" />
+            <h2 className="section-title">Deconstructing the misconception</h2>
+          </div>
 
-          <div className="p-4 rounded-2xl bg-rose-950/50 border border-rose-800/60 space-y-3">
-            <span className="text-xs uppercase font-bold text-rose-300">The False Transition:</span>
-            <div className="font-mono text-xl font-bold text-rose-200">
+          <div className="math-step math-step-misconception p-4 space-y-3">
+            <span className="text-[11px] uppercase tracking-[0.08em] font-bold text-[#92400E]">
+              The false transition
+            </span>
+            <div className="math-expression text-xl font-bold text-[#78350F] break-words">
               {lesson.whyIncorrectFails.incorrectStep}
             </div>
-            <p className="text-xs text-rose-300/90 leading-relaxed">
-              Leading to: <span className="font-mono font-bold text-white">{lesson.whyIncorrectFails.result}</span>
+            <p className="text-[12px] text-[#92400E]/90 leading-relaxed">
+              Leading to: <span className="math-expression font-bold text-[#78350F]">{lesson.whyIncorrectFails.result}</span>
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-            <span className="text-xs uppercase font-bold text-slate-400">Why It Breaks Mathematical Law:</span>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              {lesson.whyIncorrectFails.explanation}
-            </p>
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-2">
+            <span className="text-[11px] uppercase tracking-[0.08em] font-bold text-[#64748B]">
+              Why it breaks mathematical law
+            </span>
+            <p className="body-text">{lesson.whyIncorrectFails.explanation}</p>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* MODE 4: Quick Comprehension Check */}
+      {/* MODE 4: comprehension check */}
       {activeTab === 'check' && (
         <ComprehensionCheckCard
           check={lesson.comprehensionCheck}
@@ -403,22 +405,22 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
         />
       )}
 
-      {/* Bottom CTA to Prove Mastery */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800/80">
+      {/* Bottom CTA */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#E2E8F0]">
         <button
           onClick={onBack}
-          className="text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+          className="text-[13px] font-semibold text-[#475569] hover:text-[#0F172A] transition-colors cursor-pointer min-h-[40px]"
         >
-          ← Return to Dashboard
+          ← Return to dashboard
         </button>
 
         <button
           onClick={onProceedToFollowUp}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-xl shadow-emerald-600/30 transition hover:scale-[1.02] cursor-pointer"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-[13px] shadow-sm transition-colors cursor-pointer"
         >
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Prove Mastery: Take Single Follow-Up Check</span>
-          <ArrowRight className="w-4 h-4" />
+          <ListChecks className="w-4 h-4" aria-hidden="true" />
+          <span>Prove mastery: take single follow-up check</span>
+          <ArrowRight className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
     </div>

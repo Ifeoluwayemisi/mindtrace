@@ -48,77 +48,96 @@ export const PasswordChangeScreen: React.FC<PasswordChangeScreenProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto my-auto min-h-[70vh] flex flex-col justify-center px-4 py-8 animate-fade-in space-y-6">
+    <div className="max-w-md mx-auto my-auto min-h-[70vh] flex flex-col justify-center px-4 py-8 animate-fade-in space-y-5">
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF9EB] border border-[#FCECC2] text-[#B27B08] text-xs font-bold">
-          <ShieldAlert className="w-3.5 h-3.5" />
-          <span>Security Notice · Password Update Required</span>
-        </div>
-        <h1 className="text-2xl font-display font-extrabold text-[#252641]">
-          Establish Your Private Password
-        </h1>
-        <p className="text-xs text-[#74788E] max-w-sm mx-auto leading-relaxed">
-          Your account was provisioned with a temporary or school-assigned credential. For your academic and diagnostic privacy, you must establish a permanent password before accessing MindTrace.
+        <span className="badge badge-diagnostic inline-flex">
+          <ShieldAlert className="w-3.5 h-3.5" aria-hidden="true" />
+          <span>Security notice · password update required</span>
+        </span>
+        <h1 className="page-title">Set your private password</h1>
+        <p className="body-text max-w-sm mx-auto">
+          Your account was provisioned with a temporary or school-assigned credential. For your
+          academic and diagnostic privacy, set a permanent password before continuing.
         </p>
       </div>
 
       {errorMessage && (
-        <div className="p-3.5 rounded-2xl bg-[#FFF1EE] border border-[#FDDDD7] text-[#D64D31] text-xs flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+        <div
+          role="alert"
+          className="p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-[13px] flex items-start gap-2.5"
+        >
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4">
+      <form onSubmit={handleSubmit} className="card-modern p-6 sm:p-7 space-y-4">
         <div>
-          <label className="block text-xs font-bold text-[#252641] mb-1.5">New Password</label>
-          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
-            <Lock className="w-4 h-4 text-[#74788E]" />
+          <label htmlFor="new-password" className="label-modern">
+            New password
+          </label>
+          <div className="flex items-center gap-2.5 px-3 rounded-xl bg-white border border-[#E2E8F0] focus-within:border-[#2563EB] focus-within:shadow-[0_0_0_3px_rgba(37,99,235,0.14)] transition-shadow">
+            <Lock className="w-4 h-4 text-[#94A3B8] shrink-0" aria-hidden="true" />
             <input
+              id="new-password"
               type={showPassword ? 'text' : 'password'}
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="At least 6 characters"
-              className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
+              autoComplete="new-password"
+              className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-[#74788E] hover:text-[#252641] cursor-pointer"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              className="p-1.5 rounded-md text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors cursor-pointer shrink-0"
             >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showPassword ? (
+                <EyeOff className="w-4 h-4" aria-hidden="true" />
+              ) : (
+                <Eye className="w-4 h-4" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-[#252641] mb-1.5">Confirm New Password</label>
-          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
-            <Lock className="w-4 h-4 text-[#74788E]" />
+          <label htmlFor="confirm-password" className="label-modern">
+            Confirm new password
+          </label>
+          <div className="flex items-center gap-2.5 px-3 rounded-xl bg-white border border-[#E2E8F0] focus-within:border-[#2563EB] focus-within:shadow-[0_0_0_3px_rgba(37,99,235,0.14)] transition-shadow">
+            <Lock className="w-4 h-4 text-[#94A3B8] shrink-0" aria-hidden="true" />
             <input
+              id="confirm-password"
               type={showPassword ? 'text' : 'password'}
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
+              placeholder="Retype new password"
+              autoComplete="new-password"
+              className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
             />
           </div>
+          {confirmPassword.length > 0 && confirmPassword !== newPassword && (
+            <p className="text-[12px] text-[#92400E] mt-1.5">Passwords do not match yet.</p>
+          )}
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1">
           <button
             type="submit"
             disabled={isLoading || newPassword.length < 6 || newPassword !== confirmPassword}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs text-white shadow-md shadow-[#6755E8]/30 transition flex items-center justify-center gap-2 cursor-pointer"
+            className="btn-primary w-full"
           >
             {isLoading ? (
-              <span>Updating credentials...</span>
+              <span>Updating credentials…</span>
             ) : (
               <>
-                <span>Save New Password & Continue</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Save password & continue</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </>
             )}
           </button>
@@ -126,12 +145,8 @@ export const PasswordChangeScreen: React.FC<PasswordChangeScreenProps> = ({
       </form>
 
       <div className="text-center">
-        <button
-          type="button"
-          onClick={onLogout}
-          className="inline-flex items-center gap-1.5 text-xs text-[#74788E] hover:text-[#252641] font-semibold transition cursor-pointer"
-        >
-          <LogOut className="w-3.5 h-3.5" />
+        <button type="button" onClick={onLogout} className="btn-ghost">
+          <LogOut className="w-3.5 h-3.5" aria-hidden="true" />
           <span>Log out and return later</span>
         </button>
       </div>

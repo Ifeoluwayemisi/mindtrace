@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Users,
   Plus,
   Copy,
   RefreshCw,
@@ -9,10 +8,10 @@ import {
   Trash2,
   X,
   CheckCircle2,
-  AlertTriangle,
   BookOpen,
 } from 'lucide-react';
 import { apiRequest } from '../../services/apiClient';
+import { getInitials } from '../../utils/avatar';
 
 interface ClassroomManagerModalProps {
   isOpen: boolean;
@@ -167,174 +166,198 @@ export const ClassroomManagerModal: React.FC<ClassroomManagerModalProps> = ({ is
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+    <div
+      className="modal-backdrop animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="classroom-manager-title"
+    >
       {toast && (
-        <div className="fixed top-6 right-6 z-50 p-3 rounded-2xl bg-indigo-600 text-white shadow-xl text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed top-5 right-5 z-[80] px-4 py-3 rounded-xl bg-white border border-[#A7F3D0] shadow-lg text-[13px] font-semibold text-[#065F46] flex items-center gap-2 animate-fade-in"
+        >
+          <CheckCircle2 className="w-4 h-4 text-[#059669]" aria-hidden="true" />
           <span>{toast}</span>
         </div>
       )}
 
-      <div className="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+      <div className="modal-surface max-w-4xl">
         {/* Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-              <BookOpen className="w-5 h-5" />
+        <div className="p-5 border-b border-[#E2E8F0] flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] flex items-center justify-center text-[#2563EB] shrink-0">
+              <BookOpen className="w-5 h-5" aria-hidden="true" />
             </div>
-            <div>
-              <h2 className="text-base font-display font-bold text-white">Classroom Management & Roster</h2>
-              <p className="text-xs text-slate-400">Create classes, manage invite codes & onboard students</p>
+            <div className="min-w-0">
+              <h2 id="classroom-manager-title" className="section-title">
+                Classroom management
+              </h2>
+              <p className="text-[13px] text-[#475569]">
+                Create classes, manage invite codes and onboard students.
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>New Classroom</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={() => setShowCreateModal(true)} className="btn-primary min-h-[40px] px-3">
+              <Plus className="w-4 h-4" aria-hidden="true" />
+              <span className="hidden sm:inline">New classroom</span>
             </button>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
+            <button onClick={onClose} aria-label="Close classroom manager" className="icon-btn">
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Classrooms List Column */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Classrooms</h3>
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Classrooms list */}
+          <section className="space-y-3" aria-labelledby="your-classrooms-heading">
+            <h3 id="your-classrooms-heading" className="eyebrow">
+              Your classrooms
+            </h3>
             {loading ? (
-              <p className="text-xs text-slate-500 py-6 text-center">Loading classrooms...</p>
+              <p className="text-[13px] text-[#64748B] py-6 text-center">Loading classrooms…</p>
             ) : classrooms.length === 0 ? (
-              <div className="p-6 rounded-2xl bg-slate-950/60 border border-slate-800 text-center space-y-3">
-                <p className="text-xs text-slate-400">No classrooms created yet.</p>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold"
-                >
-                  Create First Classroom
+              <div className="p-6 rounded-xl bg-[#F8FAFC] border border-dashed border-[#CBD5E1] text-center space-y-3">
+                <p className="text-[13px] text-[#475569]">No classrooms created yet.</p>
+                <button onClick={() => setShowCreateModal(true)} className="btn-secondary min-h-[36px] px-3 text-[12px]">
+                  Create first classroom
                 </button>
               </div>
             ) : (
-              classrooms.map((cls) => (
-                <div
-                  key={cls.id}
-                  onClick={() => selectClassroom(cls)}
-                  className={`p-4 rounded-2xl border transition cursor-pointer space-y-2 ${
-                    selectedClass?.id === cls.id
-                      ? 'bg-indigo-950/40 border-indigo-500/80 shadow-lg'
-                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-white text-sm">{cls.name}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                      {cls.gradeLevel}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-slate-400">
-                    <span>{cls.subject || 'Mathematics'}</span>
-                    <span className="font-mono text-indigo-300 font-semibold">Code: {cls.inviteCode}</span>
-                  </div>
-                </div>
-              ))
+              <ul className="space-y-2">
+                {classrooms.map((cls) => {
+                  const active = selectedClass?.id === cls.id;
+                  return (
+                    <li key={cls.id}>
+                      <button
+                        onClick={() => selectClassroom(cls)}
+                        aria-pressed={active}
+                        className={`w-full text-left p-3.5 rounded-xl border transition-colors cursor-pointer space-y-2 ${
+                          active
+                            ? 'bg-[#EFF6FF] border-[#2563EB]'
+                            : 'bg-white border-[#E2E8F0] hover:border-[#CBD5E1]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-[#0F172A] text-[13px] truncate">{cls.name}</span>
+                          <span className="badge badge-neutral">{cls.gradeLevel}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-2 text-[11px] text-[#475569]">
+                          <span className="truncate">{cls.subject || 'Mathematics'}</span>
+                          <span className="font-mono text-[#1D4ED8] font-semibold whitespace-nowrap">
+                            {cls.inviteCode}
+                          </span>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
-          </div>
+          </section>
 
-          {/* Selected Classroom Roster & Details Column */}
+          {/* Selected classroom */}
           <div className="md:col-span-2 space-y-4">
             {selectedClass ? (
-              <div className="rounded-2xl bg-slate-950/80 border border-slate-800 p-5 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-                  <div>
-                    <h3 className="text-lg font-display font-bold text-white">{selectedClass.name}</h3>
-                    <p className="text-xs text-slate-400">
-                      {selectedClass.subject} · Grade {selectedClass.gradeLevel} · Invite Code:{' '}
-                      <span className="font-mono font-bold text-indigo-400">{selectedClass.inviteCode}</span>
+              <div className="rounded-xl bg-white border border-[#E2E8F0] p-4 sm:p-5 space-y-4">
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-3 pb-3 border-b border-[#E2E8F0]">
+                  <div className="min-w-0">
+                    <h3 className="text-[15px] font-semibold text-[#0F172A] truncate">{selectedClass.name}</h3>
+                    <p className="text-[12px] text-[#475569] mt-0.5">
+                      {selectedClass.subject} · Grade {selectedClass.gradeLevel} · Invite code:{' '}
+                      <span className="font-mono font-semibold text-[#1D4ED8]">{selectedClass.inviteCode}</span>
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(selectedClass.inviteCode);
                         showToast('Invite code copied to clipboard!');
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold inline-flex items-center gap-1.5 transition cursor-pointer"
+                      className="btn-secondary min-h-[34px] px-3 text-[12px]"
                     >
-                      <Copy className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>Copy Code</span>
+                      <Copy className="w-3.5 h-3.5 text-[#2563EB]" aria-hidden="true" />
+                      <span>Copy code</span>
                     </button>
                     <button
                       onClick={() => handleRegenerateCode(selectedClass.id)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold inline-flex items-center gap-1.5 transition cursor-pointer"
+                      className="icon-btn w-9 h-9"
                       title="Generate new invite code"
+                      aria-label="Generate new invite code"
                     >
-                      <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                      <RefreshCw className="w-3.5 h-3.5 text-[#B45309]" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => setShowOnboardModal(true)}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition cursor-pointer"
+                      className="btn-primary min-h-[34px] px-3 text-[12px]"
                     >
-                      <UserPlus className="w-3.5 h-3.5" />
-                      <span>Onboard Student</span>
+                      <UserPlus className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>Onboard student</span>
                     </button>
                     <button
                       onClick={() => handleArchiveClassroom(selectedClass.id)}
-                      className="p-2 rounded-xl bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 transition cursor-pointer"
-                      title="Archive Classroom"
+                      className="icon-btn w-9 h-9 text-[#B91C1C] border-[#FECACA] hover:bg-[#FEF2F2] hover:text-[#991B1B]"
+                      title="Archive classroom"
+                      aria-label="Archive classroom"
                     >
-                      <Archive className="w-3.5 h-3.5" />
+                      <Archive className="w-3.5 h-3.5" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
 
-                {/* Roster list */}
+                {/* Roster */}
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    Enrolled Student Roster ({roster.length})
+                  <h4 className="eyebrow">
+                    Enrolled roster ({roster.length})
                   </h4>
                   {loadingRoster ? (
-                    <p className="text-xs text-slate-500 py-4 text-center">Loading roster...</p>
+                    <p className="text-[13px] text-[#64748B] py-4 text-center">Loading roster…</p>
                   ) : roster.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl">
-                      No students enrolled yet. Share invite code <span className="font-mono text-indigo-400">{selectedClass.inviteCode}</span> with your students or use Onboard Student.
+                    <div className="p-5 text-center text-[12px] text-[#475569] bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
+                      No students enrolled yet. Share invite code{' '}
+                      <span className="font-mono text-[#1D4ED8] font-semibold">{selectedClass.inviteCode}</span>{' '}
+                      with your students or use Onboard student.
                     </div>
                   ) : (
-                    <div className="divide-y divide-slate-800/60 max-h-64 overflow-y-auto">
+                    <ul className="divide-y divide-[#F1F5F9] max-h-64 overflow-y-auto">
                       {roster.map((st) => (
-                        <div key={st.id} className="py-2.5 flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-800/60 text-indigo-300 font-bold flex items-center justify-center text-[10px]">
-                              {st.fullName?.substring(0, 2).toUpperCase() || 'ST'}
+                        <li key={st.id} className="py-2.5 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE] text-[#1D4ED8] font-semibold flex items-center justify-center text-[10px] shrink-0">
+                              {getInitials(st.fullName)}
                             </div>
-                            <div>
-                              <span className="font-semibold text-white block">{st.fullName}</span>
-                              <span className="text-[10px] text-slate-400">XP: {st.totalXp || 0} · Streak: {st.streakDays || 0}d</span>
+                            <div className="min-w-0">
+                              <span className="font-semibold text-[#0F172A] block text-[12px] truncate">
+                                {st.fullName}
+                              </span>
+                              <span className="text-[11px] text-[#64748B]">
+                                XP: {st.totalXp || 0} · Streak: {st.streakDays || 0}d
+                              </span>
                             </div>
                           </div>
                           <button
                             onClick={() => handleRemoveStudent(st.id)}
-                            className="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 transition"
+                            className="p-2 rounded-lg text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors shrink-0"
                             title="Remove student"
+                            aria-label={`Remove ${st.fullName} from classroom`}
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                           </button>
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="p-12 text-center text-xs text-slate-500 bg-slate-950/40 rounded-3xl border border-slate-800 flex flex-col items-center justify-center space-y-2">
-                <BookOpen className="w-8 h-8 text-slate-600 mb-1" />
-                <p>Select a classroom on the left to inspect its roster and manage invite codes.</p>
+              <div className="p-10 text-center bg-[#F8FAFC] rounded-xl border border-dashed border-[#CBD5E1] flex flex-col items-center justify-center space-y-2">
+                <BookOpen className="w-7 h-7 text-[#94A3B8]" aria-hidden="true" />
+                <p className="text-[13px] text-[#475569] max-w-xs">
+                  Select a classroom on the left to inspect its roster and manage invite codes.
+                </p>
               </div>
             )}
           </div>
@@ -343,37 +366,46 @@ export const ClassroomManagerModal: React.FC<ClassroomManagerModalProps> = ({ is
 
       {/* Create Classroom Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <form onSubmit={handleCreateClassroom} className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white">Create New Classroom</h3>
+        <div className="modal-backdrop z-[70]" role="dialog" aria-modal="true" aria-labelledby="new-classroom-title">
+          <form onSubmit={handleCreateClassroom} className="modal-surface max-w-md p-6 space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <h3 id="new-classroom-title" className="section-title">
+                Create new classroom
+              </h3>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(false)}
-                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+                aria-label="Close create classroom dialog"
+                className="icon-btn w-9 h-9 shrink-0"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Classroom Name</label>
+                <label htmlFor="new-class-name" className="label-modern">
+                  Classroom name
+                </label>
                 <input
+                  id="new-class-name"
                   type="text"
                   required
                   placeholder="e.g. SS2 Science A — Mathematics"
                   value={newClassName}
                   onChange={(e) => setNewClassName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-hidden focus:border-indigo-500"
+                  className="input-modern"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1">Grade Level</label>
+                  <label htmlFor="new-class-grade" className="label-modern">
+                    Grade level
+                  </label>
                   <select
+                    id="new-class-grade"
                     value={newGradeLevel}
                     onChange={(e) => setNewGradeLevel(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-hidden"
+                    className="input-modern font-semibold cursor-pointer"
                   >
                     <option value="SS1">SS1</option>
                     <option value="SS2">SS2</option>
@@ -381,39 +413,38 @@ export const ClassroomManagerModal: React.FC<ClassroomManagerModalProps> = ({ is
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1">Subject</label>
+                  <label htmlFor="new-class-subject" className="label-modern">
+                    Subject
+                  </label>
                   <input
+                    id="new-class-subject"
                     type="text"
                     value={newSubject}
                     onChange={(e) => setNewSubject(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-hidden"
+                    className="input-modern"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-xs text-slate-400 font-medium block mb-1">Description (Optional)</label>
+                <label htmlFor="new-class-description" className="label-modern">
+                  Description (optional)
+                </label>
                 <input
+                  id="new-class-description"
                   type="text"
                   placeholder="e.g. Preparing for WAEC 2026 Mathematics Paper 1 & 2"
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-hidden"
+                  className="input-modern"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold"
-              >
+              <button type="button" onClick={() => setShowCreateModal(false)} className="btn-secondary">
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
-              >
-                Create Classroom
+              <button type="submit" className="btn-primary">
+                Create classroom
               </button>
             </div>
           </form>
@@ -422,35 +453,45 @@ export const ClassroomManagerModal: React.FC<ClassroomManagerModalProps> = ({ is
 
       {/* Onboard Student Modal */}
       {showOnboardModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white">Onboard New Student</h3>
+        <div className="modal-backdrop z-[70]" role="dialog" aria-modal="true" aria-labelledby="onboard-student-title">
+          <div className="modal-surface max-w-md p-6 space-y-4">
+            <div className="flex items-start justify-between gap-3">
+              <h3 id="onboard-student-title" className="section-title">
+                Onboard new student
+              </h3>
               <button
                 type="button"
                 onClick={() => {
                   setShowOnboardModal(false);
                   setOnboardResult(null);
                 }}
-                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+                aria-label="Close onboard student dialog"
+                className="icon-btn w-9 h-9 shrink-0"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
             {onboardResult ? (
               <div className="space-y-4">
-                <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800/60 text-emerald-200 space-y-2">
-                  <div className="flex items-center gap-2 font-bold text-xs text-emerald-300">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>Student Onboarded Successfully</span>
+                <div className="p-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] space-y-2">
+                  <div className="flex items-center gap-2 font-semibold text-[13px] text-[#047857]">
+                    <CheckCircle2 className="w-4 h-4 text-[#059669]" aria-hidden="true" />
+                    <span>Student onboarded successfully</span>
                   </div>
-                  <p className="text-[11px] text-emerald-200/80">
-                    Provide the following temporary credentials to <span className="font-bold text-white">{onboardResult.fullName}</span>:
+                  <p className="text-[12px] text-[#065F46]">
+                    Provide the following temporary credentials to{' '}
+                    <span className="font-semibold text-[#0F172A]">{onboardResult.fullName}</span>:
                   </p>
-                  <div className="bg-slate-950 p-3 rounded-xl font-mono text-xs space-y-1 text-slate-300">
-                    <div>Username: <span className="text-white font-bold">{onboardResult.username}</span></div>
-                    <div>Temp Password: <span className="text-amber-300 font-bold">{onboardResult.temporaryPassword}</span></div>
+                  <div className="bg-white p-3 rounded-lg font-mono text-[12px] space-y-1 text-[#334155] border border-[#A7F3D0]">
+                    <div>
+                      Username:{' '}
+                      <span className="text-[#0F172A] font-semibold">{onboardResult.username}</span>
+                    </div>
+                    <div>
+                      Temp password:{' '}
+                      <span className="text-[#92400E] font-semibold">{onboardResult.temporaryPassword}</span>
+                    </div>
                   </div>
                 </div>
                 <button
@@ -459,7 +500,7 @@ export const ClassroomManagerModal: React.FC<ClassroomManagerModalProps> = ({ is
                     setOnboardResult(null);
                     setShowOnboardModal(false);
                   }}
-                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
+                  className="btn-primary w-full"
                 >
                   Done
                 </button>
@@ -467,33 +508,43 @@ export const ClassroomManagerModal: React.FC<ClassroomManagerModalProps> = ({ is
             ) : (
               <form onSubmit={handleOnboardStudent} className="space-y-3">
                 <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1">Student Full Name</label>
+                  <label htmlFor="onboard-name" className="label-modern">
+                    Student full name
+                  </label>
                   <input
+                    id="onboard-name"
                     type="text"
                     required
                     placeholder="e.g. Oluwaseun Adeleke"
                     value={onboardName}
                     onChange={(e) => setOnboardName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-hidden"
+                    className="input-modern"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1">Username</label>
+                  <label htmlFor="onboard-username" className="label-modern">
+                    Username
+                  </label>
                   <input
+                    id="onboard-username"
                     type="text"
                     required
                     placeholder="e.g. oluwaseun_a"
                     value={onboardUsername}
                     onChange={(e) => setOnboardUsername(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-hidden"
+                    autoComplete="off"
+                    className="input-modern font-mono"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 font-medium block mb-1">Grade Level</label>
+                  <label htmlFor="onboard-grade" className="label-modern">
+                    Grade level
+                  </label>
                   <select
+                    id="onboard-grade"
                     value={onboardGrade}
                     onChange={(e) => setOnboardGrade(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-hidden"
+                    className="input-modern font-semibold cursor-pointer"
                   >
                     <option value="SS1">SS1</option>
                     <option value="SS2">SS2</option>
@@ -501,18 +552,11 @@ export const ClassroomManagerModal: React.FC<ClassroomManagerModalProps> = ({ is
                   </select>
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowOnboardModal(false)}
-                    className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold"
-                  >
+                  <button type="button" onClick={() => setShowOnboardModal(false)} className="btn-secondary">
                     Cancel
                   </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
-                  >
-                    Generate Credentials
+                  <button type="submit" className="btn-primary">
+                    Generate credentials
                   </button>
                 </div>
               </form>
