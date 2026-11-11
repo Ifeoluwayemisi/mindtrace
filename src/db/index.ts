@@ -123,10 +123,39 @@ sqlite.exec(`
   CREATE TABLE IF NOT EXISTS assignments (
     id TEXT PRIMARY KEY,
     classroom_id TEXT NOT NULL,
+    teacher_id TEXT NOT NULL,
     title TEXT NOT NULL,
-    topic_id TEXT NOT NULL,
+    instructions TEXT,
+    subject TEXT NOT NULL DEFAULT 'Mathematics',
+    grade_level TEXT NOT NULL,
+    published INTEGER NOT NULL DEFAULT 0,
     due_date TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    late_policy TEXT,
+    retake_policy TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS assignment_questions (
+    id TEXT PRIMARY KEY,
+    assignment_id TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    display_order INTEGER NOT NULL,
+    marks INTEGER NOT NULL DEFAULT 1
+  );
+
+  CREATE TABLE IF NOT EXISTS assignment_submissions (
+    id TEXT PRIMARY KEY,
+    assignment_id TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    diagnostic_attempt_id TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'submitted',
+    score INTEGER NOT NULL DEFAULT 0,
+    total_marks INTEGER NOT NULL DEFAULT 0,
+    xp_earned INTEGER NOT NULL DEFAULT 0,
+    submitted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_late INTEGER NOT NULL DEFAULT 0,
+    attempt_number INTEGER NOT NULL DEFAULT 1
   );
 
   CREATE TABLE IF NOT EXISTS diagnostic_attempts (
@@ -188,6 +217,11 @@ const alterStatements = [
   'ALTER TABLE teacher_profiles ADD COLUMN approved_by_admin_id TEXT;',
   'ALTER TABLE teacher_profiles ADD COLUMN approved_at TEXT;',
   'ALTER TABLE teacher_profiles ADD COLUMN rejection_reason TEXT;',
+  'ALTER TABLE classrooms ADD COLUMN subject TEXT NOT NULL DEFAULT "Mathematics";',
+  'ALTER TABLE classrooms ADD COLUMN status TEXT NOT NULL DEFAULT "active";',
+  'ALTER TABLE classrooms ADD COLUMN enrollment_method TEXT NOT NULL DEFAULT "invite_code";',
+  'ALTER TABLE classrooms ADD COLUMN description TEXT;',
+  'ALTER TABLE classroom_memberships ADD COLUMN status TEXT NOT NULL DEFAULT "active";',
 ];
 
 for (const stmt of alterStatements) {
@@ -209,6 +243,8 @@ export const teacherProfiles = isPlaceholderDb ? sqliteSchema.teacherProfiles : 
 export const classrooms = isPlaceholderDb ? sqliteSchema.classrooms : (pgSchema.classrooms as any);
 export const classroomMemberships = isPlaceholderDb ? sqliteSchema.classroomMemberships : (pgSchema.classroomMemberships as any);
 export const assignments = isPlaceholderDb ? sqliteSchema.assignments : (pgSchema.assignments as any);
+export const assignmentQuestions = isPlaceholderDb ? sqliteSchema.assignmentQuestions : (pgSchema.assignmentQuestions as any);
+export const assignmentSubmissions = isPlaceholderDb ? sqliteSchema.assignmentSubmissions : (pgSchema.assignmentSubmissions as any);
 export const diagnosticAttempts = isPlaceholderDb ? sqliteSchema.diagnosticAttempts : (pgSchema.diagnosticAttempts as any);
 export const diagnosticMisconceptions = isPlaceholderDb ? sqliteSchema.diagnosticMisconceptions : (pgSchema.diagnosticMisconceptions as any);
 export const rewardTransactions = isPlaceholderDb ? sqliteSchema.rewardTransactions : (pgSchema.rewardTransactions as any);

@@ -164,11 +164,62 @@ export const assignments = pgTable('assignments', {
   classroomId: varchar('classroom_id', { length: 36 })
     .notNull()
     .references(() => classrooms.id, { onDelete: 'cascade' }),
+  teacherId: varchar('teacher_id', { length: 36 })
+    .notNull()
+    .references(() => teacherProfiles.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
-  topicId: varchar('topic_id', { length: 50 }).notNull(),
+  instructions: text('instructions'),
+  subject: varchar('subject', { length: 50 }).default('Mathematics').notNull(),
+  gradeLevel: varchar('grade_level', { length: 10 }).notNull(),
+  published: boolean('published').default(false).notNull(),
   dueDate: timestamp('due_date', { withTimezone: true }),
+  latePolicy: jsonb('late_policy'), // { allowed: boolean, penalty: number }
+  retakePolicy: jsonb('retake_policy'), // { allowed: boolean, attempts: number }
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
+// 8. ASSIGNMENT QUESTIONS
+export const assignmentQuestions = pgTable('assignment_questions', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  assignmentId: varchar('assignment_id', { length: 36 })
+    .notNull()
+    .references(() => assignments.id, { onDelete: 'cascade' }),
+  questionId: varchar('question_id', { length: 50 }).notNull(),
+  displayOrder: integer('display_order').notNull(),
+  marks: integer('marks').default(1).notNull(),
+});
+
+// 9. ASSIGNMENT SUBMISSIONS
+export const assignmentSubmissions = pgTable(
+  'assignment_submissions',
+  {
+    id: varchar('id', { length: 36 }).primaryKey(),
+    assignmentId: varchar('assignment_id', { length: 36 })
+      .notNull()
+      .references(() => assignments.id, { onDelete: 'cascade' }),
+    studentId: varchar('student_id', { length: 36 })
+      .notNull()
+      .references(() => studentProfiles.id, { onDelete: 'cascade' }),
+    diagnosticAttemptId: varchar('diagnostic_attempt_id', { length: 36 })
+      .notNull()
+      .references(() => diagnosticAttempts.id, { onDelete: 'cascade' }),
+    status: varchar('status', { length: 20 }).default('submitted').notNull(), // 'submitted' | 'graded'
+    score: integer('score').default(0).notNull(),
+    totalMarks: integer('total_marks').default(0).notNull(),
+    xpEarned: integer('xp_earned').default(0).notNull(),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }).defaultNow().notNull(),
+    isLate: boolean('is_late').default(false).notNull(),
+    attemptNumber: integer('attempt_number').default(1).notNull(),
+  },
+  (table) => ({
+    uniqueAttempt: uniqueIndex('idx_assignment_student_attempt').on(
+      table.assignmentId,
+      table.studentId,
+      table.attemptNumber
+    ),
+  })
+);
 
 // 8. DIAGNOSTIC ATTEMPTS (Supports Nullable Final Answer for Incomplete Attempts)
 export const diagnosticAttempts = pgTable(

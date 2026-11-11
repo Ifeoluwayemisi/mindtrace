@@ -108,11 +108,52 @@ export const classroomMemberships = sqliteTable('classroom_memberships', {
 export const assignments = sqliteTable('assignments', {
   id: text('id').primaryKey(),
   classroomId: text('classroom_id').notNull().references(() => classrooms.id, { onDelete: 'cascade' }),
+  teacherId: text('teacher_id').notNull().references(() => teacherProfiles.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
-  topicId: text('topic_id').notNull(),
+  instructions: text('instructions'),
+  subject: text('subject').default('Mathematics').notNull(),
+  gradeLevel: text('grade_level').notNull(),
+  published: integer('published', { mode: 'boolean' }).default(false).notNull(),
   dueDate: text('due_date'),
+  latePolicy: text('late_policy', { mode: 'json' }),
+  retakePolicy: text('retake_policy', { mode: 'json' }),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
+
+// 8. ASSIGNMENT QUESTIONS
+export const assignmentQuestions = sqliteTable('assignment_questions', {
+  id: text('id').primaryKey(),
+  assignmentId: text('assignment_id').notNull().references(() => assignments.id, { onDelete: 'cascade' }),
+  questionId: text('question_id').notNull(),
+  displayOrder: integer('display_order').notNull(),
+  marks: integer('marks').default(1).notNull(),
+});
+
+// 9. ASSIGNMENT SUBMISSIONS
+export const assignmentSubmissions = sqliteTable(
+  'assignment_submissions',
+  {
+    id: text('id').primaryKey(),
+    assignmentId: text('assignment_id').notNull().references(() => assignments.id, { onDelete: 'cascade' }),
+    studentId: text('student_id').notNull().references(() => studentProfiles.id, { onDelete: 'cascade' }),
+    diagnosticAttemptId: text('diagnostic_attempt_id').notNull().references(() => diagnosticAttempts.id, { onDelete: 'cascade' }),
+    status: text('status').default('submitted').notNull(),
+    score: integer('score').default(0).notNull(),
+    totalMarks: integer('total_marks').default(0).notNull(),
+    xpEarned: integer('xp_earned').default(0).notNull(),
+    submittedAt: text('submitted_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+    isLate: integer('is_late', { mode: 'boolean' }).default(false).notNull(),
+    attemptNumber: integer('attempt_number').default(1).notNull(),
+  },
+  (table) => ({
+    uniqueAttempt: uniqueIndex('idx_assignment_student_attempt').on(
+      table.assignmentId,
+      table.studentId,
+      table.attemptNumber
+    ),
+  })
+);
 
 // 8. DIAGNOSTIC ATTEMPTS
 export const diagnosticAttempts = sqliteTable(

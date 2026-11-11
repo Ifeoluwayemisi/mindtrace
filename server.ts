@@ -64,16 +64,22 @@ app.use(
 import { authRouter } from './src/routes/auth';
 import { syncRouter } from './src/routes/sync';
 import { teacherRouter } from './src/routes/teacher';
+import { teacherAssignmentRouter } from './src/routes/teacherAssignments';
 import { aiRouter } from './src/routes/ai';
 import { adminRouter } from './src/routes/admin';
 import { studentRouter } from './src/routes/student';
+import { studentAssignmentRouter } from './src/routes/studentAssignments';
+import { analyticsRouter } from './src/routes/analytics';
 
 app.use('/api/auth', authRouter);
 app.use('/api/sync', syncRouter);
 app.use('/api/teacher', teacherRouter);
+app.use('/api/teacher/assignments', teacherAssignmentRouter);
+app.use('/api/teacher/analytics', analyticsRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/student', studentRouter);
+app.use('/api/student/assignments', studentAssignmentRouter);
 
 // 4. Health Check Endpoint
 app.get('/api/health', async (_req: Request, res: Response) => {

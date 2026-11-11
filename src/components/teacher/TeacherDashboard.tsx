@@ -87,6 +87,17 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
 
   // Dynamically augment roster with live student attempts from local storage
   const [dynamicRoster, setDynamicRoster] = useState<StudentRosterItem[]>(MOCK_STUDENT_ROSTER);
+  const [realAnalytics, setRealAnalytics] = useState<any>(analytics);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      const res = await apiRequest(`/api/teacher/analytics/classroom/${selectedClass}`);
+      if (res.ok) {
+        setRealAnalytics(res.data.data);
+      }
+    };
+    fetchAnalytics();
+  }, [selectedClass]);
 
   React.useEffect(() => {
     const recent = storageService.getRecentDiagnoses();
