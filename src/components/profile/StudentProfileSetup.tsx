@@ -22,12 +22,12 @@ interface StudentProfileSetupProps {
 }
 
 const PRESET_AVATARS = [
-  { id: 'AD', label: 'Aminat', bg: 'bg-indigo-600' },
-  { id: 'BA', label: 'Babatunde', bg: 'bg-emerald-600' },
-  { id: 'CE', label: 'Chiamaka', bg: 'bg-violet-600' },
-  { id: 'DO', label: 'David', bg: 'bg-amber-600' },
-  { id: 'EN', label: 'Emeka', bg: 'bg-cyan-600' },
-  { id: 'FA', label: 'Fatimah', bg: 'bg-rose-600' },
+  { id: 'AD', label: 'Preset A', bg: 'bg-indigo-600' },
+  { id: 'BA', label: 'Preset B', bg: 'bg-emerald-600' },
+  { id: 'CE', label: 'Preset C', bg: 'bg-violet-600' },
+  { id: 'DO', label: 'Preset D', bg: 'bg-amber-600' },
+  { id: 'EN', label: 'Preset E', bg: 'bg-cyan-600' },
+  { id: 'FA', label: 'Preset F', bg: 'bg-rose-600' },
 ];
 
 export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
@@ -37,8 +37,8 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
   // Profile Form States
-  const [name, setName] = useState(initialProfile.name || 'Aminat Diallo');
-  const [username, setUsername] = useState(initialProfile.username || 'aminat_diallo');
+  const [name, setName] = useState(initialProfile.name || '');
+  const [username, setUsername] = useState(initialProfile.username || '');
   const [selectedAvatar, setSelectedAvatar] = useState(initialProfile.avatarSeed || 'AD');
   const [customAvatarUrl, setCustomAvatarUrl] = useState<string | null>(null);
   const [grade, setGrade] = useState<GradeLevel>(initialProfile.grade || 'SS2');
@@ -494,9 +494,9 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
           </div>
 
           <div>
-            <h1 className="text-2xl font-display font-extrabold text-white">Profile Ready!</h1>
+            <h1 className="text-2xl font-display font-extrabold text-white">Profile Configuration Complete</h1>
             <p className="text-xs text-slate-300 mt-1">
-              Your personalized mathematics diagnostic workspace is ready for offline practice.
+              Your offline workspace is configured for your syllabus track and presentation preferences.
             </p>
           </div>
 
@@ -535,7 +535,7 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
             className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-amber-300 fill-amber-300" />
-            <span>Enter MindTrace Workspace</span>
+            <span>Enter Mathematics Workspace</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

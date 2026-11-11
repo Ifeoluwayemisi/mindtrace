@@ -197,7 +197,11 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     diagnosis.earnedXp = earnedXp;
 
     // Save record to local IndexedDB store and enqueue for micro-sync
-    await storageService.saveDiagnosticRecord(diagnosis, student, 38, activeHint ? 1 : 0);
+    await storageService.saveDiagnosticRecord(diagnosis, student, 38, activeHint ? 1 : 0, {
+      equation: question.equation,
+      workingSteps: steps,
+      finalAnswer,
+    });
     await storageService.saveStudentProfile(student);
 
     setTimeout(() => {
@@ -295,7 +299,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Hackathon Evaluation Presets (Click to autofill test cases):</span>
+            <span>Diagnostic Step Presets (Click to autofill sample working):</span>
           </span>
         </div>
         <div className="flex flex-wrap gap-2">

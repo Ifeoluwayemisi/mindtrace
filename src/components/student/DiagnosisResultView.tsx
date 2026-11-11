@@ -203,6 +203,91 @@ export const DiagnosisResultView: React.FC<DiagnosisResultViewProps> = ({
         </div>
       )}
 
+      {/* Line-by-Line Step Breakdown & Academic Score Card */}
+      {diagnosis.stepEvaluation && (
+        <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-indigo-400" />
+                Line-by-Line Step Assessment
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Evaluated transformation validity & mathematical rigor per line
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="px-3 py-1.5 rounded-xl bg-indigo-950/80 border border-indigo-700/60 text-right">
+                <div className="text-[10px] text-indigo-300 uppercase tracking-wider font-semibold">
+                  Academic Score
+                </div>
+                <div className="text-lg font-mono font-bold text-indigo-200">
+                  {diagnosis.stepEvaluation.academicScorePercentage}%
+                </div>
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-right">
+                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                  Valid Steps
+                </div>
+                <div className="text-lg font-mono font-bold text-white">
+                  {diagnosis.stepEvaluation.validStepsCount} / {diagnosis.stepEvaluation.totalSteps}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2.5">
+            {diagnosis.stepEvaluation.stepAnalysis.map((step) => (
+              <div
+                key={step.stepNumber}
+                className={`p-3.5 rounded-2xl border transition-all ${
+                  step.isCorrect
+                    ? 'bg-emerald-950/10 border-emerald-800/40'
+                    : 'bg-rose-950/20 border-rose-800/50'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className={`w-6 h-6 rounded-lg text-xs font-mono font-bold flex items-center justify-center shrink-0 ${
+                        step.isCorrect
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                          : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                      }`}
+                    >
+                      L{step.stepNumber}
+                    </span>
+                    <span className="font-mono text-sm font-semibold text-slate-100">
+                      {step.mathExpression}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {step.isCorrect ? (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" /> Valid Step
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/20 border border-rose-500/40 text-rose-300 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" /> Faulty Transition
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-2 text-xs text-slate-300 space-y-1 pl-8">
+                  <p>{step.feedbackNote}</p>
+                  {!step.isCorrect && step.expectedExpression && (
+                    <div className="text-[11px] font-mono text-emerald-300 bg-emerald-950/40 p-2 rounded-lg border border-emerald-900/50 mt-1">
+                      Expected correct step: <span className="font-bold">{step.expectedExpression}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Action Decision Buttons */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
         <button

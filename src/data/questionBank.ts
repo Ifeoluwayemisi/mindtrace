@@ -35,7 +35,7 @@ export const MISCONCEPTION_RULES: Record<string, MisconceptionRule> = {
     severity: 'low',
     description: 'The algebraic logic and transposition were structurally correct, but an arithmetic calculation error occurred.',
     pedagogicalRemedy: 'Validate student logical strategy while emphasizing a rapid mental check on final arithmetic arithmetic steps.',
-    chalkboardTip: 'Your algebraic path was spotless! Let us just recheck the division arithmetic.',
+    chalkboardTip: 'Your algebraic path was structurally correct. Verify the arithmetic in the final division step.',
   },
   ALG_VARIABLE_DROPPED: {
     code: 'ALG_VARIABLE_DROPPED',
@@ -43,7 +43,7 @@ export const MISCONCEPTION_RULES: Record<string, MisconceptionRule> = {
     category: 'Like Terms',
     severity: 'medium',
     description: 'Student drops the variable symbol when subtracting like terms (e.g. evaluating 5x - 2x as 3 instead of 3x).',
-    pedagogicalRemedy: 'Emphasize that like terms are items: 5 mangoes minus 2 mangoes leaves 3 mangoes, not just the number 3.',
+    pedagogicalRemedy: 'Emphasize that like terms represent quantities: 5 units minus 2 units leaves 3 units, not a pure number.',
     chalkboardTip: 'Remind class: 5x - 2x = (5 - 2)x = 3x. The x represents the unknown quantity.',
   },
   ALG_INCOMPLETE_ISOLATION: {
@@ -62,7 +62,7 @@ export const MISCONCEPTION_RULES: Record<string, MisconceptionRule> = {
     severity: 'low',
     description: 'Every step adheres to standard algebraic axioms and yields the accurate root.',
     pedagogicalRemedy: 'Reinforce mastery and encourage moving to multi-term algebraic fractions.',
-    chalkboardTip: 'Flawless execution! Ready for WAEC Section B multi-step questions.',
+    chalkboardTip: 'Flawless execution. Prepared for WAEC Section B multi-step questions.',
   },
   INSUFFICIENT_EVIDENCE: {
     code: 'INSUFFICIENT_EVIDENCE',
@@ -152,7 +152,7 @@ export const QUESTION_BANK: Question[] = [
     ],
     followUpQuestion: {
       equation: '3(3x - 4) = 15',
-      prompt: 'Follow-up practice: Solve 3(3x - 4) = 15. Make sure to distribute to both terms!',
+      prompt: 'Follow-up practice: Solve 3(3x - 4) = 15. Ensure you distribute the multiplier factor 3 to every term inside the parentheses.',
       expectedFinalAnswer: '3',
       expectedSteps: ['9x - 12 = 15', '9x = 27', 'x = 3'],
     },
@@ -273,7 +273,7 @@ export const TARGETED_INTERVENTIONS: Record<string, TargetedIntervention> = {
     durationMinutes: 2,
     metaphorTitle: 'The Classroom Delivery Gift Box',
     metaphorDescription:
-      'If you bring 4 gift boxes containing 2 apples and 3 oranges, you have 4 × 2 apples AND 4 × 3 oranges. You cannot multiply only the apples!',
+      'If you bring 4 package boxes containing 2 apples and 3 oranges, you have 4 × 2 apples AND 4 × 3 oranges. Distribution applies to every item inside.',
     coreRule: 'a(b + c) = (a × b) + (a × c). The outside factor touches every term inside.',
     stepGuide: [
       {
@@ -326,7 +326,7 @@ export const TARGETED_INTERVENTIONS: Record<string, TargetedIntervention> = {
     durationMinutes: 2,
     metaphorTitle: 'Counting Physical Objects',
     metaphorDescription:
-      '5 sacks of rice minus 2 sacks of rice equals 3 sacks of rice. The "x" is the sack! Dropping x turns an unknown variable into an ordinary number.',
+      '5 units of a variable minus 2 units leaves 3 units of that variable. Dropping the variable turns an algebraic unknown into a scalar constant.',
     coreRule: 'ax - bx = (a - b)x. Subtract the coefficients, but retain the variable name.',
     stepGuide: [
       {
@@ -349,7 +349,7 @@ export const TARGETED_INTERVENTIONS: Record<string, TargetedIntervention> = {
     subtitle: 'Spotting calculation slips while keeping sound logic',
     durationMinutes: 1,
     metaphorTitle: 'The Final Double Check',
-    metaphorDescription: 'Your algebraic steps were logical! A quick check on multiplication tables ensures you lock in full WAEC marks.',
+    metaphorDescription: 'Your algebraic steps were logical. A rapid substitution check ensures you verify your final root with complete mathematical certainty.',
     coreRule: 'Always substitute your final answer back into the original equation to test if LHS equals RHS.',
     stepGuide: [
       {

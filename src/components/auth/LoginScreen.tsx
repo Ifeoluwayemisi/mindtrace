@@ -144,7 +144,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Quick Demo Switchers for Judges */}
         <div className="pt-3 border-t border-slate-800/80 text-center space-y-2">
           <span className="text-[11px] text-slate-500 uppercase font-bold tracking-wider block">
-            Hackathon Evaluator Quick-Access:
+            Quick Demo Profile Access:
           </span>
           <div className="flex items-center justify-center gap-2">
             <button

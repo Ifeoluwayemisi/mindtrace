@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Role, StudentProfile, TeacherProfile, Question, DiagnosisResult } from './types';
+import { Role, StudentProfile, TeacherProfile, Question, DiagnosisResult, AuthUser } from './types';
 import { DEFAULT_STUDENT, DEFAULT_TEACHER, storageService } from './services/storageService';
 import { syncService } from './services/syncService';
 import { authService } from './services/authService';
@@ -26,6 +26,7 @@ import { RoleSelectionScreen } from './components/auth/RoleSelectionScreen';
 import { LoginScreen } from './components/auth/LoginScreen';
 import { RegistrationScreen } from './components/auth/RegistrationScreen';
 import { PasswordRecoveryScreen } from './components/auth/PasswordRecoveryScreen';
+import { PasswordChangeScreen } from './components/auth/PasswordChangeScreen';
 
 // Profile Setup & View
 import { StudentProfileSetup } from './components/profile/StudentProfileSetup';
@@ -56,6 +57,8 @@ export default function App() {
     }
     return authService.isReturningUser() ? 'student-dashboard' : 'splash';
   });
+
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => authService.getActiveUser());
 
   const [currentRole, setCurrentRole] = useState<Role>(() => {
     const active = authService.getActiveUser();
@@ -143,8 +146,10 @@ export default function App() {
     changeView('intervention');
   };
 
-  const handleLogout = () => {
-    authService.logout();
+  const handleLogout = async () => {
+    await authService.logout();
+    setCurrentUser(null);
+    setCurrentRole('student');
     changeView('welcome');
   };
 
@@ -170,17 +175,9 @@ export default function App() {
       />
 
       {/* 2. Top Navigation Bar (Only displayed during main application views) */}
-      {!isAuthOrOnboarding ? (
+      {!isAuthOrOnboarding && !currentUser?.mustChangePassword ? (
         <Header
           currentRole={currentRole}
-          onRoleChange={(newRole) => {
-            setCurrentRole(newRole);
-            if (newRole === 'student') {
-              changeView('student-dashboard');
-            } else {
-              changeView('teacher-dashboard');
-            }
-          }}
           activeView={activeView}
           onViewChange={changeView}
           student={student}
@@ -188,7 +185,7 @@ export default function App() {
           onLogout={handleLogout}
         />
       ) : (
-        /* Minimal header during auth/onboarding */
+        /* Minimal header during auth/onboarding or password change */
         <div className="w-full bg-slate-950 border-b border-slate-900/60 py-3 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div
@@ -203,88 +200,109 @@ export default function App() {
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  authService.setOnboardingCompleted(true);
-                  changeView('student-dashboard');
-                }}
-                className="text-xs text-slate-400 hover:text-indigo-400 transition cursor-pointer px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800"
-              >
-                Skip to Demo Learner →
-              </button>
-            </div>
+            {!currentUser?.mustChangePassword && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    authService.setOnboardingCompleted(true);
+                    changeView('student-dashboard');
+                  }}
+                  className="text-xs text-slate-400 hover:text-indigo-400 transition cursor-pointer px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800"
+                >
+                  Skip to Demo Learner →
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {/* 3. Main Dynamic Content Stage */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8 pb-24 lg:pb-8 flex flex-col">
-        {/* ===================== AUTH & ONBOARDING VIEWS ===================== */}
-        {activeView === 'splash' && (
-          <SplashScreen onInitialized={() => changeView('welcome')} />
-        )}
-
-        {activeView === 'welcome' && (
-          <WelcomeScreen
-            onGetStarted={() => changeView('onboarding')}
-            onSignIn={() => changeView('login')}
-          />
-        )}
-
-        {activeView === 'onboarding' && (
-          <OnboardingCarousel
-            onComplete={() => changeView('role-select')}
-            onSkip={() => changeView('role-select')}
-          />
-        )}
-
-        {activeView === 'role-select' && (
-          <RoleSelectionScreen
-            onSelectRole={(role) => {
-              setCurrentRole(role);
-              if (role === 'student') {
-                changeView('profile-setup');
-              } else {
+        {currentUser?.mustChangePassword ? (
+          <PasswordChangeScreen
+            onPasswordChanged={() => {
+              const refreshed = authService.getActiveUser();
+              setCurrentUser(refreshed);
+              if (refreshed?.role === 'teacher') {
                 changeView('teacher-dashboard');
-              }
-            }}
-            onBack={() => changeView('welcome')}
-          />
-        )}
-
-        {activeView === 'login' && (
-          <LoginScreen
-            onLoginSuccess={(role) => {
-              setCurrentRole(role);
-              if (role === 'student') {
-                setStudent(storageService.getSavedStudentProfile());
+              } else {
                 changeView('student-dashboard');
-              } else {
-                changeView('teacher-dashboard');
               }
             }}
-            onGoToRegister={() => changeView('register')}
-            onGoToRecovery={() => changeView('recovery')}
-            onBack={() => changeView('welcome')}
+            onLogout={handleLogout}
           />
-        )}
+        ) : (
+          <>
+            {/* ===================== AUTH & ONBOARDING VIEWS ===================== */}
+            {activeView === 'splash' && (
+              <SplashScreen onInitialized={() => changeView('welcome')} />
+            )}
 
-        {activeView === 'register' && (
-          <RegistrationScreen
-            initialRole={currentRole}
-            onRegisterSuccess={(role, isStudent) => {
-              setCurrentRole(role);
-              if (isStudent) {
-                changeView('profile-setup');
-              } else {
-                changeView('teacher-dashboard');
-              }
-            }}
-            onGoToLogin={() => changeView('login')}
-            onBack={() => changeView('role-select')}
-          />
-        )}
+            {activeView === 'welcome' && (
+              <WelcomeScreen
+                onGetStarted={() => changeView('onboarding')}
+                onSignIn={() => changeView('login')}
+              />
+            )}
+
+            {activeView === 'onboarding' && (
+              <OnboardingCarousel
+                onComplete={() => changeView('role-select')}
+                onSkip={() => changeView('role-select')}
+              />
+            )}
+
+            {activeView === 'role-select' && (
+              <RoleSelectionScreen
+                onSelectRole={(role) => {
+                  setCurrentRole(role);
+                  if (role === 'student') {
+                    changeView('profile-setup');
+                  } else {
+                    changeView('teacher-dashboard');
+                  }
+                }}
+                onBack={() => changeView('welcome')}
+              />
+            )}
+
+            {activeView === 'login' && (
+              <LoginScreen
+                onLoginSuccess={(role) => {
+                  const u = authService.getActiveUser();
+                  setCurrentUser(u);
+                  setCurrentRole(u?.role || role);
+                  if (role === 'student') {
+                    setStudent(storageService.getSavedStudentProfile());
+                    changeView('student-dashboard');
+                  } else {
+                    changeView('teacher-dashboard');
+                  }
+                }}
+                onGoToRegister={() => changeView('register')}
+                onGoToRecovery={() => changeView('recovery')}
+                onBack={() => changeView('welcome')}
+              />
+            )}
+
+            {activeView === 'register' && (
+              <RegistrationScreen
+                initialRole={currentRole}
+                onRegisterSuccess={(role, isStudent) => {
+                  const u = authService.getActiveUser();
+                  setCurrentUser(u);
+                  setCurrentRole(u?.role || role);
+                  if (isStudent) {
+                    changeView('profile-setup');
+                  } else {
+                    changeView('teacher-dashboard');
+                  }
+                }}
+                onGoToLogin={() => changeView('login')}
+                onBack={() => changeView('role-select')}
+              />
+            )}
 
         {activeView === 'recovery' && (
           <PasswordRecoveryScreen onBackToLogin={() => changeView('login')} />
@@ -450,15 +468,17 @@ export default function App() {
             openChalkboardOnMount={activeView === 'teacher-chalkboard'}
           />
         )}
+          </>
+        )}
       </main>
 
-      {/* 4. Footer with zero fake telemetry tickers */}
+      {/* 4. Footer */}
       <footer className="border-t border-slate-900 bg-slate-950/80 py-6 px-4 sm:px-6 text-xs text-slate-500 mb-14 lg:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-display font-semibold text-slate-300">MindTrace</span>
             <span>·</span>
-            <span>Wale Lab NextGen AI Hackathon 2026 (Track 1)</span>
+            <span>Secondary Mathematics Diagnostic Platform</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px] text-slate-400">
@@ -472,7 +492,7 @@ export default function App() {
       </footer>
 
       {/* 5. Mobile Bottom Navigation Bar (Persistent 1-tap mobile navigation) */}
-      {!isAuthOrOnboarding && (
+      {!isAuthOrOnboarding && !currentUser?.mustChangePassword && (
         <MobileBottomNav
           currentRole={currentRole}
           activeView={activeView}

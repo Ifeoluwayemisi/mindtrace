@@ -20,7 +20,8 @@ import { MOCK_STUDENT_ROSTER, StudentRosterItem } from '../../data/mockTeacherDa
 import { ChalkboardScriptModal } from './ChalkboardScriptModal';
 import { StudentDetailModal } from './StudentDetailModal';
 import { storageService } from '../../services/storageService';
-import { Download } from 'lucide-react';
+import { authService } from '../../services/authService';
+import { Download, ShieldCheck, Key } from 'lucide-react';
 
 interface TeacherDashboardProps {
   teacher: TeacherProfile;
@@ -53,6 +54,29 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'at-risk' | 'mastered'>('all');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [currentVerification, setCurrentVerification] = useState<'pending' | 'approved' | 'rejected'>(
+    teacher.verificationStatus || authService.getActiveUser()?.verificationStatus || 'pending'
+  );
+  const [redemptionToken, setRedemptionToken] = useState('');
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const [redemptionError, setRedemptionError] = useState<string | null>(null);
+
+  const handleRedeemToken = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!redemptionToken.trim()) return;
+    setIsRedeeming(true);
+    setRedemptionError(null);
+    const res = await authService.redeemTeacherToken(redemptionToken.trim());
+    setIsRedeeming(false);
+    if (res.success) {
+      setCurrentVerification('approved');
+      showToast('Accreditation verified! Full educator permissions granted.');
+      setRedemptionToken('');
+    } else {
+      setRedemptionError(res.message || 'Invalid or expired accreditation token.');
+    }
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -146,6 +170,61 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
         onClose={() => setSelectedStudent(null)}
         onPushRemedy={(name) => showToast(`Pushed 2-minute targeted remedy to ${name}`)}
       />
+
+      {/* Educator Verification Status Notice */}
+      {currentVerification === 'pending' && (
+        <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-800/60 text-amber-200 space-y-3">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-xs font-bold text-amber-300">Teacher Account Verification Pending</h3>
+                <p className="text-[11px] text-amber-200/80 mt-0.5">
+                  Your profile is pending approval from your school administrator or academic coordinator. You can explore demo rosters, but classroom creation and assignment publishing require verified educator credentials.
+                </p>
+              </div>
+            </div>
+            <form onSubmit={handleRedeemToken} className="flex items-center gap-2 shrink-0">
+              <input
+                type="text"
+                value={redemptionToken}
+                onChange={(e) => setRedemptionToken(e.target.value.toUpperCase().trim())}
+                placeholder="Enter MTR-XXXX-XXXX"
+                className="px-3 py-1.5 rounded-xl bg-slate-950 border border-amber-800/80 font-mono text-xs text-amber-300 placeholder:text-amber-300/40 focus:outline-hidden"
+              />
+              <button
+                type="submit"
+                disabled={isRedeeming || !redemptionToken.trim()}
+                className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
+              >
+                {isRedeeming ? 'Verifying...' : 'Redeem Token'}
+              </button>
+            </form>
+          </div>
+          {redemptionError && (
+            <p className="text-[11px] text-rose-300 font-medium pl-8">{redemptionError}</p>
+          )}
+        </div>
+      )}
+
+      {currentVerification === 'rejected' && (
+        <div className="p-4 rounded-2xl bg-rose-950/50 border border-rose-800/60 text-rose-200 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-xs font-bold text-rose-300">Accreditation Request Rejected</h3>
+            <p className="text-[11px] text-rose-200/80 mt-0.5">
+              Your educator verification request was declined by the administrator. Please contact your school administration or submit an inquiry to coordinate approval.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {currentVerification === 'approved' && (
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 text-xs font-medium">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Accredited Educator · WAEC / MOE Verified</span>
+        </div>
+      )}
 
       {/* Top Header & Homework Review Bar (Modeled after user's reference screenshot) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">

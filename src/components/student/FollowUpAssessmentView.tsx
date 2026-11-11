@@ -94,10 +94,10 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
         </div>
 
         <h2 className="text-xl font-display font-bold text-white">
-          Put Your New Understanding into Practice
+          Verify Concept Mastery
         </h2>
         <p className="text-xs text-slate-300">
-          Solve this follow-up equation to verify that you have eliminated the misconception.
+          Solve this follow-up equation independently to confirm that the algebraic principle is understood.
         </p>
 
         {/* Audio Read-Aloud for Follow-up Equation */}
@@ -158,18 +158,18 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-bold text-emerald-300">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                <span>Misconception Overcome! Full Marks.</span>
+                <span>Misconception Resolved. Correct Solution.</span>
               </div>
               {earnedBonusXp > 0 && (
                 <span className="text-xs font-mono font-bold text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-800">
-                  +{earnedBonusXp} XP Added!
+                  +{earnedBonusXp} XP Earned
                 </span>
               )}
             </div>
             <p className="text-xs text-emerald-300/90 leading-relaxed">
               You applied the inverse sign transposition correctly. Your algebra mastery has
               increased to <strong className="text-white">{student.masteryPercentage}%</strong> and
-              your practice streak is now <strong className="text-white">{student.streakDays} days</strong>!
+              your practice streak is now <strong className="text-white">{student.streakDays} days</strong>.
             </p>
           </div>
         )}
@@ -177,10 +177,10 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
         {isSuccess === false && (
           <div className="p-4 rounded-2xl bg-amber-950/60 border border-amber-800/60 text-amber-200 space-y-2 animate-fade-in">
             <div className="flex items-center gap-2 text-sm font-bold text-amber-300">
-              <span>Not quite yet — Let's check the signs</span>
+              <span>Check Step: Transposition Sign Reversal</span>
             </div>
             <p className="text-xs text-amber-300/90">
-              In 4x - 9 = 15, adding 9 to both sides gives 4x = 15 + 9 = 24. Then dividing by 4 gives x = 6.
+              In 4x - 9 = 15, applying the additive inverse (+9) to both sides yields 4x = 15 + 9 = 24. Dividing by coefficient 4 yields x = 6.
             </p>
           </div>
         )}

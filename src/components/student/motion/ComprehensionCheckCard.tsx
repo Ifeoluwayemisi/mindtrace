@@ -42,10 +42,10 @@ export const ComprehensionCheckCard: React.FC<ComprehensionCheckCardProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-400">
           <HelpCircle className="w-4 h-4" />
-          <span>Quick Comprehension Check</span>
+          <span>Concept Check</span>
         </div>
         <span className="text-[11px] font-mono text-amber-400 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-800/60">
-          Test Your Intuition
+          Active Check
         </span>
       </div>
 
@@ -111,12 +111,12 @@ export const ComprehensionCheckCard: React.FC<ComprehensionCheckCardProps> = ({
               {isCorrect ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Brilliant! Concept Mastered</span>
+                  <span>Correct: Principle Applied Accurately</span>
                 </>
               ) : (
                 <>
                   <AlertTriangle className="w-4 h-4 text-rose-400" />
-                  <span>Not quite — Common Cognitive Trap</span>
+                  <span>Incorrect: Cognitive Trap Identified</span>
                 </>
               )}
             </span>
@@ -126,7 +126,7 @@ export const ComprehensionCheckCard: React.FC<ComprehensionCheckCardProps> = ({
                 onClick={handleReset}
                 className="text-[11px] underline font-semibold text-rose-300 hover:text-white cursor-pointer"
               >
-                Try Again
+                Retry Check
               </button>
             )}
           </div>

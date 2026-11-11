@@ -18,9 +18,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         {/* Left Column: Headlines & Academic Context */}
         <div className="lg:col-span-7 space-y-5 text-left">
           <div className="flex items-center gap-2 text-xs text-indigo-400 font-semibold tracking-wide">
-            <span>Wale Lab NextGen AI Hackathon</span>
+            <span>WAEC & JAMB Senior Secondary Mathematics</span>
             <span aria-hidden="true">·</span>
-            <span>Track 1: Zero-Bandwidth & Localized Learning</span>
+            <span>Offline-First Diagnostic Learning</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight leading-[1.15]">

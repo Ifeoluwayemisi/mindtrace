@@ -46,16 +46,16 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       active: isStudentActive(['student-dashboard']),
     },
     {
-      id: 'subject-overview',
-      label: 'Topics',
-      icon: BookOpen,
-      active: isStudentActive(['subject-overview']),
-    },
-    {
       id: 'question-solve',
       label: 'Practice',
       icon: Zap,
       active: isStudentActive(['question-solve', 'diagnosis-result', 'follow-up', 'session-summary']),
+    },
+    {
+      id: 'subject-overview',
+      label: 'Topics',
+      icon: BookOpen,
+      active: isStudentActive(['subject-overview']),
     },
     {
       id: 'remedy-library',
@@ -69,12 +69,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       icon: Trophy,
       active: isStudentActive(['gamification']),
       badge: student?.totalPoints ? `${student.totalPoints}p` : undefined,
-    },
-    {
-      id: 'student-profile',
-      label: 'Profile',
-      icon: User,
-      active: isStudentActive(['student-profile', 'student-history', 'student-progress']),
     },
   ];
 

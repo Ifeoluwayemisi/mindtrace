@@ -37,10 +37,10 @@ export const SessionSummaryView: React.FC<SessionSummaryViewProps> = ({
           Session Complete
         </span>
         <h1 className="text-2xl font-display font-extrabold text-white">
-          Great Mathematical Workout!
+          Diagnostic Session Complete
         </h1>
         <p className="text-xs text-slate-300 max-w-sm mx-auto">
-          Every error analyzed brings you closer to 100% confidence in your WAEC mathematics exam.
+          Every misconception identified strengthens your problem-solving foundation for WAEC and JAMB examinations.
         </p>
       </div>
 

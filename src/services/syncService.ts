@@ -7,6 +7,7 @@
 import { SyncPayloadRecord, ClassAnalyticsSummary } from '../types';
 import { storageService } from './storageService';
 import { INITIAL_CLASS_ANALYTICS } from '../data/mockTeacherData';
+import { apiRequest } from './apiClient';
 
 type SyncListener = (status: {
   isOnline: boolean;
@@ -82,7 +83,7 @@ class SyncService {
     }
   }
 
-  // Trigger sync batch (<15KB target)
+  // Trigger sync batch (<15KB target) to Neon PostgreSQL server
   async triggerAutoSync(): Promise<{
     success: boolean;
     syncedCount: number;
@@ -108,37 +109,66 @@ class SyncService {
       };
     }
 
-    // Prepare micro-batch payload
-    const payload = JSON.stringify({
-      version: '1.0',
-      clientTimestamp: new Date().toISOString(),
-      records: pending,
+    // Format attempts for POST /api/sync/batch
+    const attempts = pending.map((r) => {
+      const payload = (r.payloadData as any) || {};
+      return {
+        id: r.id,
+        questionId: r.questionId || 'q-lin-01',
+        equation: payload.equation || '3x - 7 = 14',
+        workingSteps: payload.workingSteps || [],
+        finalAnswer: payload.finalAnswer !== undefined ? payload.finalAnswer : null,
+        clientTimestamp: r.timestamp,
+      };
     });
 
-    // Calculate approximate payload size in KB
-    const sizeInBytes = new Blob([payload]).size;
+    const body = { attempts };
+    const sizeInBytes = new Blob([JSON.stringify(body)]).size;
     const sizeInKb = parseFloat((sizeInBytes / 1024).toFixed(2));
     this.lastPayloadSizeKb = sizeInKb;
 
-    // Simulate reliable micro-sync upload (<400ms)
-    await new Promise((r) => setTimeout(r, 450));
+    // Send batch payload to server
+    const res = await apiRequest('/api/sync/batch', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
 
-    // Mark queued items as synced
-    const recordIds = pending.map((r) => r.id);
-    await storageService.markRecordsAsSynced(recordIds);
+    if (res.ok && res.data?.success) {
+      const recordIds = pending.map((r) => r.id);
+      await storageService.markRecordsAsSynced(recordIds);
 
-    // Update teacher class analytics with newly synced student data
-    this.updateAnalyticsWithBatch(pending);
+      // Update local profile with server authoritative XP & mastery if returned
+      if (res.data.authoritativeProfile) {
+        const student = storageService.getSavedStudentProfile();
+        if (typeof res.data.authoritativeProfile.totalXp === 'number') {
+          student.totalPoints = res.data.authoritativeProfile.totalXp;
+        }
+        if (typeof res.data.authoritativeProfile.masteryPercentage === 'number') {
+          student.masteryPercentage = res.data.authoritativeProfile.masteryPercentage;
+        }
+        await storageService.saveStudentProfile(student);
+      }
 
-    this.lastSyncedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    this.notify();
+      this.updateAnalyticsWithBatch(pending);
+      this.lastSyncedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      this.notify();
 
-    return {
-      success: true,
-      syncedCount: pending.length,
-      payloadSizeKb: sizeInKb,
-      message: `Synchronized ${pending.length} diagnostic record(s) (${sizeInKb} KB).`,
-    };
+      return {
+        success: true,
+        syncedCount: res.data.acceptedCount ?? pending.length,
+        payloadSizeKb: sizeInKb,
+        message: `Synchronized ${res.data.acceptedCount ?? pending.length} diagnostic record(s) with MindTrace server (${sizeInKb} KB).`,
+      };
+    } else {
+      // Offline fallback: keep pending records in IndexedDB
+      this.notify();
+      return {
+        success: false,
+        syncedCount: 0,
+        payloadSizeKb: sizeInKb,
+        message: res.message || 'Offline queue retained in local IndexedDB store.',
+      };
+    }
   }
 
   private updateAnalyticsWithBatch(records: SyncPayloadRecord[]) {

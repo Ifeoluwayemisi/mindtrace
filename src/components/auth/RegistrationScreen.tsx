@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ShieldCheck, Key } from 'lucide-react';
-import { authService, RegistrationInput, TEACHER_ACCREDITATION_CODE } from '../../services/authService';
+import { authService, RegistrationInput } from '../../services/authService';
 import { Role, GradeLevel } from '../../types';
 
 interface RegistrationScreenProps {
@@ -42,7 +42,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       role,
       grade: role === 'student' ? grade : undefined,
       school,
-      teacherAccreditationCode: role === 'teacher' ? teacherCode : undefined,
+      verificationToken: role === 'teacher' && teacherCode.trim() ? teacherCode.trim() : undefined,
     };
 
     const res = await authService.register(input);
@@ -69,7 +69,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
     setUsername('f_adeyemi');
     setEmail('f.adeyemi@school.edu.ng');
     setPassword('teacher123');
-    setTeacherCode(TEACHER_ACCREDITATION_CODE);
+    setTeacherCode('');
     setRole('teacher');
   };
 
@@ -213,27 +213,27 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           </div>
         )}
 
-        {/* Teacher Accreditation Code Gate */}
+        {/* School Accreditation Token (Optional) */}
         {role === 'teacher' && (
           <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-800/60 space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5 text-amber-400" />
-                <span>Teacher Accreditation Code:</span>
+                <span>School Accreditation Token (Optional)</span>
               </label>
+              <span className="text-[10px] text-slate-400">Admin-issued</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
               <input
                 type="text"
-                required
                 value={teacherCode}
-                onChange={(e) => setTeacherCode(e.target.value.toUpperCase())}
-                placeholder="e.g. MINDTRACE-TEACHER-2026"
+                onChange={(e) => setTeacherCode(e.target.value.toUpperCase().trim())}
+                placeholder="e.g. MTR-XXXX-XXXX"
                 className="w-full bg-transparent font-mono text-xs text-amber-300 placeholder:text-slate-600 focus:outline-hidden"
               />
             </div>
             <p className="text-[11px] text-slate-400 leading-normal">
-              For hackathon testing, enter <code className="text-amber-300 font-mono font-bold">MINDTRACE-TEACHER-2026</code>.
+              If your school administrator issued an accreditation token, enter it for instant verification. Otherwise, your account will be created with <span className="text-amber-300 font-medium">Pending Verification</span> status.
             </p>
           </div>
         )}

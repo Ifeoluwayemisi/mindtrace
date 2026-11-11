@@ -29,12 +29,12 @@ interface StudentProfileViewProps {
 }
 
 const PRESET_AVATARS = [
-  { id: 'AD', label: 'Aminat', bg: 'bg-indigo-600' },
-  { id: 'BA', label: 'Babatunde', bg: 'bg-emerald-600' },
-  { id: 'CE', label: 'Chiamaka', bg: 'bg-violet-600' },
-  { id: 'DO', label: 'David', bg: 'bg-amber-600' },
-  { id: 'EN', label: 'Emeka', bg: 'bg-cyan-600' },
-  { id: 'FA', label: 'Fatimah', bg: 'bg-rose-600' },
+  { id: 'AD', label: 'Preset A', bg: 'bg-indigo-600' },
+  { id: 'BA', label: 'Preset B', bg: 'bg-emerald-600' },
+  { id: 'CE', label: 'Preset C', bg: 'bg-violet-600' },
+  { id: 'DO', label: 'Preset D', bg: 'bg-amber-600' },
+  { id: 'EN', label: 'Preset E', bg: 'bg-cyan-600' },
+  { id: 'FA', label: 'Preset F', bg: 'bg-rose-600' },
 ];
 
 export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
@@ -113,21 +113,20 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
 
     await storageService.saveStudentProfile(updated);
     onProfileUpdated(updated);
-    triggerToast('Profile changes saved to local IndexedDB!');
+    triggerToast('Profile changes saved locally');
   };
-
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 1024 * 1024) {
-      alert('Avatar image must be under 1 MB.');
+      triggerToast('Avatar image size must be under 1 MB');
       return;
     }
     const reader = new FileReader();
     reader.onload = () => {
       setAvatarSeed(reader.result as string);
-      triggerToast('Custom avatar uploaded and saved!');
+      triggerToast('Custom avatar updated successfully');
     };
     reader.readAsDataURL(file);
   };

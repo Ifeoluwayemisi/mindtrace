@@ -121,10 +121,10 @@ export const GamificationHub: React.FC<GamificationHubProps> = ({
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs font-mono text-indigo-300">
               <Trophy className="w-4 h-4 text-amber-400" />
-              <span>Level {level} Math Explorer · {student.grade} WAEC Track</span>
+              <span>Level {level} Scholar · {student.grade} WAEC Track</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight">
-              Points, Badges & Mastery Journey
+              Cognitive XP & Competency Milestones
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 max-w-lg">
               Earn XP for step-by-step mathematical reasoning, targeted misconception remedies, and consistent daily practice.
@@ -137,7 +137,7 @@ export const GamificationHub: React.FC<GamificationHubProps> = ({
               className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition cursor-pointer"
             >
               <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />
-              <span>Solve Equation for +15 XP</span>
+              <span>Solve Practice Equation (+15 XP)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

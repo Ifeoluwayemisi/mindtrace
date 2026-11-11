@@ -47,6 +47,7 @@ export interface TeacherProfile {
   classes: string[];
   activeClass: string;
   subject: string;
+  verificationStatus: 'pending' | 'approved' | 'rejected';
 }
 
 export interface AuthUser {
@@ -56,6 +57,8 @@ export interface AuthUser {
   email: string;
   role: Role;
   isDemoSession: boolean;
+  mustChangePassword?: boolean;
+  verificationStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 export type MisconceptionCode =
@@ -123,6 +126,32 @@ export interface StepSubmission {
   mathExpression: string;
 }
 
+export interface StepAssessmentItem {
+  stepNumber: number;
+  mathExpression: string;
+  actionDescription: string;
+  isCorrect: boolean;
+  isValidTransformation: boolean;
+  isMethodAppropriate: boolean;
+  demonstratesUnderstanding: boolean;
+  feedbackNote: string;
+  expectedExpression?: string;
+}
+
+export interface StepLevelEvaluation {
+  totalSteps: number;
+  validStepsCount: number;
+  methodMarks: number; // 0 - 70 points based on valid step ratio
+  accuracyMarks: number; // 0 - 30 points for numerical final answer match
+  academicScorePercentage: number; // Pure academic score (methodMarks + accuracyMarks) separate from XP
+  finalAnswerCorrect: boolean;
+  firstFaultyStepNumber: number | null;
+  stepAnalysis: StepAssessmentItem[];
+  hasSufficientEvidence: boolean;
+  diagnosticConfidence: number; // 0.0 - 1.0 confidence score
+  identifiedMisconceptions: MisconceptionCode[];
+}
+
 export interface StudentAttemptSubmission {
   id: string;
   questionId: string;
@@ -155,6 +184,7 @@ export interface DiagnosisResult {
   needsClarification: boolean;
   clarifyingPrompt?: string;
   earnedXp?: number;
+  stepEvaluation?: StepLevelEvaluation;
 }
 
 export interface TargetedIntervention {

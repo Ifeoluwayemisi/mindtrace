@@ -49,6 +49,7 @@ export const DEFAULT_TEACHER: TeacherProfile = {
   classes: ['Class A - Algebra I (SS2)', 'Class B - Algebra I (SS2)', 'SS3 Exam Track'],
   activeClass: 'Class A - Algebra I (SS2)',
   subject: 'Senior Mathematics (SS1 - SS3)',
+  verificationStatus: 'pending',
 };
 
 class StorageService {
@@ -136,14 +137,105 @@ class StorageService {
 
   getSavedStudentProfile(): StudentProfile {
     try {
-      const stored = localStorage.getItem('mindtrace_student_profile');
-      if (stored) {
-        return { ...DEFAULT_STUDENT, ...JSON.parse(stored) };
+      const storedUser = localStorage.getItem('mindtrace_active_auth_user');
+      const activeUser = storedUser ? JSON.parse(storedUser) : null;
+      const storedProfile = localStorage.getItem('mindtrace_student_profile');
+
+      if (activeUser && activeUser.role === 'student') {
+        const defaultForActive: StudentProfile = {
+          id: activeUser.id,
+          name: activeUser.name || 'Student Learner',
+          username: activeUser.username || 'student',
+          email: activeUser.email || '',
+          grade: 'SS2',
+          classSection: 'SS2 A',
+          school: 'Senior Secondary School',
+          targetExam: 'WAEC',
+          preferredPresentation: ['visual', 'interactive'],
+          audioSupport: false,
+          learningPreferences: ['visual', 'interactive'],
+          streakDays: 0,
+          totalPoints: 0,
+          currentLevel: 1,
+          dailyGoalTarget: 3,
+          dailyGoalCompleted: 0,
+          lastActiveDate: new Date().toISOString(),
+          badgeAchievements: [],
+          leaderboardOptIn: true,
+          avatarSeed: 'AD',
+          totalDiagnosed: 0,
+          masteryPercentage: 0,
+          createdAt: new Date().toISOString().split('T')[0],
+        };
+
+        if (storedProfile) {
+          const parsed = JSON.parse(storedProfile);
+          if (parsed.id === activeUser.id || parsed.username === activeUser.username) {
+            return { ...defaultForActive, ...parsed };
+          }
+        }
+        return defaultForActive;
+      }
+
+      if (storedProfile) {
+        const parsed = JSON.parse(storedProfile);
+        if (parsed.username === 'aminat_diallo') {
+          return { ...DEFAULT_STUDENT, ...parsed };
+        }
+        return {
+          id: parsed.id || 'stu-generic',
+          name: parsed.name || 'Student Learner',
+          username: parsed.username || 'student',
+          email: parsed.email || '',
+          grade: parsed.grade || 'SS2',
+          classSection: parsed.classSection || 'SS2 A',
+          school: parsed.school || 'Senior Secondary School',
+          targetExam: parsed.targetExam || 'WAEC',
+          preferredPresentation: parsed.preferredPresentation || ['visual', 'interactive'],
+          audioSupport: parsed.audioSupport ?? false,
+          learningPreferences: parsed.learningPreferences || ['visual', 'interactive'],
+          streakDays: parsed.streakDays || 0,
+          totalPoints: parsed.totalPoints || 0,
+          currentLevel: parsed.currentLevel || 1,
+          dailyGoalTarget: parsed.dailyGoalTarget || 3,
+          dailyGoalCompleted: parsed.dailyGoalCompleted || 0,
+          lastActiveDate: parsed.lastActiveDate || new Date().toISOString(),
+          badgeAchievements: parsed.badgeAchievements || [],
+          leaderboardOptIn: true,
+          avatarSeed: parsed.avatarSeed || 'AD',
+          totalDiagnosed: parsed.totalDiagnosed || 0,
+          masteryPercentage: parsed.masteryPercentage || 0,
+          createdAt: parsed.createdAt || new Date().toISOString().split('T')[0],
+        };
       }
     } catch {
       // safe
     }
-    return DEFAULT_STUDENT;
+    return {
+      id: 'stu-generic',
+      name: 'Student Learner',
+      username: 'student',
+      email: '',
+      grade: 'SS2',
+      classSection: 'SS2 A',
+      school: 'Senior Secondary School',
+      targetExam: 'WAEC',
+      preferredPresentation: ['visual', 'interactive'],
+      audioSupport: false,
+      learningPreferences: ['visual', 'interactive'],
+      streakDays: 0,
+      totalPoints: 0,
+      currentLevel: 1,
+      dailyGoalTarget: 3,
+      dailyGoalCompleted: 0,
+      lastActiveDate: new Date().toISOString(),
+      badgeAchievements: [],
+      leaderboardOptIn: true,
+      avatarSeed: 'AD',
+      totalDiagnosed: 0,
+      masteryPercentage: 0,
+      createdAt: new Date().toISOString().split('T')[0],
+    };
   }
 
   // Save diagnostic attempt to local IndexedDB and enqueue to Micro-Sync Queue
@@ -151,10 +243,12 @@ class StorageService {
     diagnosis: DiagnosisResult,
     student: StudentProfile,
     timeSpentSeconds: number = 45,
-    hintsUsed: number = 1
+    hintsUsed: number = 1,
+    payloadData?: Record<string, unknown>
   ): Promise<SyncPayloadRecord> {
+    const recordId = diagnosis.attemptId || `sync-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     const syncRecord: SyncPayloadRecord = {
-      id: `sync-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      id: recordId,
       type: 'diagnostic_attempt',
       studentId: student.id,
       studentName: student.name,
@@ -168,6 +262,7 @@ class StorageService {
       timeSpentSeconds,
       hintsUsed,
       syncStatus: 'pending',
+      payloadData: payloadData || (diagnosis as any).payloadData,
     };
 
     try {

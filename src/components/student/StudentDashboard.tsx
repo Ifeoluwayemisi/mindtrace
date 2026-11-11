@@ -64,11 +64,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-display font-extrabold text-white tracking-tight leading-tight">
-              Welcome, {student.name.split(' ')[0]}! Ready for WAEC Mathematics?
+              Ready to level up your Mathematics, {student.name ? student.name.split(' ')[0] : 'Scholar'}?
             </h1>
 
             <p className="text-sm text-slate-300 leading-relaxed">
-              Every incorrect answer has a reason. MindTrace reads your step-by-step working, isolates the exact algebraic misconception, and guides you to full understanding with 0 KB internet data.
+              Every incorrect step has a specific algebraic reason. MindTrace analyzes your line-by-line working, isolates the exact misconception, and helps you turn weak areas into confident exam problem-solving — completely offline.
             </p>
 
             {/* Presentation Modes Active */}
@@ -153,8 +153,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
             <p className="text-[11px] text-slate-400 mt-1.5">
               {(student.dailyGoalCompleted || 0) >= (student.dailyGoalTarget || 3)
-                ? 'Target reached today!'
-                : `${(student.dailyGoalTarget || 3) - (student.dailyGoalCompleted || 0)} more to finish goal`}
+                ? 'Daily practice target achieved'
+                : `${(student.dailyGoalTarget || 3) - (student.dailyGoalCompleted || 0)} equations to complete target`}
             </p>
           </div>
 
