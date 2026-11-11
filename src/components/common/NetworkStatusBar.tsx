@@ -9,6 +9,7 @@ interface NetworkStatusBarProps {
 export const NetworkStatusBar: React.FC<NetworkStatusBarProps> = ({ onSyncCompleted }) => {
   const [networkState, setNetworkState] = useState({
     isOnline: true,
+    isActuallyOnline: true,
     isSimulatedOffline: false,
     pendingCount: 0,
     lastSyncedAt: null as string | null,
@@ -48,7 +49,7 @@ export const NetworkStatusBar: React.FC<NetworkStatusBarProps> = ({ onSyncComple
     }, 4000);
   };
 
-  const isActuallyOffline = !networkState.isOnline;
+  const isActuallyOffline = !networkState.isActuallyOnline;
 
   return (
     <div className="w-full bg-slate-900/90 border-b border-slate-800/80 px-4 py-1.5 text-xs">
@@ -59,12 +60,12 @@ export const NetworkStatusBar: React.FC<NetworkStatusBarProps> = ({ onSyncComple
             {isActuallyOffline ? (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-amber-300 bg-amber-950/60 border border-amber-800/50 font-medium">
                 <WifiOff className="w-3.5 h-3.5" />
-                <span>Zero-Bandwidth Mode (100% Offline)</span>
+                <span>{networkState.isSimulatedOffline ? 'Simulated Offline' : 'Offline / No Throughput'}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 font-medium">
                 <Wifi className="w-3.5 h-3.5" />
-                <span>Connected (Ready for Micro-Sync)</span>
+                <span>Connected (Cloud Active)</span>
               </span>
             )}
           </div>

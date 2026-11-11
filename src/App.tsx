@@ -51,11 +51,11 @@ import { TeacherDashboard } from './components/teacher/TeacherDashboard';
 export default function App() {
   // Determine initial entry view based on returning user status
   const [activeView, setActiveView] = useState<string>(() => {
-    if (typeof window !== 'undefined' && window.location.hash) {
-      const hashView = window.location.hash.replace('#', '');
-      if (hashView) return hashView;
+    if (authService.isReturningUser()) {
+      const active = authService.getActiveUser();
+      return active?.role === 'teacher' ? 'teacher-dashboard' : 'student-dashboard';
     }
-    return authService.isReturningUser() ? 'student-dashboard' : 'splash';
+    return 'splash';
   });
 
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => authService.getActiveUser());
@@ -69,7 +69,9 @@ export default function App() {
   const [student, setStudent] = useState<StudentProfile>(() => {
     return storageService.getSavedStudentProfile();
   });
-  const [teacher, setTeacher] = useState<TeacherProfile>(DEFAULT_TEACHER);
+  const [teacher, setTeacher] = useState<TeacherProfile>(() => {
+    return storageService.getSavedTeacherProfile();
+  });
 
   const [selectedQuestion, setSelectedQuestion] = useState<Question>(QUESTION_BANK[0]);
   const [lastDiagnosis, setLastDiagnosis] = useState<DiagnosisResult | null>(null);
@@ -107,6 +109,17 @@ export default function App() {
     });
     return unsubscribe;
   }, []);
+
+  // Keep profiles in sync with current user session
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.role === 'student') {
+        setStudent(storageService.getSavedStudentProfile());
+      } else if (currentUser.role === 'teacher') {
+        setTeacher(storageService.getSavedTeacherProfile());
+      }
+    }
+  }, [currentUser]);
 
   // Handlers for Student Navigation Flow
   const handleSelectQuestion = (q: Question) => {
@@ -277,6 +290,7 @@ export default function App() {
                     setStudent(storageService.getSavedStudentProfile());
                     changeView('student-dashboard');
                   } else {
+                    setTeacher(storageService.getSavedTeacherProfile());
                     changeView('teacher-dashboard');
                   }
                 }}
@@ -294,8 +308,10 @@ export default function App() {
                   setCurrentUser(u);
                   setCurrentRole(u?.role || role);
                   if (isStudent) {
+                    setStudent(storageService.getSavedStudentProfile());
                     changeView('profile-setup');
                   } else {
+                    setTeacher(storageService.getSavedTeacherProfile());
                     changeView('teacher-dashboard');
                   }
                 }}

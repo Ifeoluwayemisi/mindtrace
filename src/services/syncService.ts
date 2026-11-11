@@ -11,6 +11,7 @@ import { apiRequest } from './apiClient';
 
 type SyncListener = (status: {
   isOnline: boolean;
+  isActuallyOnline: boolean;
   isSimulatedOffline: boolean;
   pendingCount: number;
   lastSyncedAt: string | null;
@@ -19,6 +20,7 @@ type SyncListener = (status: {
 
 class SyncService {
   private isSimulatedOffline: boolean = false;
+  private isActuallyOnline: boolean = true;
   private listeners: Set<SyncListener> = new Set();
   private lastSyncedAt: string | null = null;
   private lastPayloadSizeKb: number = 0;
@@ -28,6 +30,12 @@ class SyncService {
     if (typeof window !== 'undefined') {
       window.addEventListener('online', () => this.handleNetworkChange());
       window.addEventListener('offline', () => this.handleNetworkChange());
+      
+      // Perform initial check
+      this.handleNetworkChange();
+      
+      // Periodic heartbeat every 30 seconds
+      setInterval(() => this.handleNetworkChange(), 30000);
     }
   }
 
@@ -45,6 +53,31 @@ class SyncService {
       this.triggerAutoSync();
     }
     return this.isSimulatedOffline;
+  }
+
+  // Robust heartbeat check to detect "Lie-fi"
+  async checkActualConnectivity(): Promise<boolean> {
+    if (this.isSimulatedOffline) return false;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
+
+    try {
+      // Use a small, cached-disabled fetch to health endpoint
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      
+      const res = await fetch('/api/health', { 
+        method: 'HEAD', 
+        cache: 'no-store',
+        signal: controller.signal 
+      });
+      
+      clearTimeout(timeoutId);
+      this.isActuallyOnline = res.ok;
+      return res.ok;
+    } catch {
+      this.isActuallyOnline = false;
+      return false;
+    }
   }
 
   getAirplaneModeState(): boolean {
@@ -69,6 +102,7 @@ class SyncService {
   private notifyListener(listener: SyncListener, pendingCount?: number) {
     listener({
       isOnline: this.isEffectiveOnline(),
+      isActuallyOnline: this.isActuallyOnline,
       isSimulatedOffline: this.isSimulatedOffline,
       pendingCount: pendingCount ?? 0,
       lastSyncedAt: this.lastSyncedAt,
@@ -76,9 +110,10 @@ class SyncService {
     });
   }
 
-  private handleNetworkChange() {
+  private async handleNetworkChange() {
+    const isActuallyOnline = await this.checkActualConnectivity();
     this.notify();
-    if (this.isEffectiveOnline()) {
+    if (isActuallyOnline) {
       this.triggerAutoSync();
     }
   }

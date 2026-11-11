@@ -242,6 +242,28 @@ class StorageService {
     };
   }
 
+  getSavedTeacherProfile(): TeacherProfile {
+    try {
+      const storedUser = localStorage.getItem('mindtrace_active_auth_user');
+      const activeUser = storedUser ? JSON.parse(storedUser) : null;
+
+      if (activeUser && activeUser.role === 'teacher') {
+        return {
+          ...DEFAULT_TEACHER,
+          id: activeUser.id,
+          name: activeUser.name || DEFAULT_TEACHER.name,
+          username: activeUser.username || DEFAULT_TEACHER.username,
+          email: activeUser.email || DEFAULT_TEACHER.email,
+          verificationStatus: activeUser.verificationStatus || DEFAULT_TEACHER.verificationStatus,
+          school: activeUser.school || DEFAULT_TEACHER.school,
+        };
+      }
+    } catch {
+      // safe
+    }
+    return DEFAULT_TEACHER;
+  }
+
   // Save diagnostic attempt to local IndexedDB and enqueue to Micro-Sync Queue
   async saveDiagnosticRecord(
     diagnosis: DiagnosisResult,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Users,
   Clock,
@@ -22,6 +22,7 @@ import { StudentDetailModal } from './StudentDetailModal';
 import { ClassroomManagerModal } from './ClassroomManagerModal';
 import { storageService } from '../../services/storageService';
 import { authService } from '../../services/authService';
+import { apiRequest } from '../../services/apiClient';
 import { Download, ShieldCheck, Key } from 'lucide-react';
 
 interface TeacherDashboardProps {
