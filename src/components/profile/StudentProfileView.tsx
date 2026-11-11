@@ -15,11 +15,9 @@ import {
   LogOut,
   RefreshCw,
   Download,
-  AlertTriangle,
 } from 'lucide-react';
 import { StudentProfile, LearningPreference, GradeLevel, ExamTrack } from '../../types';
 import { storageService } from '../../services/storageService';
-import { syncService } from '../../services/syncService';
 import { AudioPlayerControl } from '../common/AudioPlayerControl';
 
 interface StudentProfileViewProps {
@@ -29,12 +27,14 @@ interface StudentProfileViewProps {
 }
 
 const PRESET_AVATARS = [
-  { id: 'AD', label: 'Preset A', bg: 'bg-indigo-600' },
-  { id: 'BA', label: 'Preset B', bg: 'bg-emerald-600' },
-  { id: 'CE', label: 'Preset C', bg: 'bg-violet-600' },
-  { id: 'DO', label: 'Preset D', bg: 'bg-amber-600' },
-  { id: 'EN', label: 'Preset E', bg: 'bg-cyan-600' },
-  { id: 'FA', label: 'Preset F', bg: 'bg-rose-600' },
+  { id: 'AVATAR_M1', label: 'Tunde', path: '/src/assets/images/student_avatar_male_1_1794394444739.jpg' },
+  { id: 'AVATAR_F1', label: 'Aminat', path: '/src/assets/images/student_avatar_female_1_1794394445859.jpg' },
+  { id: 'AVATAR_M2', label: 'Chidi', path: '/src/assets/images/student_avatar_male_2_1794394446145.jpg' },
+  { id: 'AVATAR_F2', label: 'Ngozi', path: '/src/assets/images/student_avatar_female_2_1794394447322.jpg' },
+  { id: 'AVATAR_M3', label: 'Segun', path: '/src/assets/images/student_avatar_male_3_1794394447398.jpg' },
+  { id: 'AVATAR_F3', label: 'Folashade', path: '/src/assets/images/student_avatar_female_3_1794394447853.jpg' },
+  { id: 'AVATAR_M4', label: 'Babatunde', path: '/src/assets/images/student_avatar_male_4_1794394448086.jpg' },
+  { id: 'AVATAR_F4', label: 'Zainab', path: '/src/assets/images/student_avatar_female_4_1794394449400.jpg' },
 ];
 
 export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
@@ -134,26 +134,32 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       {saveToast && (
-        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-indigo-600 text-white shadow-xl text-xs font-semibold flex items-center gap-2 animate-bounce">
-          <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-[#6755E8] text-white shadow-xl text-xs font-bold flex items-center gap-2 animate-bounce">
+          <CheckCircle2 className="w-4 h-4 text-[#49C6A3]" />
           <span>{saveToast}</span>
         </div>
       )}
 
       {/* Top Banner Overview */}
-      <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 md:p-8 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-3xl bg-indigo-600 flex items-center justify-center font-bold text-white text-xl overflow-hidden shadow-lg">
-            {avatarSeed.startsWith('data:image') ? (
-              <img src={avatarSeed} alt="" className="w-full h-full object-cover" />
-            ) : (
-              avatarSeed
-            )}
+          <div className="w-16 h-16 rounded-3xl bg-[#F3F1FF] border-2 border-[#6755E8] flex items-center justify-center font-bold text-white text-xl overflow-hidden shadow-sm shrink-0">
+            <img 
+              src={avatarSeed} 
+              alt="" 
+              className="w-full h-full object-cover" 
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+            <div className="w-full h-full flex items-center justify-center font-display text-2xl font-bold text-white bg-[#6755E8]">
+              {name.substring(0, 2).toUpperCase() || 'MT'}
+            </div>
           </div>
           <div>
-            <h1 className="text-xl font-display font-bold text-white">{student.name}</h1>
-            <p className="text-xs text-indigo-400 font-mono">@{student.username}</p>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h1 className="text-xl font-display font-extrabold text-[#252641]">{student.name}</h1>
+            <p className="text-xs text-[#5140CA] font-mono font-bold">@{student.username}</p>
+            <p className="text-xs text-[#74788E] mt-0.5">
               {student.classSection} · {student.school} · {student.targetExam} Target
             </p>
           </div>
@@ -161,7 +167,7 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
 
         <button
           onClick={onLogout}
-          className="self-start sm:self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-rose-950/80 hover:text-rose-300 border border-slate-700 text-xs font-semibold text-slate-300 transition cursor-pointer"
+          className="self-start sm:self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F5F6FC] hover:bg-[#FFF1EE] hover:text-[#D64D31] hover:border-[#FF9078] border border-[#E9EAF3] text-xs font-bold text-[#74788E] transition cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Switch Profile / Sign Out</span>
@@ -169,35 +175,35 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
       </div>
 
       {/* Settings Navigation Tabs */}
-      <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-xl w-fit">
+      <div className="flex items-center gap-1 p-1 bg-[#F5F6FC] border border-[#E9EAF3] rounded-xl w-fit">
         <button
           onClick={() => setActiveSection('profile')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${
-            activeSection === 'profile' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+            activeSection === 'profile' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
           }`}
         >
           Personal Info
         </button>
         <button
           onClick={() => setActiveSection('preferences')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${
-            activeSection === 'preferences' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+            activeSection === 'preferences' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
           }`}
         >
           Presentation Styles
         </button>
         <button
           onClick={() => setActiveSection('privacy')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${
-            activeSection === 'privacy' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+            activeSection === 'privacy' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
           }`}
         >
           Privacy & Leaderboard
         </button>
         <button
           onClick={() => setActiveSection('storage')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg transition cursor-pointer ${
-            activeSection === 'storage' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+          className={`px-4 py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+            activeSection === 'storage' ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs' : 'text-[#74788E] hover:text-[#252641]'
           }`}
         >
           Offline Storage & Sync
@@ -206,39 +212,39 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
 
       {/* Section 1: Personal Info & Avatar */}
       {activeSection === 'profile' && (
-        <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-5 animate-fade-in">
+        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-5 animate-fade-in">
           <div>
-            <h2 className="text-base font-display font-bold text-white">Edit Student Details</h2>
-            <p className="text-xs text-slate-400">Update your school information and avatar.</p>
+            <h2 className="text-base font-display font-bold text-[#252641]">Edit Student Details</h2>
+            <p className="text-xs text-[#74788E]">Update your school information and avatar.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+              <label className="block text-xs font-bold text-[#252641] mb-1.5">Full Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-hidden focus:border-indigo-500"
+                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs text-[#252641] focus:outline-hidden focus:border-[#6755E8] focus:bg-white"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Username</label>
+              <label className="block text-xs font-bold text-[#252641] mb-1.5">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-white focus:outline-hidden focus:border-indigo-500"
+                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] font-mono text-xs text-[#252641] font-bold focus:outline-hidden focus:border-[#6755E8] focus:bg-white"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Class Level</label>
+              <label className="block text-xs font-bold text-[#252641] mb-1.5">Class Level</label>
               <select
                 value={grade}
                 onChange={(e) => setGrade(e.target.value as GradeLevel)}
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-hidden cursor-pointer"
+                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs font-semibold text-[#252641] focus:outline-hidden focus:border-[#6755E8] cursor-pointer"
               >
                 <option value="SS1">SS1</option>
                 <option value="SS2">SS2</option>
@@ -247,11 +253,11 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Target Exam</label>
+              <label className="block text-xs font-bold text-[#252641] mb-1.5">Target Exam</label>
               <select
                 value={targetExam}
                 onChange={(e) => setTargetExam(e.target.value as ExamTrack)}
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-hidden cursor-pointer"
+                className="w-full p-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs font-semibold text-[#252641] focus:outline-hidden focus:border-[#6755E8] cursor-pointer"
               >
                 <option value="WAEC">WAEC General Mathematics</option>
                 <option value="JAMB">JAMB UTME</option>
@@ -261,38 +267,47 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
           </div>
 
           {/* Change Avatar */}
-          <div className="pt-3 border-t border-slate-800 space-y-3">
-            <label className="block text-xs font-semibold text-slate-300">Choose Peer Avatar</label>
-            <div className="grid grid-cols-6 gap-2">
+          <div className="pt-3 border-t border-[#E9EAF3] space-y-3">
+            <label className="block text-xs font-bold text-[#252641]">Choose Peer Avatar</label>
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
               {PRESET_AVATARS.map((av) => (
                 <button
                   key={av.id}
-                  onClick={() => setAvatarSeed(av.id)}
-                  className={`p-2.5 rounded-xl border text-center transition cursor-pointer ${
-                    avatarSeed === av.id ? 'border-indigo-500 bg-indigo-950/60' : 'border-slate-800 bg-slate-950'
+                  onClick={() => setAvatarSeed(av.path)}
+                  className={`group relative p-1 rounded-2xl border transition-all cursor-pointer ${
+                    avatarSeed === av.path ? 'border-[#6755E8] bg-[#F3F1FF] ring-2 ring-[#6755E8]/30' : 'border-[#E9EAF3] bg-[#F8F9FF] hover:border-[#6755E8]/40'
                   }`}
                 >
-                  <div className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center text-xs font-bold text-white ${av.bg}`}>
-                    {av.id}
+                  <div className="aspect-square rounded-xl overflow-hidden bg-white shadow-2xs">
+                    <img
+                      src={av.path}
+                      alt={av.label}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
                   </div>
-                  <span className="text-[10px] text-slate-400 mt-1 block">{av.label}</span>
+                  {avatarSeed === av.path && (
+                    <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#6755E8] flex items-center justify-center shadow-sm border border-white">
+                      <Check className="w-3 h-3 text-white" strokeWidth={4} />
+                    </div>
+                  )}
+                  <span className="text-[9px] font-bold text-[#74788E] mt-1.5 block truncate px-0.5">{av.label}</span>
                 </button>
               ))}
             </div>
 
             <div>
-              <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-950 text-xs text-slate-300 hover:text-white cursor-pointer transition">
-                <Upload className="w-3.5 h-3.5 text-indigo-400" />
+              <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[#D4D7E8] bg-[#F8F9FF] hover:bg-[#F3F1FF] text-xs font-semibold text-[#252641] cursor-pointer transition">
+                <Upload className="w-3.5 h-3.5 text-[#6755E8]" />
                 <span>Upload New Avatar Picture</span>
                 <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
               </label>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex justify-end">
+          <div className="pt-3 border-t border-[#E9EAF3] flex justify-end">
             <button
               onClick={handleSaveProfile}
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
             >
               Save Profile Changes
             </button>
@@ -302,10 +317,10 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
 
       {/* Section 2: Presentation Preferences */}
       {activeSection === 'preferences' && (
-        <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4 animate-fade-in">
+        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4 animate-fade-in">
           <div>
-            <h2 className="text-base font-display font-bold text-white">Learning Presentation Preferences</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h2 className="text-base font-display font-bold text-[#252641]">Learning Presentation Preferences</h2>
+            <p className="text-xs text-[#74788E] mt-0.5">
               Customize how mathematical explanations and step-by-step remedies are delivered to you.
             </p>
           </div>
@@ -314,17 +329,19 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
             <div
               onClick={() => togglePresentation('visual')}
               className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                preferredPresentation.includes('visual') ? 'bg-indigo-950/60 border-indigo-500' : 'bg-slate-950 border-slate-800'
+                preferredPresentation.includes('visual') ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs' : 'bg-[#F8F9FF] border-[#E9EAF3] hover:border-[#D4D7E8]'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Eye className="w-5 h-5 text-indigo-400" />
+                <div className="w-10 h-10 rounded-xl bg-[#EAE6FE] text-[#6755E8] flex items-center justify-center shrink-0">
+                  <Eye className="w-5 h-5" />
+                </div>
                 <div>
-                  <h3 className="text-xs font-bold text-white">Visual Diagrams & Comparison Tables</h3>
-                  <p className="text-[11px] text-slate-400">Step transitions highlighted with side-by-side math formulas.</p>
+                  <h3 className="text-xs font-bold text-[#252641]">Visual Diagrams & Comparison Tables</h3>
+                  <p className="text-[11px] text-[#74788E]">Step transitions highlighted with side-by-side math formulas.</p>
                 </div>
               </div>
-              <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${preferredPresentation.includes('visual') ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-slate-700'}`}>
+              <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${preferredPresentation.includes('visual') ? 'bg-[#6755E8] border-[#6755E8] text-white' : 'border-[#D4D7E8]'}`}>
                 {preferredPresentation.includes('visual') && <Check className="w-3 h-3" />}
               </div>
             </div>
@@ -333,8 +350,8 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
             <div
               className={`p-4 rounded-2xl border transition-all space-y-3 ${
                 audioSupport
-                  ? 'bg-indigo-950/60 border-indigo-500 shadow-md shadow-indigo-950/30'
-                  : 'bg-slate-950 border-slate-800'
+                  ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs'
+                  : 'bg-[#F8F9FF] border-[#E9EAF3]'
               }`}
             >
               <div
@@ -342,17 +359,17 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
                 className="flex items-center justify-between cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-950 text-emerald-400 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#E8F8F4] text-[#1B886B] flex items-center justify-center shrink-0">
                     <Volume2 className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-bold text-white">Audio Read-Aloud Assistance</h3>
-                      <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800">
+                      <h3 className="text-xs font-bold text-[#252641]">Audio Read-Aloud Assistance</h3>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#E8F8F4] text-[#1B886B] border border-[#CEEFE6]">
                         Zero Data
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="text-[11px] text-[#74788E] mt-0.5">
                       Spoken problem statements, step directions, and diagnostic explanations using browser speech.
                     </p>
                   </div>
@@ -360,12 +377,12 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
 
                 {/* Explicit Audio Assistance Toggle Switch */}
                 <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider ${audioSupport ? 'text-emerald-400' : 'text-slate-500'}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${audioSupport ? 'text-[#1B886B]' : 'text-[#74788E]'}`}>
                     {audioSupport ? 'Enabled' : 'Disabled'}
                   </span>
                   <div
                     className={`w-9 h-5 rounded-full transition-colors relative p-0.5 ${
-                      audioSupport ? 'bg-indigo-600' : 'bg-slate-800 border border-slate-700'
+                      audioSupport ? 'bg-[#6755E8]' : 'bg-[#D4D7E8]'
                     }`}
                   >
                     <div
@@ -378,12 +395,12 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
               </div>
 
               {/* Live Audio Read-Aloud Tester */}
-              <div className="pt-2 border-t border-slate-800/80">
+              <div className="pt-2 border-t border-[#E9EAF3]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                  <span className="text-[11px] text-slate-300 font-semibold">
+                  <span className="text-[11px] text-[#252641] font-bold">
                     Voice Preview & Controls Test:
                   </span>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-[#74788E]">
                     Tested via native Web Speech API
                   </span>
                 </div>
@@ -399,26 +416,28 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
             <div
               onClick={() => togglePresentation('interactive')}
               className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                preferredPresentation.includes('interactive') ? 'bg-indigo-950/60 border-indigo-500' : 'bg-slate-950 border-slate-800'
+                preferredPresentation.includes('interactive') ? 'bg-[#F3F1FF] border-[#6755E8] shadow-xs' : 'bg-[#F8F9FF] border-[#E9EAF3] hover:border-[#D4D7E8]'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Sliders className="w-5 h-5 text-violet-400" />
+                <div className="w-10 h-10 rounded-xl bg-[#EBF8FB] text-[#167E96] flex items-center justify-center shrink-0">
+                  <Sliders className="w-5 h-5" />
+                </div>
                 <div>
-                  <h3 className="text-xs font-bold text-white">Interactive Hands-On Manipulatives</h3>
-                  <p className="text-[11px] text-slate-400">Manipulate balance scale pans and rainbow brackets with sliders.</p>
+                  <h3 className="text-xs font-bold text-[#252641]">Interactive Hands-On Manipulatives</h3>
+                  <p className="text-[11px] text-[#74788E]">Manipulate balance scale pans and rainbow brackets with sliders.</p>
                 </div>
               </div>
-              <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${preferredPresentation.includes('interactive') ? 'bg-indigo-600 border-indigo-500 text-white' : 'border-slate-700'}`}>
+              <div className={`w-4 h-4 rounded-md border flex items-center justify-center ${preferredPresentation.includes('interactive') ? 'bg-[#6755E8] border-[#6755E8] text-white' : 'border-[#D4D7E8]'}`}>
                 {preferredPresentation.includes('interactive') && <Check className="w-3 h-3" />}
               </div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex justify-end">
+          <div className="pt-3 border-t border-[#E9EAF3] flex justify-end">
             <button
               onClick={handleSaveProfile}
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
             >
               Save Preferences
             </button>
@@ -428,17 +447,17 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
 
       {/* Section 3: Privacy & Leaderboard */}
       {activeSection === 'privacy' && (
-        <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4 animate-fade-in">
+        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4 animate-fade-in">
           <div>
-            <h2 className="text-base font-display font-bold text-white">Privacy & Leaderboard Visibility</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Control how your learning activity is displayed to classmates.</p>
+            <h2 className="text-base font-display font-bold text-[#252641]">Privacy & Leaderboard Visibility</h2>
+            <p className="text-xs text-[#74788E] mt-0.5">Control how your learning activity is displayed to classmates.</p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+          <div className="p-5 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-bold text-white">Show on Class Leaderboard</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <h3 className="text-xs font-bold text-[#252641]">Show on Class Leaderboard</h3>
+                <p className="text-[11px] text-[#74788E] mt-0.5">
                   When disabled, your score is hidden or displayed as "Anonymous Student".
                 </p>
               </div>
@@ -446,7 +465,7 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
                 type="button"
                 onClick={() => setLeaderboardOptIn(!leaderboardOptIn)}
                 className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-                  leaderboardOptIn ? 'bg-indigo-600' : 'bg-slate-700'
+                  leaderboardOptIn ? 'bg-[#6755E8]' : 'bg-[#D4D7E8]'
                 }`}
               >
                 <div
@@ -458,10 +477,10 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex justify-end">
+          <div className="pt-3 border-t border-[#E9EAF3] flex justify-end">
             <button
               onClick={handleSaveProfile}
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer"
             >
               Save Privacy Settings
             </button>
@@ -471,22 +490,22 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
 
       {/* Section 4: Offline Storage & Sync */}
       {activeSection === 'storage' && (
-        <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4 animate-fade-in">
+        <div className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4 animate-fade-in">
           <div>
-            <h2 className="text-base font-display font-bold text-white">Offline Data & IndexedDB Health</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h2 className="text-base font-display font-bold text-[#252641]">Offline Data & IndexedDB Health</h2>
+            <p className="text-xs text-[#74788E] mt-0.5">
               Inspect on-device diagnostic records and micro-sync queue status.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-              <span className="text-slate-400">Database Name:</span>
-              <p className="font-mono font-bold text-indigo-300">MindTraceOfflineDB (v2)</p>
+            <div className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-1">
+              <span className="text-[#74788E]">Database Name:</span>
+              <p className="font-mono font-bold text-[#5140CA]">MindTraceOfflineDB (v2)</p>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-              <span className="text-slate-400">IndexedDB Object Stores:</span>
-              <p className="font-mono text-slate-300">profiles, diagnoses, syncQueue, teacherAnalytics, lessonPackages</p>
+            <div className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-1">
+              <span className="text-[#74788E]">IndexedDB Object Stores:</span>
+              <p className="font-mono text-[#252641] font-semibold">profiles, diagnoses, syncQueue, teacherAnalytics, lessonPackages</p>
             </div>
           </div>
 
@@ -501,9 +520,9 @@ export const StudentProfileView: React.FC<StudentProfileViewProps> = ({
                 a.download = `mindtrace-profile-${student.username}.json`;
                 a.click();
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F5F6FC] hover:bg-[#F3F1FF] border border-[#E9EAF3] text-xs font-bold text-[#252641] transition cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-[#6755E8]" />
               <span>Export Offline Profile Backup</span>
             </button>
           </div>

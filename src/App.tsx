@@ -179,7 +179,7 @@ export default function App() {
   ].includes(activeView);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FF] text-[#252641] selection:bg-[#6755E8] selection:text-white">
       {/* 1. Offline / Airplane Mode Simulation Bar (Zero-Bandwidth Verification) */}
       <NetworkStatusBar
         onSyncCompleted={() => {
@@ -199,16 +199,16 @@ export default function App() {
         />
       ) : (
         /* Minimal header during auth/onboarding or password change */
-        <div className="w-full bg-slate-950 border-b border-slate-900/60 py-3 px-4 sm:px-6">
+        <div className="w-full bg-white/95 backdrop-blur-md border-b border-[#E9EAF3] py-3.5 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div
               onClick={() => changeView('welcome')}
-              className="flex items-center gap-2 cursor-pointer group"
+              className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center font-display font-bold text-white text-sm">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6755E8] to-[#5140CA] flex items-center justify-center font-display font-black text-white text-base shadow-sm shadow-[#6755E8]/20 group-hover:scale-105 transition-transform">
                 M
               </div>
-              <span className="font-display font-extrabold text-white text-base tracking-tight">
+              <span className="font-display font-black text-[#252641] text-lg tracking-tight">
                 MindTrace
               </span>
             </div>
@@ -220,7 +220,7 @@ export default function App() {
                     authService.setOnboardingCompleted(true);
                     changeView('student-dashboard');
                   }}
-                  className="text-xs text-slate-400 hover:text-indigo-400 transition cursor-pointer px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800"
+                  className="text-xs text-[#74788E] hover:text-[#6755E8] transition cursor-pointer px-3 py-1.5 rounded-xl bg-[#F5F6FC] hover:bg-[#F3F1FF] border border-[#E9EAF3] hover:border-[#6755E8]/30 font-medium"
                 >
                   Skip to Demo Learner →
                 </button>
@@ -488,20 +488,18 @@ export default function App() {
       </main>
 
       {/* 4. Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 px-4 sm:px-6 text-xs text-slate-500 mb-14 lg:mb-0">
+      <footer className="border-t border-[#E9EAF3] bg-white py-6 px-4 sm:px-6 text-xs text-[#74788E] mb-14 lg:mb-0 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-display font-semibold text-slate-300">MindTrace</span>
-            <span>·</span>
-            <span>Secondary Mathematics Diagnostic Platform</span>
+            <span className="font-display font-bold text-[#252641]">MindTrace</span>
+            <span className="text-[#E9EAF3]">|</span>
+            <span className="text-[#74788E]">Secondary Mathematics Diagnostic Platform</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] text-slate-400">
-            <span>Deterministic Edge Parser (&lt;50ms)</span>
-            <span>·</span>
-            <span>100% Offline IndexedDB</span>
-            <span>·</span>
-            <span>Micro-Sync (&le;15KB JSON)</span>
+          <div className="flex items-center gap-3 text-[11px] text-[#74788E]">
+            <span className="px-2 py-0.5 rounded-md bg-[#F5F6FC] border border-[#E9EAF3] font-mono text-[#5140CA] font-medium">Edge Parser &lt;50ms</span>
+            <span className="px-2 py-0.5 rounded-md bg-[#F5F6FC] border border-[#E9EAF3] font-mono text-[#49C6A3] font-medium">100% Offline IndexedDB</span>
+            <span className="px-2 py-0.5 rounded-md bg-[#F5F6FC] border border-[#E9EAF3] font-mono text-[#36B8D8] font-medium">Micro-Sync &le;15KB</span>
           </div>
         </div>
       </footer>

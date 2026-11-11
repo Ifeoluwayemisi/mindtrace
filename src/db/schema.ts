@@ -63,7 +63,7 @@ export const studentProfiles = pgTable(
     firstName: varchar('first_name', { length: 50 }),
     lastName: varchar('last_name', { length: 50 }),
     otherName: varchar('other_name', { length: 50 }),
-    avatarSeed: varchar('avatar_seed', { length: 255 }).default('AD').notNull(),
+    avatarSeed: varchar('avatar_seed', { length: 255 }).default('/src/assets/images/student_avatar_female_1_1794394445859.jpg').notNull(),
     gradeLevel: varchar('grade_level', { length: 10 }).default('SS2').notNull(),
     targetExam: varchar('target_exam', { length: 20 }).default('WAEC').notNull(),
     schoolName: varchar('school_name', { length: 255 }), // Nullable: no fake default

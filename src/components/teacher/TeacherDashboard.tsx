@@ -654,8 +654,18 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                     <tr key={st.id} className="hover:bg-slate-950/40 transition-colors group">
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-indigo-900/30 border border-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center shadow-inner">
-                            {st.avatar}
+                          <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shadow-inner shrink-0">
+                            <img 
+                              src={st.avatar} 
+                              alt="" 
+                              className="w-full h-full object-cover" 
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                            <span className="text-[10px] font-bold text-white bg-indigo-600 w-full h-full flex items-center justify-center">
+                              {st.name.substring(0, 1).toUpperCase()}
+                            </span>
                           </div>
                           <span className="font-bold text-slate-200 group-hover:text-white">{st.name}</span>
                         </div>

@@ -427,8 +427,18 @@ export const GamificationHub: React.FC<GamificationHubProps> = ({
                     </td>
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-950 border border-indigo-800 text-indigo-300 font-bold flex items-center justify-center text-[11px]">
-                          {entry.avatar}
+                        <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shrink-0">
+                          <img 
+                            src={entry.avatar} 
+                            alt="" 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                          <span className="text-[10px] font-bold text-white bg-indigo-600 w-full h-full flex items-center justify-center">
+                            {entry.name.substring(0, 1).toUpperCase()}
+                          </span>
                         </div>
                         <div>
                           <span className="text-white block">

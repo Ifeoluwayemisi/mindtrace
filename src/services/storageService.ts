@@ -34,7 +34,7 @@ export const DEFAULT_STUDENT: StudentProfile = {
   lastActiveDate: new Date().toISOString(),
   badgeAchievements: ['badge-first-steps', 'badge-mistake-detective', 'badge-consistency-star'],
   leaderboardOptIn: true,
-  avatarSeed: 'AD',
+  avatarSeed: '/src/assets/images/student_avatar_female_1_1794394445859.jpg',
   totalDiagnosed: 18,
   masteryPercentage: 74,
   createdAt: '2026-11-01',
@@ -190,7 +190,7 @@ class StorageService {
               ...defaultForActive,
               ...parsed,
               school: parsed.school || defaultForActive.school,
-              avatarSeed: parsed.avatarSeed && parsed.avatarSeed !== 'AD' ? parsed.avatarSeed : getInitials(parsed.name || studentName),
+              avatarSeed: (parsed.avatarSeed && parsed.avatarSeed !== 'AD') ? parsed.avatarSeed : '/src/assets/images/student_avatar_female_1_1794394445859.jpg',
             };
           }
         }

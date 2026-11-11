@@ -1,6 +1,22 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --color-violet-electric: #6755E8;
+  --color-violet-dark: #5140CA;
+  --color-lavender-soft: #F3F1FF;
+  --color-lavender-hover: #EAE6FE;
+  --color-accent-cyan: #36B8D8;
+  --color-accent-mint: #49C6A3;
+  --color-accent-coral: #FF9078;
+  --color-accent-yellow: #FFC85A;
+  --color-bg-main: #F8F9FF;
+  --color-surface-white: #FFFFFF;
+  --color-surface-muted: #F5F6FC;
+  --color-text-main: #252641;
+  --color-text-secondary: #74788E;
+  --color-border-subtle: #E9EAF3;
+  --color-border-hover: #D4D7E8;
+}
 
 @layer base {
   :root {
@@ -9,20 +25,27 @@
     --font-mono: 'JetBrains Mono', monospace;
 
     /* Semantic Math & Brand Accents */
-    --color-midnight: #090d16;
-    --color-surface-card: #0e1424;
-    --color-surface-card-subtle: #131b30;
-    --color-border-subtle: rgba(255, 255, 255, 0.08);
-    --color-accent-indigo: #6366f1;
-    --color-accent-cyan: #06b6d4;
-    --color-accent-gold: #f59e0b;
+    --color-primary: #6755E8;
+    --color-primary-dark: #5140CA;
+    --color-primary-lavender: #F3F1FF;
+    --color-cyan: #36B8D8;
+    --color-mint: #49C6A3;
+    --color-coral: #FF9078;
+    --color-yellow: #FFC85A;
+    --color-bg: #F8F9FF;
+    --color-surface: #FFFFFF;
+    --color-surface-muted: #F5F6FC;
+    --color-text-heading: #252641;
+    --color-text-body: #4A4D68;
+    --color-text-muted: #74788E;
+    --color-border: #E9EAF3;
   }
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #090d16;
-  color: #f1f5f9;
+  background-color: #F8F9FF;
+  color: #252641;
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
 }
@@ -31,6 +54,7 @@ h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
   text-wrap: balance;
+  color: #252641;
 }
 
 code, pre, .font-mono {
@@ -40,20 +64,75 @@ code, pre, .font-mono {
 
 /* Accessible focus outlines across all interactive elements */
 :focus-visible {
-  outline: 2px solid #6366f1;
+  outline: 2px solid #6755E8;
   outline-offset: 2px;
 }
 
-/* Subtle mathematical grid background helper */
+/* Subtle mathematical coordinate grid background for light mode */
 .bg-math-grid {
   background-size: 24px 24px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(103, 85, 232, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(103, 85, 232, 0.04) 1px, transparent 1px);
 }
 
 /* Smooth micro-interaction transitions */
 .transition-smooth {
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Modern Card Utilities */
+.card-modern {
+  background-color: #FFFFFF;
+  border: 1px solid #E9EAF3;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px -2px rgba(103, 85, 232, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.card-modern:hover {
+  border-color: #D4D7E8;
+}
+
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -4px rgba(103, 85, 232, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
+/* Modern Button Utilities */
+.btn-primary {
+  background: linear-gradient(135deg, #6755E8 0%, #5140CA 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px 0 rgba(103, 85, 232, 0.32);
+  transition: all 0.18s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5B48DF 0%, #4636BA 100%);
+  box-shadow: 0 6px 20px 0 rgba(103, 85, 232, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: #252641;
+  font-weight: 600;
+  border: 1px solid #E9EAF3;
+  border-radius: 0.75rem;
+  transition: all 0.18s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #F8F9FF;
+  border-color: #D4D7E8;
+  color: #5140CA;
+}
+
+/* Mathematics Step Container */
+.math-container {
+  background-color: #F3F1FF;
+  border: 1px solid #E4E0FD;
+  border-radius: 0.75rem;
+}

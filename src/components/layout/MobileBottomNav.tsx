@@ -104,7 +104,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-1 shadow-2xl safe-area-bottom"
+      className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 backdrop-blur-xl border-t border-[#E9EAF3] px-2 py-1.5 shadow-lg safe-area-bottom"
     >
       <div className="flex items-center justify-around max-w-md mx-auto">
         {items.map((item) => {
@@ -117,25 +117,25 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               onClick={() => onViewChange(item.id)}
               className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 min-h-[48px] rounded-xl transition-all cursor-pointer relative ${
                 isActive
-                  ? 'text-indigo-400 font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'text-[#6755E8] font-bold'
+                  : 'text-[#74788E] hover:text-[#252641]'
               }`}
             >
               <div className="relative">
                 <IconComponent
                   className={`w-5 h-5 transition-transform ${
-                    isActive ? 'scale-110 text-indigo-400' : 'text-slate-400'
+                    isActive ? 'scale-110 text-[#6755E8]' : 'text-[#74788E]'
                   }`}
                 />
                 {item.badge && (
-                  <span className="absolute -top-1.5 -right-3 text-[9px] font-mono font-bold bg-amber-500 text-slate-950 px-1 rounded-full leading-tight">
+                  <span className="absolute -top-1.5 -right-3 text-[9px] font-mono font-bold bg-[#FFC85A] text-[#252641] px-1 rounded-full leading-tight shadow-xs">
                     {item.badge}
                   </span>
                 )}
               </div>
               <span
                 className={`text-[10px] mt-1 transition-colors leading-none tracking-tight ${
-                  isActive ? 'text-white font-semibold' : 'text-slate-400'
+                  isActive ? 'text-[#6755E8] font-bold' : 'text-[#74788E]'
                 }`}
               >
                 {item.label}
@@ -143,7 +143,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
               {/* Active subtle pill dot */}
               {isActive && (
-                <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-indigo-500" />
+                <span className="absolute bottom-0.5 w-1.5 h-1.5 rounded-full bg-[#6755E8]" />
               )}
             </button>
           );

@@ -4,14 +4,10 @@ import {
   Plus,
   Trash2,
   Zap,
-  HelpCircle,
-  Clock,
-  Sparkles,
-  BookOpen,
   CheckCircle,
   Lightbulb,
   Volume2,
-  VolumeX,
+  Sparkles,
 } from 'lucide-react';
 import { Question, StepSubmission, DiagnosisResult, StudentProfile } from '../../types';
 import { evaluateStudentSubmission } from '../../services/edgeRuleEngine';
@@ -42,7 +38,6 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [activeHint, setActiveHint] = useState<string | null>(null);
 
-  // Add intermediate step
   const handleAddStep = () => {
     const nextNumber = steps.length + 1;
     setSteps([
@@ -56,7 +51,6 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     setFocusedField(steps.length);
   };
 
-  // Remove step
   const handleRemoveStep = (index: number) => {
     if (steps.length <= 1) return;
     const updated = steps.filter((_, i) => i !== index).map((s, i) => ({
@@ -67,14 +61,12 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     if (focusedField === index) setFocusedField(Math.max(0, index - 1));
   };
 
-  // Update step expression
   const handleStepChange = (index: number, expression: string) => {
     const updated = [...steps];
     updated[index].mathExpression = expression;
     setSteps(updated);
   };
 
-  // Insert character from accessible virtual math keyboard
   const handleInsertSymbol = (symbol: string) => {
     if (symbol === 'CLEAR') {
       if (focusedField === 'final') {
@@ -96,7 +88,6 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     }
   };
 
-  // Quick preset loaders for hackathon demonstration
   const handleLoadPreset = (type: 'sign_flip' | 'distrib_error' | 'correct' | 'insufficient') => {
     if (type === 'sign_flip') {
       if (question.id === 'q-lin-01') {
@@ -141,69 +132,32 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
     }
   };
 
-  // Execute deterministic edge diagnosis & idempotent gamification points
   const handleDiagnose = async () => {
     setIsDiagnosing(true);
-
-    // Stop speech if active
     speechService.stop();
-
-    // Run deterministic edge rule engine (<50ms execution)
     const diagnosis = evaluateStudentSubmission(question, steps, finalAnswer);
-
-    // Calculate XP rewards idempotently
     let earnedXp = 0;
-
-    // 1. Award +10 XP for completing a diagnostic
-    const diagReward = gamificationService.awardPoints(
-      student,
-      'diagnostic_complete',
-      diagnosis.attemptId || question.id,
-      10,
-      `Completed mathematical diagnostic: ${question.equation}`
-    );
+    const diagReward = gamificationService.awardPoints(student, 'diagnostic_complete', diagnosis.attemptId || question.id, 10, `Completed diagnostic: ${question.equation}`);
     if (diagReward.awarded) earnedXp += 10;
-
-    // 2. Award +5 XP for providing complete mathematical working (at least 2 non-empty steps)
     const validStepCount = steps.filter((s) => s.mathExpression.trim().length > 0).length;
     if (validStepCount >= 2) {
-      const stepReward = gamificationService.awardPoints(
-        student,
-        'working_steps_provided',
-        diagnosis.attemptId || question.id,
-        5,
-        `Provided complete intermediate working steps`
-      );
+      const stepReward = gamificationService.awardPoints(student, 'working_steps_provided', diagnosis.attemptId || question.id, 5, `Provided complete working steps`);
       if (stepReward.awarded) earnedXp += 5;
     }
-
-    // Increment daily goal count
     student.dailyGoalCompleted = (student.dailyGoalCompleted || 0) + 1;
     student.totalDiagnosed = (student.totalDiagnosed || 0) + 1;
-
-    // Check if daily goal met (award +5 XP idempotently)
     if (student.dailyGoalCompleted >= student.dailyGoalTarget) {
       const todayStr = new Date().toISOString().split('T')[0];
-      const goalReward = gamificationService.awardPoints(
-        student,
-        'daily_goal_complete',
-        todayStr,
-        5,
-        `Completed daily mathematical goal (${student.dailyGoalTarget} equations)`
-      );
+      const goalReward = gamificationService.awardPoints(student, 'daily_goal_complete', todayStr, 5, `Completed daily mathematical goal`);
       if (goalReward.awarded) earnedXp += 5;
     }
-
     diagnosis.earnedXp = earnedXp;
-
-    // Save record to local IndexedDB store and enqueue for micro-sync
     await storageService.saveDiagnosticRecord(diagnosis, student, 38, activeHint ? 1 : 0, {
       equation: question.equation,
       workingSteps: steps,
       finalAnswer,
     });
     await storageService.saveStudentProfile(student);
-
     setTimeout(() => {
       setIsDiagnosing(false);
       onDiagnosisCompleted(diagnosis);
@@ -212,58 +166,51 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-      {/* Back button & context */}
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#74788E] hover:text-[#252641] transition cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Question Selection</span>
         </button>
-
         <div className="flex items-center gap-3">
-          {/* Read-Aloud Speech Button (Compact button beside header) */}
           <AudioPlayerControl
             textToSpeak={`Solve the equation: ${question.equation}. ${question.prompt}. Focus on isolating variable ${question.targetVariable}.`}
             label="Listen"
             variant="compact"
             hasAudioPreference={Boolean(student.audioSupport || student.preferredPresentation?.includes('audio') || student.learningPreferences?.includes('audio'))}
           />
-
-          <span className="text-xs text-indigo-400 font-medium">
+          <span className="text-xs text-[#6755E8] font-bold">
             {question.contextNote || 'WAEC Mathematics Section A'}
           </span>
         </div>
       </div>
 
-      {/* Main Question Card */}
-      <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 md:p-8 space-y-4 shadow-xl">
+      <div className="card-modern p-6 md:p-8 space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+          <span className="text-xs font-black uppercase tracking-wider text-[#6755E8]">
             {question.topicTitle}
           </span>
           <div className="flex items-center gap-2">
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+            <span className="text-xs px-3 py-1 rounded-full bg-[#F5F6FC] text-[#252641] font-bold">
               Difficulty: {question.difficulty}
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-800 text-amber-300 font-mono font-bold">
+            <span className="text-xs px-3 py-1 rounded-full bg-[#FFC85A]/20 text-[#B27B08] font-mono font-bold">
               +15 XP
             </span>
           </div>
         </div>
 
-        {/* Displayed Equation */}
-        <div className="py-4 px-6 rounded-2xl bg-slate-950/90 border border-indigo-950 text-center relative group">
-          <p className="text-xs text-slate-400 mb-1">Target Equation:</p>
-          <div className="font-mono text-3xl font-extrabold text-white tracking-wide">
+        <div className="py-6 px-6 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] text-center">
+          <p className="text-xs font-bold text-[#74788E] mb-2">Target Equation:</p>
+          <div className="font-mono text-4xl font-black text-[#252641] tracking-wide">
             {question.equation}
           </div>
         </div>
 
-        <p className="text-sm text-slate-200">{question.prompt}</p>
+        <p className="text-sm text-[#4A4D68] font-medium leading-relaxed">{question.prompt}</p>
 
-        {/* Accessible Audio Read-Aloud Bar directly below question instructions */}
         <AudioPlayerControl
           textToSpeak={`Solve the equation: ${question.equation}. Instructions: ${question.prompt}. Focus on isolating variable ${question.targetVariable} step-by-step.`}
           label="Listen to Question Instructions"
@@ -271,134 +218,66 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
           hasAudioPreference={Boolean(student.audioSupport || student.preferredPresentation?.includes('audio') || student.learningPreferences?.includes('audio'))}
         />
 
-        {/* Quick hint expander */}
         <div className="pt-2">
           {!activeHint ? (
             <button
-              onClick={() =>
-                setActiveHint(
-                  `Hint: Isolate the term containing ${question.targetVariable} first by undoing operations to both sides.`
-                )
-              }
-              className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-medium cursor-pointer"
+              onClick={() => setActiveHint(`Hint: Isolate the term containing ${question.targetVariable} first by undoing operations to both sides.`)}
+              className="inline-flex items-center gap-1.5 text-xs text-[#B27B08] hover:text-[#5140CA] font-bold cursor-pointer"
             >
-              <Lightbulb className="w-3.5 h-3.5" />
+              <Lightbulb className="w-4 h-4" />
               <span>Need a hint? (Recorded for teacher analytics)</span>
             </button>
           ) : (
-            <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-800/40 text-xs text-amber-200 flex items-start gap-2">
-              <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-[#FFF9EB] border border-[#FCECC2] text-xs text-[#B27B08] font-medium flex items-start gap-3">
+              <Lightbulb className="w-4 h-4 text-[#B27B08] shrink-0 mt-0.5" />
               <span>{activeHint}</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Preset Benchmarks for Hackathon Testing */}
-      <div className="rounded-2xl bg-indigo-950/30 border border-indigo-900/30 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Diagnostic Step Presets (Click to autofill sample working):</span>
-          </span>
-        </div>
+      <div className="rounded-2xl bg-[#F3F1FF] border border-[#E4E0FD] p-5 space-y-3">
+        <span className="text-xs font-bold text-[#5140CA] flex items-center gap-2">
+          <Sparkles className="w-4 h-4" />
+          <span>Diagnostic Step Presets (Autofill sample working):</span>
+        </span>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => handleLoadPreset('sign_flip')}
-            className="px-2.5 py-1 rounded-lg bg-indigo-900/50 hover:bg-indigo-800/60 border border-indigo-700/50 text-indigo-200 text-xs font-medium transition cursor-pointer"
-          >
-            Sign Reversal Error (ALG_SIGN_FLIP)
-          </button>
-          <button
-            onClick={() => handleLoadPreset('distrib_error')}
-            className="px-2.5 py-1 rounded-lg bg-indigo-900/50 hover:bg-indigo-800/60 border border-indigo-700/50 text-indigo-200 text-xs font-medium transition cursor-pointer"
-          >
-            Bracket Slip (ALG_INVALID_DISTRIB)
-          </button>
-          <button
-            onClick={() => handleLoadPreset('correct')}
-            className="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-700/50 text-emerald-200 text-xs font-medium transition cursor-pointer"
-          >
-            Flawless Working
-          </button>
-          <button
-            onClick={() => handleLoadPreset('insufficient')}
-            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer"
-          >
-            Empty Steps (Abstention Test)
-          </button>
+          <button onClick={() => handleLoadPreset('sign_flip')} className="px-3 py-1.5 rounded-lg bg-white border border-[#E9EAF3] hover:border-[#6755E8] text-[#5140CA] text-xs font-bold transition cursor-pointer">Sign Reversal Error</button>
+          <button onClick={() => handleLoadPreset('distrib_error')} className="px-3 py-1.5 rounded-lg bg-white border border-[#E9EAF3] hover:border-[#6755E8] text-[#5140CA] text-xs font-bold transition cursor-pointer">Bracket Slip</button>
+          <button onClick={() => handleLoadPreset('correct')} className="px-3 py-1.5 rounded-lg bg-[#49C6A3] text-white text-xs font-bold transition cursor-pointer">Flawless Working</button>
+          <button onClick={() => handleLoadPreset('insufficient')} className="px-3 py-1.5 rounded-lg bg-[#E9EAF3] text-[#74788E] text-xs font-bold transition cursor-pointer">Empty Steps</button>
         </div>
       </div>
 
-      {/* Step-by-Step Mathematical Reasoning Input */}
-      <div className="rounded-3xl bg-slate-900/80 border border-slate-800 p-6 space-y-5">
+      <div className="card-modern p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-display font-bold text-white">
-              Your Step-by-Step Working
-            </h3>
-            <p className="text-xs text-slate-400">
-              Enter each transformation line. The edge rule engine examines your operational logic.
-            </p>
+            <h3 className="text-base font-display font-bold text-[#252641]">Your Working</h3>
+            <p className="text-xs text-[#74788E]">Enter step-by-step transformation.</p>
           </div>
-          <button
-            onClick={handleAddStep}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 text-xs font-medium transition cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add Line</span>
+          <button onClick={handleAddStep} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#F5F6FC] hover:bg-[#F3F1FF] text-[#6755E8] text-xs font-bold transition cursor-pointer">
+            <Plus className="w-4 h-4" /> <span>Add Line</span>
           </button>
         </div>
 
-        {/* Steps List */}
         <div className="space-y-3">
           {steps.map((step, idx) => {
             const isFieldActive = focusedField === idx;
             return (
-              <div
-                key={step.stepNumber}
-                className={`flex items-center gap-3 p-3 rounded-2xl transition ${
-                  isFieldActive
-                    ? 'bg-slate-900 border-2 border-indigo-500 shadow-md shadow-indigo-950/40'
-                    : 'bg-slate-950/70 border border-slate-800'
-                }`}
-              >
-                <div
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold font-mono shrink-0 ${
-                    isFieldActive
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-slate-900 border border-slate-800 text-indigo-400'
-                  }`}
-                >
+              <div key={step.stepNumber} className={`flex items-center gap-3 p-3 rounded-2xl transition ${isFieldActive ? 'bg-[#F3F1FF] border-2 border-[#6755E8]' : 'bg-[#F8F9FF] border border-[#E9EAF3]'}`}>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold font-mono shrink-0 ${isFieldActive ? 'bg-[#6755E8] text-white' : 'bg-white border border-[#E9EAF3] text-[#6755E8]'}`}>
                   {step.stepNumber}
                 </div>
-
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={step.mathExpression}
-                    onFocus={() => setFocusedField(idx)}
-                    onChange={(e) => handleStepChange(idx, e.target.value)}
-                    placeholder={`e.g. ${
-                      idx === 0 ? '3x = 14 + 7' : idx === 1 ? '3x = 21' : 'x = 21 / 3'
-                    }`}
-                    className="w-full bg-transparent text-sm sm:text-base font-mono text-white placeholder:text-slate-600 focus:outline-hidden"
-                  />
-                </div>
-
-                {isFieldActive && (
-                  <span className="text-[10px] uppercase font-mono font-bold text-indigo-400 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-800/60 hidden sm:inline">
-                    Editing
-                  </span>
-                )}
-
+                <input
+                  type="text"
+                  value={step.mathExpression}
+                  onFocus={() => setFocusedField(idx)}
+                  onChange={(e) => handleStepChange(idx, e.target.value)}
+                  placeholder="e.g. 3x = 14 + 7"
+                  className="w-full bg-transparent text-sm font-mono text-[#252641] placeholder:text-[#B8BCD4] focus:outline-hidden"
+                />
                 {steps.length > 1 && (
-                  <button
-                    onClick={() => handleRemoveStep(idx)}
-                    className="p-1.5 text-slate-500 hover:text-rose-400 transition cursor-pointer rounded-lg hover:bg-slate-800"
-                    title="Remove step line"
-                    aria-label={`Remove step ${step.stepNumber}`}
-                  >
+                  <button onClick={() => handleRemoveStep(idx)} className="p-1.5 text-[#B8BCD4] hover:text-[#D64D31] transition cursor-pointer rounded-lg hover:bg-[#FFF1EE]">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
@@ -407,87 +286,32 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
           })}
         </div>
 
-        {/* Accessible Virtual Mathematics Keypad (Touch Target >= 44px) */}
-        <div className="p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-300">
-              Interactive Math Keypad:
-            </span>
-            <span className="text-[11px] font-mono text-indigo-400">
-              Inserting into {focusedField === 'final' ? 'Final Answer' : `Step ${focusedField + 1}`}
-            </span>
+        <div className="p-4 rounded-2xl bg-[#F8F9FF] border border-[#E9EAF3] space-y-2">
+          <div className="flex items-center justify-between text-xs font-bold text-[#252641]">
+            <span>Math Keypad:</span>
+            <span className="text-[11px] text-[#6755E8]">Editing {focusedField === 'final' ? 'Final Answer' : `Step ${focusedField + 1}`}</span>
           </div>
-
           <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
-            {[
-              { label: '+', val: ' + ' },
-              { label: '−', val: ' - ' },
-              { label: '×', val: ' * ' },
-              { label: '÷', val: ' / ' },
-              { label: '=', val: ' = ' },
-              { label: 'x', val: 'x' },
-              { label: '(', val: '(' },
-              { label: ')', val: ')' },
-              { label: '/', val: '/' },
-              { label: '⌫ Clear', val: 'CLEAR' },
-            ].map((btn) => (
-              <button
-                key={btn.label}
-                type="button"
-                onClick={() => handleInsertSymbol(btn.val)}
-                className={`min-h-[44px] rounded-xl font-mono text-sm font-bold flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
-                  btn.val === 'CLEAR'
-                    ? 'col-span-2 sm:col-span-1 bg-rose-950/60 text-rose-300 border border-rose-800 hover:bg-rose-900/60'
-                    : 'bg-slate-900 hover:bg-slate-800 text-white border border-slate-700/80 hover:border-indigo-500'
-                }`}
-                aria-label={`Insert mathematical symbol ${btn.label}`}
-              >
+            {[ {label: '+', val: ' + '}, {label: '−', val: ' - '}, {label: '×', val: ' * '}, {label: '÷', val: ' / '}, {label: '=', val: ' = '}, {label: 'x', val: 'x'}, {label: '(', val: '('}, {label: ')', val: ')'}, {label: '/', val: '/'}, {label: '⌫', val: 'CLEAR'} ].map((btn) => (
+              <button key={btn.label} type="button" onClick={() => handleInsertSymbol(btn.val)} className={`min-h-[44px] rounded-xl font-mono text-sm font-bold flex items-center justify-center transition-all cursor-pointer active:scale-95 ${btn.val === 'CLEAR' ? 'bg-[#FFF1EE] text-[#D64D31] border border-[#FDDDD7]' : 'bg-white border border-[#E9EAF3] hover:border-[#6755E8] text-[#252641]'}`}>
                 {btn.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Final Answer Input */}
-        <div className="pt-2 border-t border-slate-800">
-          <label className="block text-xs font-bold text-slate-300 mb-2">
-            Final Answer for {question.targetVariable}:
-          </label>
-          <div
-            className={`flex items-center gap-3 p-3 rounded-2xl transition ${
-              focusedField === 'final'
-                ? 'bg-slate-900 border-2 border-indigo-500 shadow-md shadow-indigo-950/40'
-                : 'bg-slate-950/90 border border-indigo-900/60'
-            }`}
-          >
-            <span className="font-mono text-sm font-bold text-indigo-400">
-              {question.targetVariable} =
-            </span>
-            <input
-              type="text"
-              value={finalAnswer}
-              onFocus={() => setFocusedField('final')}
-              onChange={(e) => setFinalAnswer(e.target.value)}
-              placeholder="e.g. 7"
-              className="flex-1 bg-transparent font-mono text-base font-bold text-white placeholder:text-slate-600 focus:outline-hidden"
-            />
+        <div className="pt-2 border-t border-[#E9EAF3]">
+          <label className="block text-xs font-bold text-[#252641] mb-2">Final Answer:</label>
+          <div className={`flex items-center gap-3 p-3 rounded-2xl transition ${focusedField === 'final' ? 'bg-[#F3F1FF] border-2 border-[#6755E8]' : 'bg-[#F8F9FF] border border-[#E9EAF3]'}`}>
+            <span className="font-mono text-sm font-bold text-[#6755E8]">x =</span>
+            <input type="text" value={finalAnswer} onFocus={() => setFocusedField('final')} onChange={(e) => setFinalAnswer(e.target.value)} placeholder="e.g. 7" className="w-full bg-transparent font-mono text-base font-bold text-[#252641] placeholder:text-[#B8BCD4] focus:outline-hidden" />
           </div>
         </div>
 
-        {/* Primary Action Button */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>Deterministic edge engine: &lt;50ms response, 0 KB data.</span>
-          </div>
-
-          <button
-            onClick={handleDiagnose}
-            disabled={isDiagnosing}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
-          >
-            <Zap className={`w-4 h-4 ${isDiagnosing ? 'animate-bounce' : ''}`} />
-            <span>{isDiagnosing ? 'Diagnosing Reasoning...' : 'Diagnose My Steps'}</span>
+        <div className="pt-4 flex items-center justify-between gap-3">
+          <div className="text-xs text-[#74788E] font-medium">Deterministic engine: &lt;50ms response.</div>
+          <button onClick={handleDiagnose} disabled={isDiagnosing} className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white font-bold text-sm shadow-xl shadow-[#6755E8]/20 transition-all hover:scale-[1.02] cursor-pointer">
+            <Zap className="w-4 h-4" /> <span>{isDiagnosing ? 'Diagnosing...' : 'Diagnose Steps'}</span>
           </button>
         </div>
       </div>

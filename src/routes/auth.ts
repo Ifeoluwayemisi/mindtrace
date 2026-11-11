@@ -108,7 +108,7 @@ authRouter.post('/register-student', authRateLimiter, async (req: Request, res: 
           fullName: fullName.trim(),
           role: 'student',
           schoolName: resolvedSchool,
-          avatarSeed: computedInitials,
+          avatarSeed: '/src/assets/images/student_avatar_female_1_1794394445859.jpg',
           gradeLevel: gradeLevel || 'SS2',
           targetExam: targetExam || 'WAEC',
           totalXp: 0,

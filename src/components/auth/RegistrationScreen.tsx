@@ -80,14 +80,14 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
   return (
     <div className="max-w-md mx-auto my-auto min-h-[75vh] flex flex-col justify-center px-4 py-6 animate-fade-in space-y-6">
       <div className="text-center space-y-1.5">
-        <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400">
-          <ShieldCheck className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F3F1FF] border border-[#E4E0FD] text-xs font-bold text-[#5140CA]">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#6755E8]" />
           <span>Local Cryptographic Vault · Offline Ready</span>
         </div>
-        <h1 className="text-2xl font-display font-extrabold text-white">
+        <h1 className="text-2xl font-display font-extrabold text-[#252641]">
           Create Your {role === 'student' ? 'Learner' : 'Teacher'} Profile
         </h1>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-[#74788E]">
           {role === 'student'
             ? 'Start identifying and correcting algebraic misconceptions with zero data cost.'
             : 'Access diagnostic analytics and student progress across WAEC curriculum modules.'}
@@ -95,28 +95,28 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       </div>
 
       {errorMessage && (
-        <div className="p-3.5 rounded-2xl bg-rose-950/70 border border-rose-800/80 text-rose-200 text-xs flex items-start gap-2.5">
+        <div className="p-3.5 rounded-2xl bg-[#FFF1EE] border border-[#FDDDD7] text-[#D64D31] text-xs flex items-start gap-2.5">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {/* Main Registration Form */}
-      <form onSubmit={handleSubmit} className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
+      <form onSubmit={handleSubmit} className="p-7 rounded-3xl bg-white border border-[#E9EAF3] shadow-lg space-y-4">
         {/* Role Segmented Switcher */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">I am registering as a:</label>
-          <div className="flex items-center p-1 rounded-xl bg-slate-950 border border-slate-800">
+          <label className="block text-xs font-bold text-[#252641] mb-1.5">I am registering as a:</label>
+          <div className="flex items-center p-1 rounded-xl bg-[#F5F6FC] border border-[#E9EAF3]">
             <button
               type="button"
               onClick={() => {
                 setRole('student');
                 setErrorMessage(null);
               }}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                 role === 'student'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs'
+                  : 'text-[#74788E] hover:text-[#252641]'
               }`}
             >
               Secondary Student
@@ -127,10 +127,10 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                 setRole('teacher');
                 setErrorMessage(null);
               }}
-              className={`flex-1 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+              className={`flex-1 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                 role === 'teacher'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-[#6755E8] to-[#5140CA] text-white shadow-xs'
+                  : 'text-[#74788E] hover:text-[#252641]'
               }`}
             >
               Mathematics Teacher
@@ -140,9 +140,9 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
 
         {/* Full Name */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
-          <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-            <User className="w-4 h-4 text-slate-500" />
+          <label className="block text-xs font-bold text-[#252641] mb-1.5">Full Name</label>
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
+            <User className="w-4 h-4 text-[#74788E]" />
             <input
               type="text"
               required
@@ -154,41 +154,41 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                 }
               }}
               placeholder="e.g. Aminat Diallo"
-              className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
             />
           </div>
         </div>
 
         {/* Username */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-            Username <span className="text-slate-500 font-normal">(Leaderboard Pseudonym)</span>
+          <label className="block text-xs font-bold text-[#252641] mb-1.5">
+            Username <span className="text-[#74788E] font-normal">(Leaderboard Pseudonym)</span>
           </label>
-          <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-            <span className="text-xs text-slate-500 font-mono">@</span>
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
+            <span className="text-xs text-[#74788E] font-mono">@</span>
             <input
               type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
               placeholder="aminat_math"
-              className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
             />
           </div>
         </div>
 
         {/* School Email */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
-          <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-            <Mail className="w-4 h-4 text-slate-500" />
+          <label className="block text-xs font-bold text-[#252641] mb-1.5">Email Address</label>
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
+            <Mail className="w-4 h-4 text-[#74788E]" />
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="student@school.edu.ng"
-              className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
             />
           </div>
         </div>
@@ -197,11 +197,11 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
         {role === 'student' && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Class Grade</label>
+              <label className="block text-xs font-bold text-[#252641] mb-1.5">Class Grade</label>
               <select
                 value={grade}
                 onChange={(e) => setGrade(e.target.value as GradeLevel)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-hidden cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] text-xs font-semibold text-[#252641] focus:outline-hidden focus:border-[#6755E8] cursor-pointer"
               >
                 <option value="SS1">SS1 (Senior Sec 1)</option>
                 <option value="SS2">SS2 (Senior Sec 2)</option>
@@ -209,8 +209,8 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Target Curriculum</label>
-              <div className="px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-emerald-400 font-semibold truncate">
+              <label className="block text-xs font-bold text-[#252641] mb-1.5">Target Curriculum</label>
+              <div className="px-3 py-2.5 rounded-xl bg-[#E8F8F4] border border-[#CEEFE6] text-xs text-[#1B886B] font-bold truncate">
                 WAEC & JAMB
               </div>
             </div>
@@ -223,28 +223,28 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
             {/* Professional Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Designation</label>
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-                  <User className="w-4 h-4 text-slate-500" />
+                <label className="block text-xs font-bold text-[#252641] mb-1.5">Designation</label>
+                <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
+                  <User className="w-4 h-4 text-[#74788E]" />
                   <input
                     type="text"
                     value={designation}
                     onChange={(e) => setDesignation(e.target.value)}
                     placeholder="e.g. Senior Math Lead"
-                    className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+                    className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Subject(s)</label>
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-                  <BookOpen className="w-4 h-4 text-slate-500" />
+                <label className="block text-xs font-bold text-[#252641] mb-1.5">Subject(s)</label>
+                <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
+                  <BookOpen className="w-4 h-4 text-[#74788E]" />
                   <input
                     type="text"
                     value={subjects}
                     onChange={(e) => setSubjects(e.target.value)}
                     placeholder="e.g. Mathematics, Further Math"
-                    className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+                    className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -252,39 +252,39 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
 
             {/* School Name */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">School / Institution</label>
-              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-                <School className="w-4 h-4 text-slate-500" />
+              <label className="block text-xs font-bold text-[#252641] mb-1.5">School / Institution</label>
+              <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
+                <School className="w-4 h-4 text-[#74788E]" />
                 <input
                   type="text"
                   required={role === 'teacher'}
                   value={school}
                   onChange={(e) => setSchool(e.target.value)}
                   placeholder="e.g. Agege Senior High"
-                  className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+                  className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
                 />
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-800/60 space-y-2">
+            <div className="p-4 rounded-2xl bg-[#F3F1FF] border border-[#E4E0FD] space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
-                  <Key className="w-3.5 h-3.5 text-amber-400" />
+                <label className="block text-xs font-bold text-[#5140CA] flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-[#B27B08]" />
                   <span>School Accreditation Token (Optional)</span>
                 </label>
-                <span className="text-[10px] text-slate-400">Admin-issued</span>
+                <span className="text-[10px] text-[#74788E] font-medium">Admin-issued</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-[#D4D7E8] focus-within:border-[#6755E8]">
                 <input
                   type="text"
                   value={teacherCode}
                   onChange={(e) => setTeacherCode(e.target.value.toUpperCase().trim())}
                   placeholder="e.g. MTR-XXXX-XXXX"
-                  className="w-full bg-transparent font-mono text-xs text-amber-300 placeholder:text-slate-600 focus:outline-hidden"
+                  className="w-full bg-transparent font-mono text-xs text-[#5140CA] font-bold placeholder:text-[#94A3B8] focus:outline-hidden"
                 />
               </div>
-              <p className="text-[11px] text-slate-400 leading-normal">
-                If your school administrator issued an accreditation token, enter it for instant verification. Otherwise, your account will be created with <span className="text-amber-300 font-medium">Pending Verification</span> status.
+              <p className="text-[11px] text-[#74788E] leading-normal">
+                If your school administrator issued an accreditation token, enter it for instant verification. Otherwise, your account will be created with <span className="text-[#B27B08] font-bold">Pending Verification</span> status.
               </p>
             </div>
           </div>
@@ -292,21 +292,21 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
 
         {/* Password */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
-          <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-            <Lock className="w-4 h-4 text-slate-500" />
+          <label className="block text-xs font-bold text-[#252641] mb-1.5">Password</label>
+          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#F8F9FF] border border-[#E9EAF3] focus-within:border-[#6755E8] focus-within:bg-white transition-all">
+            <Lock className="w-4 h-4 text-[#74788E]" />
             <input
               type={showPassword ? 'text' : 'password'}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
-              className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#252641] placeholder:text-[#94A3B8] focus:outline-hidden"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="text-slate-500 hover:text-slate-300 cursor-pointer"
+              className="text-[#74788E] hover:text-[#252641] cursor-pointer"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -316,7 +316,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition cursor-pointer disabled:opacity-50"
+          className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-[#6755E8] to-[#5140CA] hover:from-[#5B48DF] hover:to-[#4636BA] text-white font-bold text-xs shadow-md shadow-[#6755E8]/30 transition cursor-pointer disabled:opacity-50"
         >
           <span>{isLoading ? 'Hashing & Creating Account...' : role === 'student' ? 'Continue to Profile Setup' : 'Create Teacher Account'}</span>
           <ArrowRight className="w-4 h-4" />
@@ -327,15 +327,15 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
           <button
             type="button"
             onClick={handleAutofillStudent}
-            className="text-indigo-400 hover:text-indigo-300 cursor-pointer"
+            className="text-[#6755E8] hover:text-[#5140CA] font-bold cursor-pointer"
           >
             Autofill Student Sample
           </button>
-          <span className="text-slate-600">·</span>
+          <span className="text-[#E9EAF3]">·</span>
           <button
             type="button"
             onClick={handleAutofillTeacher}
-            className="text-violet-400 hover:text-violet-300 cursor-pointer"
+            className="text-[#5140CA] hover:text-[#6755E8] font-bold cursor-pointer"
           >
             Autofill Teacher Sample
           </button>
@@ -343,15 +343,15 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       </form>
 
       {/* Footer Navigation */}
-      <div className="flex items-center justify-between text-xs text-slate-400">
-        <button onClick={onBack} className="hover:text-white transition cursor-pointer">
+      <div className="flex items-center justify-between text-xs text-[#74788E]">
+        <button onClick={onBack} className="hover:text-[#252641] font-semibold transition cursor-pointer">
           ← Back
         </button>
         <div className="space-x-1">
           <span>Already registered?</span>
           <button
             onClick={onGoToLogin}
-            className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
+            className="text-[#6755E8] hover:text-[#5140CA] font-bold cursor-pointer"
           >
             Sign In
           </button>
@@ -360,4 +360,3 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
     </div>
   );
 };
-
