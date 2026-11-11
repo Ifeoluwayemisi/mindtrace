@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build:client": "vite build --outDir dist/client",
-    "build:server": "esbuild server.ts --bundle --platform=node --format=esm --outfile=dist/server.js --external:express --external:@neondatabase/serverless --external:connect-pg-simple --external:vite --external:pg --external:better-sqlite3 --external:@tailwindcss/vite --external:lightningcss --external:@tailwindcss/oxide*",
+    "build:server": "esbuild server.ts --bundle --platform=node --format=esm --outfile=api/server.js --external:express --external:@neondatabase/serverless --external:connect-pg-simple --external:vite --external:pg --external:better-sqlite3 --external:@tailwindcss/vite --external:lightningcss --external:@tailwindcss/oxide*",
     "build": "npm run build:client && npm run build:server",
-    "start": "node dist/server.js",
+    "start": "node api/server.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",
     "preview": "vite preview",

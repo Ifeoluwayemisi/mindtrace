@@ -136,12 +136,16 @@ async function configureServer() {
     });
   });
 
-  app.listen(PORT, () => {
-    console.log(`=======================================================`);
-    console.log(`🚀 MindTrace Server listening on http://0.0.0.0:${PORT}`);
-    console.log(`⚙️  Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`=======================================================`);
-  });
+  if (!isProduction) {
+    app.listen(PORT, () => {
+      console.log(`=======================================================`);
+      console.log(`🚀 MindTrace Server listening on http://0.0.0.0:${PORT}`);
+      console.log(`⚙️  Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`=======================================================`);
+    });
+  }
 }
 
 configureServer();
+
+export default app;
