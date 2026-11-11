@@ -16,6 +16,8 @@ export interface RegistrationInput {
   role: Role;
   grade?: GradeLevel;
   school?: string;
+  designation?: string;
+  subjects?: string;
   verificationToken?: string;
 }
 
@@ -283,6 +285,8 @@ class AuthService {
               schoolName: input.school || 'Senior Secondary High School',
               verificationToken: input.verificationToken ? input.verificationToken.trim() : undefined,
               email: input.email,
+              designation: input.designation,
+              subjects: input.subjects ? input.subjects.split(',').map((s) => s.trim()) : undefined,
             };
 
       const apiRes = await apiRequest(endpoint, {

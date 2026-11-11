@@ -105,6 +105,8 @@ export const teacherProfiles = pgTable(
       .notNull(), // 'pending' | 'approved' | 'rejected'
     approvedByAdminId: varchar('approved_by_admin_id', { length: 36 }),
     approvedAt: timestamp('approved_at', { withTimezone: true }),
+    designation: varchar('designation', { length: 100 }), // e.g. "Senior Mathematics Lead"
+    subjects: jsonb('subjects').default(['Mathematics']).notNull(), // array of strings
     rejectionReason: varchar('rejection_reason', { length: 255 }),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

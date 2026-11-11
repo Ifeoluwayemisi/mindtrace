@@ -44,10 +44,13 @@ export interface TeacherProfile {
   username: string;
   email: string;
   school: string;
+  designation?: string;
+  subjects?: string[];
   classes: string[];
   activeClass: string;
   subject: string;
   verificationStatus: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string;
 }
 
 export interface AuthUser {

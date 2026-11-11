@@ -5,6 +5,8 @@ import {
   classrooms,
   assignments,
   assignmentQuestions,
+  assignmentSubmissions,
+  studentProfiles,
 } from '../db/index';
 import { requireAuth, requireApprovedTeacher } from '../middleware/authMiddleware';
 import { generateUUID } from '../services/serverAuth';
@@ -129,5 +131,56 @@ teacherAssignmentRouter.patch('/:assignmentId/publish', requireAuth, requireAppr
   } catch (err: any) {
     console.error('Error publishing assignment:', err);
     res.status(500).json({ error: 'Server Error', message: 'Failed to publish assignment.' });
+  }
+});
+
+/**
+ * GET /api/teacher/assignments/:assignmentId/submissions
+ * Retrieves all student submissions for a specific assignment
+ */
+teacherAssignmentRouter.get('/assignments/:assignmentId/submissions', requireAuth, requireApprovedTeacher, async (req: Request, res: Response) => {
+  try {
+    const teacherId = req.session.userId!;
+    const { assignmentId } = req.params;
+
+    // 1. Verify teacher owns this assignment
+    const assignmentRow = await db
+      .select()
+      .from(assignments)
+      .where(and(eq(assignments.id, assignmentId), eq(assignments.teacherId, teacherId)))
+      .limit(1);
+
+    if (assignmentRow.length === 0) {
+      res.status(404).json({ error: 'Not Found', message: 'Assignment not found or access denied.' });
+      return;
+    }
+
+    // 2. Fetch submissions with student profiles
+    const submissions = await db
+      .select({
+        id: assignmentSubmissions.id,
+        studentId: assignmentSubmissions.studentId,
+        studentName: studentProfiles.fullName,
+        score: assignmentSubmissions.score,
+        totalMarks: assignmentSubmissions.totalMarks,
+        submittedAt: assignmentSubmissions.submittedAt,
+        attemptNumber: assignmentSubmissions.attemptNumber,
+        isLate: assignmentSubmissions.isLate,
+        status: assignmentSubmissions.status,
+        diagnosticAttemptId: assignmentSubmissions.diagnosticAttemptId,
+      })
+      .from(assignmentSubmissions)
+      .innerJoin(studentProfiles, eq(assignmentSubmissions.studentId, studentProfiles.id))
+      .where(eq(assignmentSubmissions.assignmentId, assignmentId))
+      .orderBy(desc(assignmentSubmissions.submittedAt));
+
+    res.json({
+      success: true,
+      assignment: assignmentRow[0],
+      submissions
+    });
+  } catch (err: any) {
+    console.error('Error fetching assignment submissions:', err);
+    res.status(500).json({ error: 'Server Error', message: 'Failed to fetch submissions.' });
   }
 });

@@ -134,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-slate-400'
                 }`}
               >
-                Insights Heatmap
+                Insights
               </button>
               <button
                 onClick={() => handleNavClick('teacher-students')}
@@ -144,7 +144,17 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-slate-400'
                 }`}
               >
-                Student Roster
+                Students
+              </button>
+              <button
+                onClick={() => handleNavClick('teacher-assignments')}
+                className={`hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
+                  activeView === 'teacher-assignments'
+                    ? 'text-white border-b-2 border-indigo-500 font-bold'
+                    : 'text-slate-400'
+                }`}
+              >
+                Homework & Assignments
               </button>
               <button
                 onClick={() => handleNavClick('teacher-problems')}
@@ -154,17 +164,7 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-slate-400'
                 }`}
               >
-                Curriculum Problems
-              </button>
-              <button
-                onClick={() => handleNavClick('teacher-chalkboard')}
-                className={`hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
-                  activeView === 'teacher-chalkboard'
-                    ? 'text-white border-b-2 border-indigo-500 font-bold'
-                    : 'text-slate-400'
-                }`}
-              >
-                Chalkboard Scripts
+                Curriculum
               </button>
             </>
           )}

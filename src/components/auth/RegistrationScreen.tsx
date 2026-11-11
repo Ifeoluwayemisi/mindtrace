@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ShieldCheck, Key } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, ShieldCheck, Key, School, BookOpen } from 'lucide-react';
 import { authService, RegistrationInput } from '../../services/authService';
 import { Role, GradeLevel } from '../../types';
 
@@ -23,7 +23,9 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [teacherCode, setTeacherCode] = useState('');
-  const [school, setSchool] = useState('Independent Learner');
+  const [designation, setDesignation] = useState('');
+  const [subjects, setSubjects] = useState('Mathematics');
+  const [school, setSchool] = useState(role === 'teacher' ? '' : 'Independent Learner');
   const [grade, setGrade] = useState<GradeLevel>('SS2');
 
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +44,8 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
       role,
       grade: role === 'student' ? grade : undefined,
       school,
+      designation: role === 'teacher' ? designation : undefined,
+      subjects: role === 'teacher' ? subjects : undefined,
       verificationToken: role === 'teacher' && teacherCode.trim() ? teacherCode.trim() : undefined,
     };
 
@@ -215,26 +219,74 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
 
         {/* School Accreditation Token (Optional) */}
         {role === 'teacher' && (
-          <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-800/60 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-amber-400" />
-                <span>School Accreditation Token (Optional)</span>
-              </label>
-              <span className="text-[10px] text-slate-400">Admin-issued</span>
+          <div className="space-y-4">
+            {/* Professional Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Designation</label>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
+                  <User className="w-4 h-4 text-slate-500" />
+                  <input
+                    type="text"
+                    value={designation}
+                    onChange={(e) => setDesignation(e.target.value)}
+                    placeholder="e.g. Senior Math Lead"
+                    className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Subject(s)</label>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
+                  <BookOpen className="w-4 h-4 text-slate-500" />
+                  <input
+                    type="text"
+                    value={subjects}
+                    onChange={(e) => setSubjects(e.target.value)}
+                    placeholder="e.g. Mathematics, Further Math"
+                    className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
-              <input
-                type="text"
-                value={teacherCode}
-                onChange={(e) => setTeacherCode(e.target.value.toUpperCase().trim())}
-                placeholder="e.g. MTR-XXXX-XXXX"
-                className="w-full bg-transparent font-mono text-xs text-amber-300 placeholder:text-slate-600 focus:outline-hidden"
-              />
+
+            {/* School Name */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">School / Institution</label>
+              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
+                <School className="w-4 h-4 text-slate-500" />
+                <input
+                  type="text"
+                  required={role === 'teacher'}
+                  value={school}
+                  onChange={(e) => setSchool(e.target.value)}
+                  placeholder="e.g. Agege Senior High"
+                  className="w-full bg-transparent text-xs text-white placeholder:text-slate-600 focus:outline-hidden"
+                />
+              </div>
             </div>
-            <p className="text-[11px] text-slate-400 leading-normal">
-              If your school administrator issued an accreditation token, enter it for instant verification. Otherwise, your account will be created with <span className="text-amber-300 font-medium">Pending Verification</span> status.
-            </p>
+
+            <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-800/60 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-amber-400" />
+                  <span>School Accreditation Token (Optional)</span>
+                </label>
+                <span className="text-[10px] text-slate-400">Admin-issued</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus-within:border-indigo-500">
+                <input
+                  type="text"
+                  value={teacherCode}
+                  onChange={(e) => setTeacherCode(e.target.value.toUpperCase().trim())}
+                  placeholder="e.g. MTR-XXXX-XXXX"
+                  className="w-full bg-transparent font-mono text-xs text-amber-300 placeholder:text-slate-600 focus:outline-hidden"
+                />
+              </div>
+              <p className="text-[11px] text-slate-400 leading-normal">
+                If your school administrator issued an accreditation token, enter it for instant verification. Otherwise, your account will be created with <span className="text-amber-300 font-medium">Pending Verification</span> status.
+              </p>
+            </div>
           </div>
         )}
 

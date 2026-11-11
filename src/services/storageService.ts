@@ -256,6 +256,8 @@ class StorageService {
           email: activeUser.email || DEFAULT_TEACHER.email,
           verificationStatus: activeUser.verificationStatus || DEFAULT_TEACHER.verificationStatus,
           school: activeUser.school || DEFAULT_TEACHER.school,
+          designation: activeUser.profile?.designation || activeUser.designation,
+          subjects: activeUser.profile?.subjects || activeUser.subjects,
         };
       }
     } catch {

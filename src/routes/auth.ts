@@ -131,7 +131,7 @@ authRouter.post('/register-student', authRateLimiter, async (req: Request, res: 
  */
 authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: Response) => {
   try {
-    const { username, fullName, password, schoolName, verificationToken, email } = req.body;
+    const { username, fullName, password, schoolName, verificationToken, email, designation, subjects } = req.body;
 
     if (!username || !fullName || !password || !schoolName) {
       res.status(400).json({
@@ -224,6 +224,8 @@ authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: 
       id: userId,
       fullName: fullName.trim(),
       schoolName: schoolName.trim(),
+      designation: designation || null,
+      subjects: subjects || ['Mathematics'],
       verificationId,
       verificationStatus,
       approvedAt: verificationStatus === 'approved' ? new Date().toISOString() : null,

@@ -270,11 +270,7 @@ export default function App() {
               <RoleSelectionScreen
                 onSelectRole={(role) => {
                   setCurrentRole(role);
-                  if (role === 'student') {
-                    changeView('profile-setup');
-                  } else {
-                    changeView('teacher-dashboard');
-                  }
+                  changeView('register');
                 }}
                 onBack={() => changeView('welcome')}
               />
@@ -472,12 +468,15 @@ export default function App() {
             activeTab={
               activeView === 'teacher-students'
                 ? 'students'
+                : activeView === 'teacher-assignments'
+                ? 'assignments'
                 : activeView === 'teacher-problems'
                 ? 'problems'
                 : 'insights'
             }
             onTabChange={(tab) => {
               if (tab === 'students') changeView('teacher-students');
+              else if (tab === 'assignments') changeView('teacher-assignments');
               else if (tab === 'problems') changeView('teacher-problems');
               else changeView('teacher-dashboard');
             }}

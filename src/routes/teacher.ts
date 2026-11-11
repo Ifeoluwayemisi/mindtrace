@@ -1,16 +1,18 @@
 import { Router, Request, Response } from 'express';
-import { eq, and, inArray, sql } from 'drizzle-orm';
+import { eq, and, inArray, sql, desc } from 'drizzle-orm';
 import {
   db,
   classrooms,
   classroomMemberships,
   studentProfiles,
   diagnosticAttempts,
+  diagnosticMisconceptions,
   teacherProfiles,
   users,
 } from '../db/index';
 import { requireAuth, requireRole, requireApprovedTeacher } from '../middleware/authMiddleware';
 import { generateUUID, hashPassword } from '../services/serverAuth';
+import { analyticsService } from '../services/analyticsService';
 
 export const teacherRouter = Router();
 
@@ -486,26 +488,116 @@ teacherRouter.get('/roster', requireAuth, requireApprovedTeacher, async (req: Re
 
 /**
  * GET /api/teacher/analytics
- * Returns class-wide aggregated misconception heatmaps from verified attempts
+ * Returns comprehensive class-wide performance metrics and misconception heatmaps
  */
 teacherRouter.get('/analytics', requireAuth, requireApprovedTeacher, async (req: Request, res: Response) => {
   try {
-    const misconceptionsQuery = await db
-      .select({
-        misconceptionCode: diagnosticAttempts.serverPrimaryMisconception,
-        count: sql<number>`COUNT(*)`,
-      })
-      .from(diagnosticAttempts)
-      .where(sql`${diagnosticAttempts.serverPrimaryMisconception} IS NOT NULL`)
-      .groupBy(diagnosticAttempts.serverPrimaryMisconception);
+    const teacherId = req.session.userId!;
+    const { classroomId } = req.query;
+
+    if (!classroomId) {
+      res.status(400).json({ error: 'Missing Classroom ID' });
+      return;
+    }
+
+    // Verify ownership
+    const classRow = await db
+      .select()
+      .from(classrooms)
+      .where(and(eq(classrooms.id, classroomId as string), eq(classrooms.teacherId, teacherId)))
+      .limit(1);
+
+    if (classRow.length === 0) {
+      res.status(404).json({ error: 'Not Found' });
+      return;
+    }
+
+    const overview = await analyticsService.getClassroomOverview(classroomId as string);
+    const insights = await analyticsService.getMisconceptionInsights(classroomId as string);
 
     res.json({
       success: true,
-      misconceptionHeatmap: misconceptionsQuery,
+      overview,
+      insights,
       timestamp: new Date().toISOString(),
     });
   } catch (err: any) {
     console.error('Error in GET /api/teacher/analytics:', err);
     res.status(500).json({ error: 'Failed to compute class analytics.', message: err?.message });
+  }
+});
+
+/**
+ * GET /api/teacher/students/:studentId/details
+ * Retrieves detailed performance metrics and misconception history for a specific student
+ */
+teacherRouter.get('/students/:studentId/details', requireAuth, requireApprovedTeacher, async (req: Request, res: Response) => {
+  try {
+    const teacherId = req.session.userId!;
+    const { studentId } = req.params;
+
+    // 1. Verify student belongs to a classroom owned by this teacher
+    const ownership = await db
+      .select({ id: classrooms.id })
+      .from(classrooms)
+      .innerJoin(classroomMemberships, eq(classrooms.id, classroomMemberships.classroomId))
+      .where(
+        and(
+          eq(classrooms.teacherId, teacherId),
+          eq(classroomMemberships.studentId, studentId),
+          eq(classroomMemberships.status, 'active')
+        )
+      )
+      .limit(1);
+
+    if (ownership.length === 0) {
+      res.status(403).json({ error: 'Forbidden', message: 'You do not have permission to view this student\'s details.' });
+      return;
+    }
+
+    // 2. Fetch student profile
+    const profiles = await db
+      .select()
+      .from(studentProfiles)
+      .where(eq(studentProfiles.id, studentId))
+      .limit(1);
+
+    if (profiles.length === 0) {
+      res.status(404).json({ error: 'Not Found', message: 'Student profile not found.' });
+      return;
+    }
+
+    const student = profiles[0];
+
+    // 3. Fetch recent diagnostic attempts
+    const attempts = await db
+      .select()
+      .from(diagnosticAttempts)
+      .where(eq(diagnosticAttempts.studentId, studentId))
+      .orderBy(desc(diagnosticAttempts.clientTimestamp))
+      .limit(10);
+
+    // 4. Fetch all active misconceptions
+    const misconceptions = await db
+      .select({
+        code: diagnosticMisconceptions.misconceptionCode,
+        confidence: diagnosticMisconceptions.confidenceScore,
+        createdAt: diagnosticMisconceptions.createdAt,
+        attemptId: diagnosticMisconceptions.attemptId,
+      })
+      .from(diagnosticMisconceptions)
+      .innerJoin(diagnosticAttempts, eq(diagnosticMisconceptions.attemptId, diagnosticAttempts.id))
+      .where(eq(diagnosticAttempts.studentId, studentId))
+      .orderBy(desc(diagnosticMisconceptions.createdAt));
+
+    res.json({
+      success: true,
+      student,
+      attempts,
+      misconceptions,
+    });
+  } catch (err: any) {
+    console.error('Error fetching student details:', err);
+    res.status(500).json({ error: 'Server Error', message: 'Failed to retrieve student details.' });
   }
 });
