@@ -13,6 +13,7 @@ type SyncListener = (status: {
   isOnline: boolean;
   isActuallyOnline: boolean;
   isSimulatedOffline: boolean;
+  isServerReachable: boolean;
   pendingCount: number;
   lastSyncedAt: string | null;
   lastPayloadSizeKb: number;
@@ -21,21 +22,26 @@ type SyncListener = (status: {
 class SyncService {
   private isSimulatedOffline: boolean = false;
   private isActuallyOnline: boolean = true;
+  private isServerReachable: boolean = true;
   private listeners: Set<SyncListener> = new Set();
   private lastSyncedAt: string | null = null;
   private lastPayloadSizeKb: number = 0;
   private currentAnalytics: ClassAnalyticsSummary = { ...INITIAL_CLASS_ANALYTICS };
 
   constructor() {
+    // Load simulation state from localStorage if it exists
     if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('mindtrace_simulated_offline');
+      this.isSimulatedOffline = stored === 'true';
+
       window.addEventListener('online', () => this.handleNetworkChange());
       window.addEventListener('offline', () => this.handleNetworkChange());
       
       // Perform initial check
       this.handleNetworkChange();
       
-      // Periodic heartbeat every 30 seconds
-      setInterval(() => this.handleNetworkChange(), 30000);
+      // Periodic heartbeat every 45 seconds (increased to avoid excessive polling)
+      setInterval(() => this.handleNetworkChange(), 45000);
     }
   }
 
@@ -45,9 +51,12 @@ class SyncService {
     return typeof navigator !== 'undefined' ? navigator.onLine : true;
   }
 
-  // Toggle airplane mode for testing offline resilience
-  toggleSimulatedAirplaneMode(): boolean {
+  // Toggle simulation for testing offline resilience
+  toggleSimulation(): boolean {
     this.isSimulatedOffline = !this.isSimulatedOffline;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mindtrace_simulated_offline', String(this.isSimulatedOffline));
+    }
     this.notify();
     if (this.isEffectiveOnline()) {
       this.triggerAutoSync();
@@ -56,27 +65,38 @@ class SyncService {
   }
 
   // Robust heartbeat check to detect "Lie-fi"
-  async checkActualConnectivity(): Promise<boolean> {
-    if (this.isSimulatedOffline) return false;
-    if (typeof navigator !== 'undefined' && !navigator.onLine) return false;
+  async checkActualConnectivity(): Promise<{ browserOnline: boolean; serverReachable: boolean }> {
+    const browserOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+    this.isActuallyOnline = browserOnline;
+
+    if (this.isSimulatedOffline) {
+      this.isServerReachable = false;
+      return { browserOnline, serverReachable: false };
+    }
+
+    if (!browserOnline) {
+      this.isServerReachable = false;
+      return { browserOnline: false, serverReachable: false };
+    }
 
     try {
       // Use a small, cached-disabled fetch to health endpoint
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       
+      // Use GET instead of HEAD for better compatibility across environments
       const res = await fetch('/api/health', { 
-        method: 'HEAD', 
+        method: 'GET', 
         cache: 'no-store',
         signal: controller.signal 
       });
       
       clearTimeout(timeoutId);
-      this.isActuallyOnline = res.ok;
-      return res.ok;
+      this.isServerReachable = res.ok;
+      return { browserOnline: true, serverReachable: res.ok };
     } catch {
-      this.isActuallyOnline = false;
-      return false;
+      this.isServerReachable = false;
+      return { browserOnline: true, serverReachable: false };
     }
   }
 
@@ -104,6 +124,7 @@ class SyncService {
       isOnline: this.isEffectiveOnline(),
       isActuallyOnline: this.isActuallyOnline,
       isSimulatedOffline: this.isSimulatedOffline,
+      isServerReachable: this.isServerReachable,
       pendingCount: pendingCount ?? 0,
       lastSyncedAt: this.lastSyncedAt,
       lastPayloadSizeKb: this.lastPayloadSizeKb,

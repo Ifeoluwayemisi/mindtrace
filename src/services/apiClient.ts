@@ -23,6 +23,21 @@ export async function apiRequest<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<{ ok: boolean; status: number; data?: T; error?: string; message?: string }> {
+  // 1. Intercept for Simulated Offline Mode
+  if (typeof window !== 'undefined') {
+    const isSimulated = localStorage.getItem('mindtrace_simulated_offline') === 'true';
+    // Allow health check to pass through if we want, but for "airplane mode" we should block everything.
+    // However, the sync service uses native fetch for health check, so we only block apiRequest.
+    if (isSimulated && !endpoint.includes('/api/health')) {
+      return {
+        ok: false,
+        status: 0,
+        error: 'Simulated Network Error',
+        message: 'MindTrace is in SIMULATED OFFLINE mode. This request was intercepted locally.',
+      };
+    }
+  }
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {}),
