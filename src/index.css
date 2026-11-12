@@ -42,7 +42,7 @@
 @layer base {
   :root {
     --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
     /* Semantic Math & Brand Accents */
@@ -591,6 +591,14 @@
 
 .transition-smooth {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The app shell uses a column flex container. Without an explicit min-width,
+   wide intrinsic content (for example nowrap table cells) can clamp children
+   to their min-content width and cause horizontal overflow on small screens. */
+main > * {
+  min-width: 0;
+  width: 100%;
 }
 
 .skip-link {

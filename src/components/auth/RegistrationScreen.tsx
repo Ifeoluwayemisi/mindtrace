@@ -154,7 +154,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                 }
               }}
               placeholder="e.g. Aminat Diallo"
-              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
             />
           </div>
         </div>
@@ -172,7 +172,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
               placeholder="aminat_math"
-              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
             />
           </div>
         </div>
@@ -188,7 +188,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="student@school.edu.ng"
-              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
             />
           </div>
         </div>
@@ -201,7 +201,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
               <select
                 value={grade}
                 onChange={(e) => setGrade(e.target.value as GradeLevel)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-semibold text-[#0F172A] focus:outline-hidden focus:border-[#2563EB] cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs font-semibold text-[#0F172A] focus:border-[#2563EB] cursor-pointer"
               >
                 <option value="SS1">SS1 (Senior Sec 1)</option>
                 <option value="SS2">SS2 (Senior Sec 2)</option>
@@ -231,7 +231,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                     value={designation}
                     onChange={(e) => setDesignation(e.target.value)}
                     placeholder="e.g. Senior Math Lead"
-                    className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+                    className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
                   />
                 </div>
               </div>
@@ -244,7 +244,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                     value={subjects}
                     onChange={(e) => setSubjects(e.target.value)}
                     placeholder="e.g. Mathematics, Further Math"
-                    className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+                    className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
                   />
                 </div>
               </div>
@@ -261,7 +261,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                   value={school}
                   onChange={(e) => setSchool(e.target.value)}
                   placeholder="e.g. Agege Senior High"
-                  className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+                  className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
                 />
               </div>
             </div>
@@ -280,7 +280,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
                   value={teacherCode}
                   onChange={(e) => setTeacherCode(e.target.value.toUpperCase().trim())}
                   placeholder="e.g. MTR-XXXX-XXXX"
-                  className="w-full bg-transparent font-mono text-xs text-[#2563EB] font-bold placeholder:text-[#94A3B8] focus:outline-hidden"
+                  className="w-full bg-transparent font-mono text-xs text-[#2563EB] font-bold placeholder:text-[#94A3B8]"
                 />
               </div>
               <p className="text-[11px] text-[#475569] leading-normal">
@@ -301,7 +301,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
-              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
             />
             <button
               type="button"

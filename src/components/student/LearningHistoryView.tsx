@@ -103,7 +103,7 @@ export const LearningHistoryView: React.FC<LearningHistoryViewProps> = ({
                   <span>{label}</span>
                   <span
                     className={`font-mono text-[11px] tabular-nums ${
-                      active ? 'text-[#2563EB]' : 'text-[#94A3B8]'
+                      active ? 'text-[#2563EB]' : 'text-[#64748B]'
                     }`}
                   >
                     {count}

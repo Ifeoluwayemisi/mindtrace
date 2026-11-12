@@ -94,7 +94,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="e.g. aminat_diallo"
-              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
             />
           </div>
         </div>
@@ -120,7 +120,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-hidden"
+              className="w-full bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8]"
             />
             <button
               type="button"

@@ -37,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const studentAvatarSrc = student ? resolveAvatarSrc(student.avatarSeed) : null;
 
   const handleNavClick = (view: string) => {
     onViewChange(view);
@@ -185,17 +186,20 @@ export const Header: React.FC<HeaderProps> = ({
               title="View student profile & preferences"
             >
               <div className="w-7 h-7 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE] overflow-hidden shrink-0 flex items-center justify-center">
-                <img
-                  src={resolveAvatarSrc(student.avatarSeed) ?? undefined}
-                  alt=""
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                <span className="text-[10px] font-bold text-[#1D4ED8] w-full h-full flex items-center justify-center">
-                  {getInitials(student.name)}
-                </span>
+                {studentAvatarSrc ? (
+                  <img
+                    src={studentAvatarSrc}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <span className="text-[10px] font-bold text-[#1D4ED8] w-full h-full flex items-center justify-center">
+                    {getInitials(student.name)}
+                  </span>
+                )}
               </div>
               <div className="hidden sm:flex flex-col">
                 <span className="text-[11px] font-bold text-[#0F172A] truncate max-w-[90px]">

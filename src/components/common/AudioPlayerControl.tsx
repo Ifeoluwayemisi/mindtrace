@@ -237,7 +237,7 @@ export const AudioPlayerControl: React.FC<AudioPlayerControlProps> = ({
                 ? `Pause ${label}`
                 : isPaused
                 ? `Resume ${label}`
-                : `Play ${label}`
+                : `Listen aloud: ${label}`
             }
             className={`inline-flex items-center gap-2 min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer select-none shadow-sm ${
               isPlaying

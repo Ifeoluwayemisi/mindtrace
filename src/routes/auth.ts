@@ -4,8 +4,21 @@ import crypto from 'crypto';
 import { db, users, studentProfiles, teacherProfiles, teacherVerifications } from '../db/index';
 import { hashPassword, verifyPassword, generateUUID } from '../services/serverAuth';
 import { requireAuth, authRateLimiter } from '../middleware/authMiddleware';
+import { isDemoModeEnabled } from '../config/demoMode';
 
 export const authRouter = Router();
+
+/**
+ * In server-controlled demo mode, authenticated teachers are treated as
+ * accredited so evaluators can explore the classroom workspace. The real
+ * verification gate remains active whenever MINDTRACE_DEMO_MODE is not true.
+ */
+function effectiveTeacherVerification(
+  status: 'pending' | 'approved' | 'rejected' | undefined
+): 'pending' | 'approved' | 'rejected' | undefined {
+  if (isDemoModeEnabled() && status) return 'approved';
+  return status;
+}
 
 /**
  * GET /api/auth/csrf-token
@@ -318,6 +331,7 @@ authRouter.post('/login', authRateLimiter, async (req: Request, res: Response) =
         profileData = profs[0];
         verificationStatus = profs[0].verificationStatus as any;
       }
+      verificationStatus = effectiveTeacherVerification(verificationStatus);
     }
 
     // Regenerate session to protect against session fixation
@@ -512,6 +526,7 @@ authRouter.get('/me', requireAuth, async (req: Request, res: Response) => {
         profileData = profs[0];
         verificationStatus = profs[0].verificationStatus as any;
       }
+      verificationStatus = effectiveTeacherVerification(verificationStatus);
     }
 
     res.json({

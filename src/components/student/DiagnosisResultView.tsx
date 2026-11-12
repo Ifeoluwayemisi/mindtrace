@@ -160,7 +160,7 @@ export const DiagnosisResultView: React.FC<DiagnosisResultViewProps> = ({
               <div className="math-expression text-lg font-bold text-[#78350F] py-1 break-words">
                 {diagnosis.faultyExpression}
               </div>
-              <p className="text-[12px] text-[#92400E]/85">
+              <p className="text-[12px] text-[#92400E]">
                 Transposed without inverting the operational sign.
               </p>
             </div>

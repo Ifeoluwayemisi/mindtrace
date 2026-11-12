@@ -85,7 +85,7 @@ export const PasswordRecoveryScreen: React.FC<PasswordRecoveryScreenProps> = ({
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="e.g. aminat_diallo"
                   autoComplete="username"
-                  className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+                  className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8]"
                 />
               </div>
             </div>

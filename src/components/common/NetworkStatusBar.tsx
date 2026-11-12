@@ -128,7 +128,7 @@ export const NetworkStatusBar: React.FC<NetworkStatusBarProps> = ({ onSyncComple
             <button
               onClick={handleManualSync}
               disabled={isSyncing}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[11px] shadow-sm shadow-[#2563EB]/20 transition cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[11px] shadow-sm shadow-[#2563EB]/20 transition cursor-pointer disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>Retry Sync</span>
@@ -138,7 +138,7 @@ export const NetworkStatusBar: React.FC<NetworkStatusBarProps> = ({ onSyncComple
           {/* Simulated Offline Mode Toggle */}
           <button
             onClick={handleToggleSimulation}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[11px] font-semibold transition cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-semibold transition cursor-pointer ${
               networkState.isSimulatedOffline
                 ? 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A] shadow-sm'
                 : 'bg-[#F1F5F9] text-[#0F172A] border-[#E2E8F0] hover:bg-[#EFF6FF] hover:border-[#2563EB]/40 hover:text-[#2563EB]'

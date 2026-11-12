@@ -191,7 +191,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <button key={item.title} onClick={item.onClick} className="card-modern card-interactive p-4 text-left flex flex-col gap-2">
             <item.icon className="w-5 h-5 text-[#2563EB]" aria-hidden="true" />
             <div>
-              <h3 className="text-[13px] font-bold text-[#0F172A]">{item.title}</h3>
+              <span className="block text-[13px] font-bold text-[#0F172A]">{item.title}</span>
               <p className="text-[11px] text-[#64748B]">{item.desc}</p>
             </div>
           </button>

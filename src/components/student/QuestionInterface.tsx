@@ -328,7 +328,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
                     onChange={(e) => handleStepChange(idx, e.target.value)}
                     placeholder="e.g. 3x = 14 + 7"
                     aria-describedby={`step-state-${idx}`}
-                    className="w-full bg-transparent math-expression text-[15px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+                    className="w-full min-h-[28px] bg-transparent math-expression text-[15px] text-[#0F172A] placeholder:text-[#94A3B8]"
                   />
                   <span id={`step-state-${idx}`} className="sr-only">
                     {isFieldActive ? 'Current step' : isFilled ? 'Completed step' : 'Not started'}
@@ -387,7 +387,7 @@ export const QuestionInterface: React.FC<QuestionInterfaceProps> = ({
               onFocus={() => setFocusedField('final')}
               onChange={(e) => setFinalAnswer(e.target.value)}
               placeholder="e.g. 7"
-              className="w-full bg-transparent math-expression text-lg font-bold text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+              className="w-full min-h-[32px] bg-transparent math-expression text-lg font-bold text-[#0F172A] placeholder:text-[#94A3B8]"
             />
           </div>
         </div>

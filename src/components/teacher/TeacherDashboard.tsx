@@ -630,7 +630,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                   {realAnalytics.topMisconceptions.map((mis, idx) => (
                     <div key={idx} className="p-3 rounded-lg bg-[#FFFBEB] border border-[#FDE68A] space-y-1">
                       <div className="text-[12px] font-semibold text-[#92400E]">{mis.title}</div>
-                      <div className="flex justify-between text-[11px] text-[#92400E]/80">
+                      <div className="flex justify-between text-[11px] text-[#92400E]">
                         <span>{mis.affectedPercentage}% affected</span>
                         <span className="text-[#1D4ED8] font-semibold cursor-pointer">Script →</span>
                       </div>
@@ -716,14 +716,16 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                           <td>
                             <div className="flex items-center gap-3">
                               <div className="relative w-8 h-8 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] overflow-hidden flex items-center justify-center shrink-0">
-                                <img
-                                  src={avatarSrc ?? undefined}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).style.display = 'none';
-                                  }}
-                                />
+                                {avatarSrc ? (
+                                  <img
+                                    src={avatarSrc}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                  />
+                                ) : null}
                                 <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#475569]">
                                   {getInitials(st.name)}
                                 </span>

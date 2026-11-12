@@ -148,7 +148,7 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
               key={s.id}
               aria-current={step === s.id ? 'step' : undefined}
               className={`text-[10px] font-semibold truncate ${
-                step === s.id ? 'text-[#2563EB]' : step > s.id ? 'text-[#047857]' : 'text-[#94A3B8]'
+                step === s.id ? 'text-[#2563EB]' : step > s.id ? 'text-[#047857]' : 'text-[#64748B]'
               }`}
             >
               {s.id}. {s.label}
@@ -323,7 +323,7 @@ export const StudentProfileSetup: React.FC<StudentProfileSetupProps> = ({
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                   autoComplete="username"
-                  className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none font-mono font-medium"
+                  className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] font-mono font-medium"
                 />
               </div>
             </div>

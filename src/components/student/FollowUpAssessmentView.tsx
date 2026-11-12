@@ -140,7 +140,7 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
                 value={finalAnswer}
                 onChange={(e) => setFinalAnswer(e.target.value)}
                 placeholder="e.g. 6"
-                className="flex-1 bg-transparent math-expression text-base font-bold text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+                className="flex-1 min-h-[32px] bg-transparent math-expression text-base font-bold text-[#0F172A] placeholder:text-[#94A3B8]"
               />
             </div>
           </div>
@@ -172,7 +172,7 @@ export const FollowUpAssessmentView: React.FC<FollowUpAssessmentViewProps> = ({
               <AlertTriangle className="w-5 h-5 text-[#D97706]" aria-hidden="true" />
               <span>Check step: transposition sign reversal</span>
             </div>
-            <p className="text-[13px] text-[#92400E]/90 leading-relaxed">
+            <p className="text-[13px] text-[#92400E] leading-relaxed">
               In 4x - 9 = 15, applying the additive inverse (+9) to both sides yields 4x = 15 + 9 = 24. Dividing by coefficient 4 yields x = 6.
             </p>
           </div>

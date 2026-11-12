@@ -381,7 +381,7 @@ export const AnimatedMicroLessonPlayer: React.FC<AnimatedMicroLessonPlayerProps>
             <div className="math-expression text-xl font-bold text-[#78350F] break-words">
               {lesson.whyIncorrectFails.incorrectStep}
             </div>
-            <p className="text-[12px] text-[#92400E]/90 leading-relaxed">
+            <p className="text-[12px] text-[#92400E] leading-relaxed">
               Leading to: <span className="math-expression font-bold text-[#78350F]">{lesson.whyIncorrectFails.result}</span>
             </p>
           </div>

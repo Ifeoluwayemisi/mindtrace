@@ -86,7 +86,7 @@ export const PasswordChangeScreen: React.FC<PasswordChangeScreenProps> = ({
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="At least 6 characters"
               autoComplete="new-password"
-              className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+              className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8]"
             />
             <button
               type="button"
@@ -118,7 +118,7 @@ export const PasswordChangeScreen: React.FC<PasswordChangeScreenProps> = ({
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Retype new password"
               autoComplete="new-password"
-              className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+              className="w-full min-h-[44px] bg-transparent text-[14px] text-[#0F172A] placeholder:text-[#94A3B8]"
             />
           </div>
           {confirmPassword.length > 0 && confirmPassword !== newPassword && (

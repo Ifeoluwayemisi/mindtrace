@@ -460,14 +460,16 @@ export const GamificationHub: React.FC<GamificationHubProps> = ({
                     <td>
                       <div className="flex items-center gap-2.5">
                         <div className="relative w-8 h-8 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] overflow-hidden shrink-0">
-                          <img
-                            src={resolveAvatarSrc(entry.avatar) ?? undefined}
-                            alt=""
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
+                          {resolveAvatarSrc(entry.avatar) ? (
+                            <img
+                              src={resolveAvatarSrc(entry.avatar) ?? undefined}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          ) : null}
                           <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#475569]">
                             {getInitials(entry.name)}
                           </span>

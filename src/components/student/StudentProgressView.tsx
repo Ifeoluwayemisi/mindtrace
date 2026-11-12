@@ -66,7 +66,7 @@ export const StudentProgressView: React.FC<StudentProgressViewProps> = ({
             <div className="text-2xl font-bold text-[#92400E] font-display tabular-nums">
               {student.streakDays} days
             </div>
-            <p className="text-[11px] text-[#92400E]/75 mt-2">Consecutive daily problem solving</p>
+            <p className="text-[11px] text-[#92400E] mt-2">Consecutive daily problem solving</p>
           </div>
 
           <div className="p-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0]">
@@ -171,7 +171,7 @@ export const StudentProgressView: React.FC<StudentProgressViewProps> = ({
                   <span className="text-[11px] font-mono text-[#065F46] block">
                     {record.parsingDurationMs}ms
                   </span>
-                  <span className="text-[10px] text-[#94A3B8]">Local rule</span>
+                  <span className="text-[10px] text-[#64748B]">Local rule</span>
                 </div>
               </div>
             ))}
