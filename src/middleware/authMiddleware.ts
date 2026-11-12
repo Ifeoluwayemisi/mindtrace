@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import { eq } from 'drizzle-orm';
 import { db, users, teacherProfiles } from '../db/index';
+import { isDemoModeEnabled } from '../config/demoMode';
 
 // Extend Express Session declaration
 declare module 'express-session' {
@@ -46,7 +47,8 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
 }
 
 /**
- * Middleware: Ensure authenticated user possesses specific role
+ * Middleware: Ensure authenticated user possesses specific role.
+ * Demo mode does not modify the role stored in the HTTP-only session.
  */
 export function requireRole(allowedRole: 'student' | 'teacher' | 'admin') {
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -73,8 +75,11 @@ export function requireRole(allowedRole: 'student' | 'teacher' | 'admin') {
 }
 
 /**
- * Middleware: Ensure teacher is approved by administrator or accreditation token.
- * Validates authoritatively against database records, not trusting cached client state.
+ * Middleware: Check teacher role and profile before enforcing accreditation.
+ * In explicitly enabled demo mode, authenticated teachers (including existing
+ * pending or rejected accounts) can use teacher workspace endpoints. The role
+ * and profile checks remain authoritative and classroom ownership checks in
+ * each endpoint are unaffected.
  */
 export async function requireApprovedTeacher(
   req: Request,
@@ -99,16 +104,13 @@ export async function requireApprovedTeacher(
     return;
   }
 
-  // If admin, automatically approved
   if (req.session.userRole === 'admin') {
     return next();
   }
 
   try {
     const profs = await db
-      .select({
-        verificationStatus: teacherProfiles.verificationStatus,
-      })
+      .select({ verificationStatus: teacherProfiles.verificationStatus })
       .from(teacherProfiles)
       .where(eq(teacherProfiles.id, req.session.userId))
       .limit(1);
@@ -124,6 +126,10 @@ export async function requireApprovedTeacher(
 
     const status = profs[0].verificationStatus;
     req.session.verificationStatus = status as 'pending' | 'approved' | 'rejected';
+
+    if (isDemoModeEnabled()) {
+      return next();
+    }
 
     if (status === 'pending') {
       res.status(403).json({
@@ -211,12 +217,9 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction):
   next();
 }
 
-/**
- * Rate limiting for authentication routes (Login/Register)
- * Max 10 attempts per 15 minutes per IP
- */
+/** Rate limiting for authentication routes. */
 export const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: process.env.NODE_ENV === 'test' ? 1000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
