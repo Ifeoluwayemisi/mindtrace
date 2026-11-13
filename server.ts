@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { pool, checkDatabaseConnection } from './src/db/index';
+import { seedDemoTeacherData } from './src/db/seedDemoTeacher';
 
 dotenv.config();
 
@@ -109,11 +110,16 @@ app.get('/api/health', async (_req: Request, res: Response) => {
 // 5. Vite Dev Server / Production Static File Serving Integration
 async function configureServer() {
   if (!isProduction) {
+    // Seed fictional classroom data locally so evaluator accounts can explore the teacher workspace.
+    await seedDemoTeacherData();
+  }
+
+  if (!isProduction) {
     // Development mode: Attach Vite dev server middleware to Express
     const { createServer: createViteServer } = await import('vite');
     const react = (await import('@vitejs/plugin-react')).default;
     const tailwindcss = (await import('@tailwindcss/vite')).default;
-
+    
     const vite = await createViteServer({
       server: { middlewareMode: true, hmr: false, ws: false },
       configFile: false,

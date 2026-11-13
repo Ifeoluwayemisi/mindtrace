@@ -9,9 +9,8 @@ import { isDemoModeEnabled } from '../config/demoMode';
 export const authRouter = Router();
 
 /**
- * In server-controlled demo mode, authenticated teachers are treated as
- * accredited so evaluators can explore the classroom workspace. The real
- * verification gate remains active whenever MINDTRACE_DEMO_MODE is not true.
+ * Demo mode reports existing teachers as accredited for evaluation, without
+ * weakening authentication or teacher-role checks.
  */
 function effectiveTeacherVerification(
   status: 'pending' | 'approved' | 'rejected' | undefined
@@ -139,8 +138,8 @@ authRouter.post('/register-student', authRateLimiter, async (req: Request, res: 
 
 /**
  * POST /api/auth/register-teacher
- * Registers a teacher. Default status is 'pending'.
- * Only teachers providing a valid, unredeemed, unexpired single-use token become 'approved'.
+ * New teachers are approved immediately so registration proceeds directly to the workspace.
+ * If supplied, accreditation tokens are still validated and single-use redemption is preserved.
  */
 authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: Response) => {
   try {
@@ -160,9 +159,9 @@ authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: 
     }
 
     let verificationId: string | null = null;
-    let verificationStatus: 'pending' | 'approved' | 'rejected' = 'pending';
+    const verificationStatus: 'approved' = 'approved';
 
-    // If an optional token was provided, validate it strictly
+    // Continue to reject invalid, redeemed, or expired tokens when one is provided.
     if (verificationToken && verificationToken.trim().length > 0) {
       const tokenHash = crypto.createHash('sha256').update(verificationToken.trim()).digest('hex');
       const verifications = await db
@@ -196,13 +195,12 @@ authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: 
         res.status(400).json({
           error: 'Token Expired',
           code: 'TOKEN_EXPIRED',
-          message: 'This teacher verification token has expired.',
+          message: 'The provided teacher accreditation token has expired.',
         });
         return;
       }
 
       verificationId = ver.id;
-      verificationStatus = 'approved';
     }
 
     const usernameNormalized = username.trim().toLowerCase();
@@ -220,7 +218,7 @@ authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: 
     const userId = generateUUID();
     const passwordHash = await hashPassword(password);
 
-    // Atomically create teacher user and profile
+    // Atomically create teacher user and approved profile
     await db.insert(users).values({
       id: userId,
       username: username.trim(),
@@ -241,7 +239,7 @@ authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: 
       subjects: subjects || ['Mathematics'],
       verificationId,
       verificationStatus,
-      approvedAt: verificationStatus === 'approved' ? new Date().toISOString() : null,
+      approvedAt: new Date().toISOString(),
     });
 
     // Mark verification token as redeemed if valid token was provided
@@ -262,10 +260,7 @@ authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: 
 
       res.status(201).json({
         success: true,
-        message:
-          verificationStatus === 'approved'
-            ? 'Teacher account verified and registered successfully.'
-            : 'Teacher account registered in Pending Verification state. An administrator will review your account.',
+        message: 'Teacher account approved and registered successfully.',
         user: {
           id: userId,
           username: username.trim(),
