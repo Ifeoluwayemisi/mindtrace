@@ -70,10 +70,12 @@ import { adminRouter } from './src/routes/admin';
 import { studentRouter } from './src/routes/student';
 import { studentAssignmentRouter } from './src/routes/studentAssignments';
 import { analyticsRouter } from './src/routes/analytics';
+import { isDemoMode, getDemoModeStatus } from './src/config/demoMode';
 
 app.use('/api/auth', authRouter);
 app.use('/api/sync', syncRouter);
 app.use('/api/teacher', teacherRouter);
+app.use('/api/teacher', teacherAssignmentRouter);
 app.use('/api/teacher/assignments', teacherAssignmentRouter);
 app.use('/api/teacher/analytics', analyticsRouter);
 app.use('/api/ai', aiRouter);
@@ -81,7 +83,11 @@ app.use('/api/admin', adminRouter);
 app.use('/api/student', studentRouter);
 app.use('/api/student/assignments', studentAssignmentRouter);
 
-// 4. Health Check Endpoint
+// 4. Configuration & Health Check Endpoints
+app.get('/api/config', (_req: Request, res: Response) => {
+  res.status(200).json(getDemoModeStatus());
+});
+
 app.get('/api/health', async (_req: Request, res: Response) => {
   const dbStatus = await checkDatabaseConnection();
   
@@ -90,6 +96,7 @@ app.get('/api/health', async (_req: Request, res: Response) => {
     app: 'MindTrace Diagnostic Platform API',
     version: '1.2.0',
     environment: process.env.NODE_ENV || 'development',
+    demoMode: isDemoMode(),
     serverTimestamp: new Date().toISOString(),
     database: {
       connected: dbStatus.ok,
@@ -147,6 +154,13 @@ async function configureServer() {
       console.log(`=======================================================`);
       console.log(`🚀 MindTrace Server listening on http://0.0.0.0:${PORT}`);
       console.log(`⚙️  Environment: ${process.env.NODE_ENV || 'development'}`);
+      if (isDemoMode()) {
+        console.log(`✨ [DEMO MODE ACTIVE] Teacher accreditation barriers bypassed`);
+      } else if (process.env.NODE_ENV === 'production') {
+        console.log(`🔒 [PRODUCTION SAFEGUARD] Demo mode strictly enforced off`);
+      } else {
+        console.log(`🛡️  Accreditation: Standard verification required`);
+      }
       console.log(`=======================================================`);
     });
   }

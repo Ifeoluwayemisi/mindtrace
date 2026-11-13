@@ -13,6 +13,7 @@ import {
 import { requireAuth, requireRole, requireApprovedTeacher } from '../middleware/authMiddleware';
 import { generateUUID, hashPassword } from '../services/serverAuth';
 import { analyticsService } from '../services/analyticsService';
+import { isDemoMode } from '../config/demoMode';
 
 export const teacherRouter = Router();
 
@@ -35,13 +36,14 @@ teacherRouter.get('/verification-status', requireAuth, requireRole('teacher'), a
     }
 
     const prof = profs[0];
+    const demoActive = isDemoMode();
     res.json({
       success: true,
-      verificationStatus: prof.verificationStatus || 'pending',
+      verificationStatus: demoActive ? 'approved' : prof.verificationStatus || 'pending',
       fullName: prof.fullName,
       schoolName: prof.schoolName,
-      approvedAt: prof.approvedAt,
-      rejectionReason: prof.rejectionReason,
+      approvedAt: demoActive ? (prof.approvedAt || new Date().toISOString()) : prof.approvedAt,
+      rejectionReason: demoActive ? null : prof.rejectionReason,
     });
   } catch (err: any) {
     console.error('Error in /verification-status:', err);

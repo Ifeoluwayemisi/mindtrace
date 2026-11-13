@@ -4,6 +4,25 @@
  */
 
 let cachedCsrfToken: string | null = null;
+let cachedAppConfig: { demoMode: boolean; environment: string; safeguardActive?: boolean } | null = null;
+
+export async function fetchAppConfig(): Promise<{ demoMode: boolean; environment: string; safeguardActive?: boolean }> {
+  if (cachedAppConfig) return cachedAppConfig;
+  try {
+    const res = await fetch('/api/config');
+    if (res.ok) {
+      cachedAppConfig = await res.json();
+      return cachedAppConfig!;
+    }
+  } catch (_err) {
+    // Offline or network unavailable
+  }
+  return { demoMode: false, environment: 'development' };
+}
+
+export function getCachedAppConfig(): { demoMode: boolean; environment: string } | null {
+  return cachedAppConfig;
+}
 
 export async function fetchCsrfToken(): Promise<string | null> {
   try {

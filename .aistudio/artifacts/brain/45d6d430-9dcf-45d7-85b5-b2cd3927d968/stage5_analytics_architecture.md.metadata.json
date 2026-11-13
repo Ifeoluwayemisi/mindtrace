@@ -1,6 +1,0 @@
-{
-  "summary":  "Architecture proposal for Phase 4 Stage 5 (Teacher Analytics). Defines dashboard sections, server-authoritative metric calculations, API contracts, database aggregation strategy, and security requirements, while maintaining offline-first integrity.",
-  "updatedAt":  "2026-11-11T09:56:41.776713488Z",
-  "requestFeedback":  true,
-  "userFacing":  true
-}

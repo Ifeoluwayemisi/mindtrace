@@ -17,7 +17,11 @@ export const teacherAssignmentRouter = Router();
  * GET /api/teacher/classrooms/:classroomId/assignments
  * List assignments for a specific classroom
  */
-teacherAssignmentRouter.get('/:classroomId/assignments', requireAuth, requireApprovedTeacher, async (req: Request, res: Response) => {
+teacherAssignmentRouter.get(
+  ['/classrooms/:classroomId/assignments', '/:classroomId/assignments'],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req: Request, res: Response) => {
   try {
     const teacherId = req.session.userId!;
     const { classroomId } = req.params;
@@ -51,7 +55,11 @@ teacherAssignmentRouter.get('/:classroomId/assignments', requireAuth, requireApp
  * POST /api/teacher/classrooms/:classroomId/assignments
  * Create a new assignment
  */
-teacherAssignmentRouter.post('/:classroomId/assignments', requireAuth, requireApprovedTeacher, async (req: Request, res: Response) => {
+teacherAssignmentRouter.post(
+  ['/classrooms/:classroomId/assignments', '/:classroomId/assignments'],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req: Request, res: Response) => {
   try {
     const teacherId = req.session.userId!;
     const { classroomId } = req.params;
@@ -106,7 +114,11 @@ teacherAssignmentRouter.post('/:classroomId/assignments', requireAuth, requireAp
  * PATCH /api/teacher/assignments/:assignmentId/publish
  * Publish a draft assignment
  */
-teacherAssignmentRouter.patch('/:assignmentId/publish', requireAuth, requireApprovedTeacher, async (req: Request, res: Response) => {
+teacherAssignmentRouter.patch(
+  ['/assignments/:assignmentId/publish', '/:assignmentId/publish'],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req: Request, res: Response) => {
   try {
     const teacherId = req.session.userId!;
     const { assignmentId } = req.params;
@@ -138,7 +150,11 @@ teacherAssignmentRouter.patch('/:assignmentId/publish', requireAuth, requireAppr
  * GET /api/teacher/assignments/:assignmentId/submissions
  * Retrieves all student submissions for a specific assignment
  */
-teacherAssignmentRouter.get('/assignments/:assignmentId/submissions', requireAuth, requireApprovedTeacher, async (req: Request, res: Response) => {
+teacherAssignmentRouter.get(
+  ['/assignments/:assignmentId/submissions', '/:assignmentId/submissions'],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req: Request, res: Response) => {
   try {
     const teacherId = req.session.userId!;
     const { assignmentId } = req.params;

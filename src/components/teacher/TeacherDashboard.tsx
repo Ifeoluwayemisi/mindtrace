@@ -19,7 +19,7 @@ import { StudentDetailModal } from './StudentDetailModal';
 import { ClassroomManagerModal } from './ClassroomManagerModal';
 import { storageService } from '../../services/storageService';
 import { authService } from '../../services/authService';
-import { apiRequest } from '../../services/apiClient';
+import { apiRequest, fetchAppConfig } from '../../services/apiClient';
 import { Download, ShieldCheck, Key, RefreshCw } from 'lucide-react';
 import { AssignmentManager } from './AssignmentManager';
 import { SubmissionReview } from './SubmissionReview';
@@ -79,9 +79,20 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [currentVerification, setCurrentVerification] = useState<'pending' | 'approved' | 'rejected'>(
     teacher.verificationStatus || 'pending'
   );
+
+  useEffect(() => {
+    fetchAppConfig().then((cfg) => {
+      if (cfg?.demoMode) {
+        setIsDemoMode(true);
+        setCurrentVerification('approved');
+      }
+    });
+  }, []);
+
   const [redemptionToken, setRedemptionToken] = useState('');
   const [isRedeeming, setIsRedeeming] = useState(false);
   const [redemptionError, setRedemptionError] = useState<string | null>(null);
@@ -202,8 +213,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
     return matchesSearch;
   });
 
-  // Verification Wall View
-  if (currentVerification === 'pending' || currentVerification === 'rejected') {
+  // Verification Wall View (Bypassed in Demo Mode)
+  if (!isDemoMode && (currentVerification === 'pending' || currentVerification === 'rejected')) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 py-12 space-y-7 animate-fade-in">
         <div className="w-full max-w-2xl text-center space-y-4">

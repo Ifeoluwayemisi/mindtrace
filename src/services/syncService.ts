@@ -132,9 +132,9 @@ class SyncService {
   }
 
   private async handleNetworkChange() {
-    const isActuallyOnline = await this.checkActualConnectivity();
+    const status = await this.checkActualConnectivity();
     this.notify();
-    if (isActuallyOnline) {
+    if (status.browserOnline && status.serverReachable && !this.isSimulatedOffline) {
       this.triggerAutoSync();
     }
   }

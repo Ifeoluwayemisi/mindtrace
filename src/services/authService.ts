@@ -6,7 +6,7 @@
 
 import { AuthUser, Role, GradeLevel } from '../types';
 import { DEFAULT_STUDENT, DEFAULT_TEACHER } from './storageService';
-import { apiRequest } from './apiClient';
+import { apiRequest, fetchAppConfig } from './apiClient';
 
 export interface RegistrationInput {
   name: string;
@@ -74,11 +74,15 @@ class AuthService {
         this.activeUser = JSON.parse(storedUser);
       }
 
+      const config = await fetchAppConfig();
+      const isDemo = config?.demoMode ?? false;
+
       // Check server session if online
       if (typeof navigator !== 'undefined' && navigator.onLine) {
         const meRes = await apiRequest('/api/auth/me');
         if (meRes.ok && meRes.data?.user) {
           const sUser = meRes.data.user;
+          const status = (sUser.role === 'teacher' && isDemo) ? 'approved' : sUser.verificationStatus;
           this.activeUser = {
             id: sUser.id,
             name: sUser.profile?.fullName || sUser.username,
@@ -87,7 +91,7 @@ class AuthService {
             role: sUser.role,
             isDemoSession: false,
             mustChangePassword: Boolean(sUser.mustChangePassword),
-            verificationStatus: sUser.verificationStatus,
+            verificationStatus: status,
           };
           localStorage.setItem('mindtrace_active_auth_user', JSON.stringify(this.activeUser));
         }
@@ -235,6 +239,9 @@ class AuthService {
       return { success: false, message: 'Incorrect password.' };
     }
 
+    const config = await fetchAppConfig();
+    const isDemo = config?.demoMode ?? true;
+
     const user: AuthUser = {
       id: account.id,
       name: account.name,
@@ -243,7 +250,7 @@ class AuthService {
       role: account.role,
       isDemoSession: false,
       mustChangePassword: false,
-      verificationStatus: account.role === 'teacher' ? 'pending' : undefined,
+      verificationStatus: account.role === 'teacher' ? (isDemo ? 'approved' : 'pending') : undefined,
     };
 
     this.activeUser = user;
