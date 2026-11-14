@@ -11,6 +11,7 @@ import {
   users,
 } from '../db/index';
 import { requireAuth, requireRole, requireApprovedTeacher } from '../middleware/authMiddleware';
+import { isDemoModeEnabled } from '../config/demoMode';
 import { generateUUID, hashPassword } from '../services/serverAuth';
 import { analyticsService } from '../services/analyticsService';
 import { isDemoMode } from '../config/demoMode';
@@ -36,7 +37,7 @@ teacherRouter.get('/verification-status', requireAuth, requireRole('teacher'), a
     }
 
     const prof = profs[0];
-    const demoActive = isDemoMode();
+    const demoActive = isDemoModeEnabled();
     res.json({
       success: true,
       verificationStatus: demoActive ? 'approved' : prof.verificationStatus || 'pending',

@@ -1,4 +1,17 @@
-import { eq } from 'drizzle-orm';
+/**
+ * Seeds a realistic demo classroom for the demo teacher account
+ * (chinedu_okafor / teacher123).
+ *
+ * This module is the single source of truth for demo fixtures. It is invoked
+ * automatically on local startup (see server.ts) and can also be run directly:
+ *
+ *   npx tsx scripts/seed-demo-teacher.ts
+ *
+ * Safe to run repeatedly: every academic row this module owns is namespaced
+ * with `seed-chinedu-` and replaced on each run. It never overwrites existing
+ * account passwords and refuses to run in production.
+ */
+import { eq, like } from 'drizzle-orm';
 import {
   db,
   users,
@@ -8,180 +21,587 @@ import {
   classroomMemberships,
   assignments,
   assignmentQuestions,
+  assignmentSubmissions,
   diagnosticAttempts,
   diagnosticMisconceptions,
 } from './index';
-import { generateUUID, hashPassword } from '../services/serverAuth';
+import { hashPassword, computeSHA256 } from '../services/serverAuth';
 
-/** Stable local-only fixture IDs keep demo seeding safe to repeat across restarts. */
-export const DEMO_TEACHER_ID = 'demo-teacher-chinedu-2026';
-export const DEMO_CLASSROOM_ID = 'demo-classroom-ss2-algebra-2026';
+export const DEMO_TEACHER_USERNAME = 'chinedu_okafor';
+export const DEMO_TEACHER_ID = 'tch-chinedu-01';
+export const DEMO_CLASSROOM_ID = 'seed-chinedu-class-01';
 
-const DEMO_STUDENTS = [
-  { id: 'demo-student-aminat-2026', username: 'aminat_diallo', name: 'Aminat Diallo', mastery: 74, xp: 285 },
-  { id: 'demo-student-tobi-2026', username: 'tobi_adeyemi', name: 'Tobi Adeyemi', mastery: 48, xp: 140 },
-  { id: 'demo-student-zainab-2026', username: 'zainab_bello', name: 'Zainab Bello', mastery: 91, xp: 420 },
+/** Older fixture IDs created by an earlier seeding revision; cleaned up once. */
+const LEGACY_CLASSROOM_ID = 'demo-classroom-ss2-algebra-2026';
+
+const ASSIGNMENT_PUBLISHED = 'seed-chinedu-asg-01';
+const ASSIGNMENT_DRAFT = 'seed-chinedu-asg-02';
+const STUDENT_PASSWORD = 'pass1234';
+
+const day = 24 * 60 * 60 * 1000;
+const daysAgo = (n: number, hour = 9) => {
+  const date = new Date(Date.now() - n * day);
+  date.setHours(hour, 15, 0, 0);
+  return date.toISOString();
+};
+
+interface SeedStudent {
+  id: string;
+  name: string;
+  username: string;
+  mastery: number;
+  xp: number;
+  streak: number;
+  activeDaysAgo: number;
+  existingUser?: boolean;
+  submits: boolean;
+  score: number; // out of 30
+  attempts: number;
+  misconceptions: string[];
+  /** Set while seeding when an existing account with the same username is reused. */
+  resolvedId?: string;
+}
+
+const STUDENTS: SeedStudent[] = [
+  {
+    id: 'stu-aminat-01',
+    name: 'Aminat Diallo',
+    username: 'aminat_diallo',
+    mastery: 74,
+    xp: 285,
+    streak: 6,
+    activeDaysAgo: 1,
+    existingUser: true,
+    submits: true,
+    score: 24,
+    attempts: 2,
+    misconceptions: [],
+  },
+  {
+    id: 'seed-chinedu-stu-01',
+    name: 'Chidi Okonkwo',
+    username: 'chidi_okonkwo',
+    mastery: 82,
+    xp: 340,
+    streak: 8,
+    activeDaysAgo: 1,
+    submits: true,
+    score: 27,
+    attempts: 2,
+    misconceptions: [],
+  },
+  {
+    id: 'seed-chinedu-stu-02',
+    name: 'Fatima Bello',
+    username: 'fatima_bello',
+    mastery: 91,
+    xp: 420,
+    streak: 12,
+    activeDaysAgo: 2,
+    submits: true,
+    score: 30,
+    attempts: 3,
+    misconceptions: [],
+  },
+  {
+    id: 'seed-chinedu-stu-03',
+    name: 'Tunde Bakare',
+    username: 'tunde_bakare',
+    mastery: 45,
+    xp: 120,
+    streak: 2,
+    activeDaysAgo: 2,
+    submits: true,
+    score: 12,
+    attempts: 2,
+    misconceptions: ['ALG_SIGN_FLIP'],
+  },
+  {
+    id: 'seed-chinedu-stu-04',
+    name: 'Ngozi Eze',
+    username: 'ngozi_eze',
+    mastery: 58,
+    xp: 190,
+    streak: 4,
+    activeDaysAgo: 3,
+    submits: true,
+    score: 15,
+    attempts: 2,
+    misconceptions: ['ALG_INVALID_DISTRIB'],
+  },
+  {
+    id: 'seed-chinedu-stu-05',
+    name: 'Ibrahim Musa',
+    username: 'ibrahim_musa',
+    mastery: 67,
+    xp: 230,
+    streak: 5,
+    activeDaysAgo: 4,
+    submits: true,
+    score: 18,
+    attempts: 1,
+    misconceptions: ['ALG_PRECEDENCE_VIOLATION'],
+  },
+  {
+    id: 'seed-chinedu-stu-06',
+    name: 'Blessing Adeyemi',
+    username: 'blessing_adeyemi',
+    mastery: 38,
+    xp: 95,
+    streak: 1,
+    activeDaysAgo: 5,
+    submits: true,
+    score: 9,
+    attempts: 2,
+    misconceptions: ['ALG_SIGN_FLIP', 'ALG_VARIABLE_DROPPED'],
+  },
+  {
+    id: 'seed-chinedu-stu-07',
+    name: 'Emeka Nwosu',
+    username: 'emeka_nwosu',
+    mastery: 78,
+    xp: 300,
+    streak: 7,
+    activeDaysAgo: 6,
+    submits: true,
+    score: 21,
+    attempts: 1,
+    misconceptions: [],
+  },
+  {
+    id: 'seed-chinedu-stu-08',
+    name: 'Zainab Yusuf',
+    username: 'zainab_yusuf',
+    mastery: 63,
+    xp: 175,
+    streak: 3,
+    activeDaysAgo: 9,
+    submits: false,
+    score: 0,
+    attempts: 1,
+    misconceptions: ['ALG_INVALID_DISTRIB'],
+  },
+  {
+    id: 'seed-chinedu-stu-09',
+    name: 'Kelechi Obi',
+    username: 'kelechi_obi',
+    mastery: 49,
+    xp: 140,
+    streak: 2,
+    activeDaysAgo: 11,
+    submits: false,
+    score: 0,
+    attempts: 1,
+    misconceptions: ['ALG_SIGN_FLIP'],
+  },
 ];
 
+interface EquationSpec {
+  questionId: string;
+  equation: string;
+  correct: string[];
+  faulty: Record<string, string[]>;
+}
+
+const EQUATIONS: EquationSpec[] = [
+  {
+    questionId: 'q-lin-01',
+    equation: '3x - 7 = 14',
+    correct: ['3x - 7 = 14', '3x = 14 + 7', '3x = 21', 'x = 21 / 3', 'x = 7'],
+    faulty: {
+      ALG_SIGN_FLIP: ['3x - 7 = 14', '3x = 14 - 7', '3x = 7', 'x = 7 / 3'],
+      ALG_VARIABLE_DROPPED: ['3x - 7 = 14', '3x = 14 + 7', '3 = 21', 'x = 21 / 3'],
+    },
+  },
+  {
+    questionId: 'q-lin-02',
+    equation: '5(x + 2) = 35',
+    correct: ['5(x + 2) = 35', 'x + 2 = 35 / 5', 'x + 2 = 7', 'x = 7 - 2', 'x = 5'],
+    faulty: {
+      ALG_INVALID_DISTRIB: ['5(x + 2) = 35', '5x + 2 = 35', '5x = 33', 'x = 33 / 5'],
+    },
+  },
+  {
+    questionId: 'q-lin-03',
+    equation: '2x + 9 = 4x - 3',
+    correct: ['2x + 9 = 4x - 3', '2x - 4x = -3 - 9', '-2x = -12', 'x = -12 / -2', 'x = 6'],
+    faulty: {
+      ALG_PRECEDENCE_VIOLATION: ['2x + 9 = 4x - 3', '2x - 4x = -3 + 9', '-2x = 6', 'x = -3'],
+    },
+  },
+];
+
+function buildWorkingSteps(questionIndex: number, misconceptionCode?: string) {
+  const question = EQUATIONS[questionIndex % EQUATIONS.length];
+  const trace = (misconceptionCode && question.faulty[misconceptionCode]) || question.correct;
+
+  return trace.map((mathExpression, index) => ({
+    stepNumber: index + 1,
+    actionDescription:
+      index === 0
+        ? 'Copy the equation'
+        : index === trace.length - 1
+          ? 'State the final answer'
+          : 'Apply the next algebraic operation',
+    mathExpression,
+  }));
+}
+
+const MISCONCEPTION_EVIDENCE: Record<string, object> = {
+  ALG_SIGN_FLIP: {
+    faultyStepNumber: 2,
+    faultyExpression: '3x = 14 - 7',
+    expectedExpression: '3x = 14 + 7',
+  },
+  ALG_INVALID_DISTRIB: {
+    faultyStepNumber: 1,
+    faultyExpression: '5x + 2 = 35',
+    expectedExpression: '5x + 10 = 35',
+  },
+  ALG_PRECEDENCE_VIOLATION: {
+    faultyStepNumber: 2,
+    faultyExpression: '2x - 4x = -3 + 9',
+    expectedExpression: '2x - 4x = -3 - 9',
+  },
+  ALG_VARIABLE_DROPPED: {
+    faultyStepNumber: 3,
+    faultyExpression: '3 = 21',
+    expectedExpression: '3x = 21',
+  },
+};
+
 /**
- * Seed fictional classroom data for local evaluator walkthroughs. Never invoke
- * this against a production database; the caller also enforces that boundary.
+ * Removes fixtures created by the earlier `demo-*` seeding revision so the
+ * evaluator workspace has one coherent classroom. Only touches rows whose IDs
+ * belong to that fixture namespace.
+ */
+async function removeLegacyFixtures(teacherId: string): Promise<void> {
+  const legacyClassrooms = await db
+    .select()
+    .from(classrooms)
+    .where(eq(classrooms.id, LEGACY_CLASSROOM_ID))
+    .limit(1);
+
+  if (legacyClassrooms.length === 0 || legacyClassrooms[0].teacherId !== teacherId) {
+    return;
+  }
+
+  await db.delete(diagnosticMisconceptions).where(like(diagnosticMisconceptions.attemptId, 'demo-attempt-%'));
+  await db.delete(diagnosticAttempts).where(like(diagnosticAttempts.id, 'demo-attempt-%'));
+  await db.delete(assignmentSubmissions).where(like(assignmentSubmissions.assignmentId, 'demo-assignment-%'));
+  await db.delete(assignmentQuestions).where(like(assignmentQuestions.assignmentId, 'demo-assignment-%'));
+  await db.delete(assignments).where(like(assignments.id, 'demo-assignment-%'));
+  await db.delete(classroomMemberships).where(eq(classroomMemberships.classroomId, LEGACY_CLASSROOM_ID));
+  await db.delete(classrooms).where(eq(classrooms.id, LEGACY_CLASSROOM_ID));
+}
+
+/**
+ * Resolves the demo teacher account by username. Reuses an existing row (and its
+ * password) when present, otherwise creates the account with the fixture ID.
+ */
+async function resolveDemoTeacher(): Promise<string> {
+  const existing = await db
+    .select()
+    .from(users)
+    .where(eq(users.usernameNormalized, DEMO_TEACHER_USERNAME))
+    .limit(1);
+
+  if (existing.length > 0) {
+    if (existing[0].role !== 'teacher') {
+      throw new Error('The demo teacher username is already used by a non-teacher account.');
+    }
+    return existing[0].id;
+  }
+
+  await db.insert(users).values({
+    id: DEMO_TEACHER_ID,
+    username: DEMO_TEACHER_USERNAME,
+    usernameNormalized: DEMO_TEACHER_USERNAME,
+    email: 'chinedu.okafor@mindtrace.demo',
+    passwordHash: await hashPassword('teacher123'),
+    role: 'teacher',
+    mustChangePassword: false,
+    onboardingMethod: 'independent',
+    accountStatus: 'active',
+  });
+
+  return DEMO_TEACHER_ID;
+}
+
+/**
+ * Seeds the demo teacher's classroom, roster, assignments, submissions and
+ * diagnostic attempts. Never runs in production.
  */
 export async function seedDemoTeacherData(): Promise<void> {
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('Demo teacher fixtures must never be seeded in production.');
+    throw new Error('Refusing to seed demo data in production.');
   }
 
-  const existingTeachers = await db.select().from(users).where(eq(users.usernameNormalized, 'chinedu_okafor')).limit(1);
-  let teacherId = DEMO_TEACHER_ID;
+  const passwordHash = await hashPassword(STUDENT_PASSWORD);
+  const teacherId = await resolveDemoTeacher();
 
-  if (existingTeachers.length > 0) {
-    if (existingTeachers[0].role !== 'teacher') {
-      throw new Error('The demo teacher username is already used by a non-teacher account.');
-    }
-    teacherId = existingTeachers[0].id;
-  } else {
-    await db.insert(users).values({
-      id: teacherId,
-      username: 'chinedu_okafor',
-      usernameNormalized: 'chinedu_okafor',
-      email: 'c.okafor@agegehigh.edu.ng',
-      passwordHash: await hashPassword('teacher123'),
-      role: 'teacher',
-      mustChangePassword: false,
-      onboardingMethod: 'independent',
-      accountStatus: 'active',
-    });
-  }
+  await removeLegacyFixtures(teacherId);
 
-  const existingTeacherProfile = await db.select().from(teacherProfiles).where(eq(teacherProfiles.id, teacherId)).limit(1);
-  if (existingTeacherProfile.length === 0) {
-    await db.insert(teacherProfiles).values({
+  // 1. Teacher profile (approved, never touches password or real profile data).
+  await db
+    .insert(teacherProfiles)
+    .values({
       id: teacherId,
       fullName: 'Mr. Chinedu Okafor',
-      schoolName: 'Agege Comprehensive Senior High, Lagos',
+      schoolName: 'Government Secondary School, Wuse',
       verificationStatus: 'approved',
-      approvedAt: new Date().toISOString(),
+      approvedAt: daysAgo(30),
+    })
+    .onConflictDoUpdate({
+      target: teacherProfiles.id,
+      set: {
+        fullName: 'Mr. Chinedu Okafor',
+        schoolName: 'Government Secondary School, Wuse',
+        verificationStatus: 'approved',
+        approvedAt: daysAgo(30),
+        rejectionReason: null,
+      },
     });
-  } else if (existingTeacherProfile[0].verificationStatus !== 'approved') {
-    await db.update(teacherProfiles)
-      .set({ verificationStatus: 'approved', approvedAt: new Date().toISOString(), rejectionReason: null })
-      .where(eq(teacherProfiles.id, teacherId));
-  }
 
-  const existingClassrooms = await db.select().from(classrooms).where(eq(classrooms.id, DEMO_CLASSROOM_ID)).limit(1);
-  if (existingClassrooms.length === 0) {
-    await db.insert(classrooms).values({
+  // 2. Classroom.
+  await db
+    .insert(classrooms)
+    .values({
       id: DEMO_CLASSROOM_ID,
       teacherId,
-      name: 'Class A - Algebra I',
+      name: 'SS2 Gold — Algebra & Graphs',
       gradeLevel: 'SS2',
       subject: 'Mathematics',
       status: 'active',
       enrollmentMethod: 'invite_code',
-      description: 'Sample class for exploring the MindTrace teacher and evaluator workspace.',
-      inviteCode: 'MTR26A',
+      description: 'WAEC-aligned algebra diagnostic group for the 2026 cohort.',
+      inviteCode: 'CHD4AL',
+    })
+    .onConflictDoUpdate({
+      target: classrooms.id,
+      set: {
+        teacherId,
+        name: 'SS2 Gold — Algebra & Graphs',
+        gradeLevel: 'SS2',
+        subject: 'Mathematics',
+        status: 'active',
+        description: 'WAEC-aligned algebra diagnostic group for the 2026 cohort.',
+        inviteCode: 'CHD4AL',
+      },
     });
-  }
 
-  for (const [index, student] of DEMO_STUDENTS.entries()) {
-    const existingStudent = await db.select().from(users).where(eq(users.id, student.id)).limit(1);
-    if (existingStudent.length === 0) {
+  // 3. Clear previously seeded academic rows (namespaced only).
+  await db.delete(diagnosticMisconceptions).where(like(diagnosticMisconceptions.id, 'seed-chinedu-%'));
+  await db.delete(assignmentSubmissions).where(like(assignmentSubmissions.id, 'seed-chinedu-%'));
+  await db.delete(diagnosticAttempts).where(like(diagnosticAttempts.id, 'seed-chinedu-%'));
+  await db.delete(assignmentQuestions).where(like(assignmentQuestions.id, 'seed-chinedu-%'));
+  await db.delete(assignments).where(like(assignments.id, 'seed-chinedu-%'));
+  await db.delete(classroomMemberships).where(eq(classroomMemberships.classroomId, DEMO_CLASSROOM_ID));
+
+  // 4. Students + profiles + memberships.
+  for (const student of STUDENTS) {
+    const [firstName, ...rest] = student.name.split(' ');
+    const lastName = rest.join(' ');
+    const avatarSeed = `${firstName[0]}${lastName[0] || ''}`.toUpperCase();
+
+    // Reuse an existing account with this username so the seed stays idempotent
+    // even if the roster was created by an earlier revision.
+    const existingStudent = await db
+      .select()
+      .from(users)
+      .where(eq(users.usernameNormalized, student.username))
+      .limit(1);
+
+    let studentId = student.id;
+    if (existingStudent.length > 0) {
+      studentId = existingStudent[0].id;
+    } else {
       await db.insert(users).values({
-        id: student.id,
+        id: studentId,
         username: student.username,
         usernameNormalized: student.username,
-        email: `${student.username}@demo.mindtrace.local`,
-        passwordHash: await hashPassword('pass1234'),
+        passwordHash,
         role: 'student',
         mustChangePassword: false,
-        onboardingMethod: 'independent',
+        createdByTeacherId: student.existingUser ? null : teacherId,
+        onboardingMethod: student.existingUser ? 'independent' : 'school_managed',
         accountStatus: 'active',
       });
-      await db.insert(studentProfiles).values({
-        id: student.id,
+    }
+
+    await db
+      .insert(studentProfiles)
+      .values({
+        id: studentId,
         fullName: student.name,
-        schoolName: 'Agege Comprehensive Senior High, Lagos',
-        avatarSeed: student.name.split(' ').map((part) => part[0]).join('').toUpperCase(),
+        firstName,
+        lastName,
+        avatarSeed,
         gradeLevel: 'SS2',
         targetExam: 'WAEC',
+        schoolName: 'Government Secondary School, Wuse',
         totalXp: student.xp,
-        streakDays: [4, 1, 7][index],
+        streakDays: student.streak,
+        lastActiveDate: daysAgo(student.activeDaysAgo, 18),
         masteryPercentage: student.mastery,
         dailyGoalTarget: 3,
-        dailyGoalCompleted: [2, 1, 3][index],
-        lastActiveDate: new Date().toISOString().slice(0, 10),
+        dailyGoalCompleted: Math.min(3, student.streak),
+      })
+      .onConflictDoUpdate({
+        target: studentProfiles.id,
+        set: {
+          fullName: student.name,
+          firstName,
+          lastName,
+          avatarSeed,
+          gradeLevel: 'SS2',
+          schoolName: 'Government Secondary School, Wuse',
+          totalXp: student.xp,
+          streakDays: student.streak,
+          lastActiveDate: daysAgo(student.activeDaysAgo, 18),
+          masteryPercentage: student.mastery,
+        },
       });
-    }
 
-    const memberships = await db.select().from(classroomMemberships)
-      .where(eq(classroomMemberships.id, `demo-membership-${student.id}`)).limit(1);
-    if (memberships.length === 0) {
-      await db.insert(classroomMemberships).values({
-        id: `demo-membership-${student.id}`,
-        classroomId: DEMO_CLASSROOM_ID,
-        studentId: student.id,
-        status: 'active',
-      });
-    }
+    await db.insert(classroomMemberships).values({
+      id: `seed-chinedu-member-${studentId}`,
+      classroomId: DEMO_CLASSROOM_ID,
+      studentId,
+      status: 'active',
+      joinedAt: daysAgo(20),
+    });
+
+    // Track the resolved ID for the activity fixtures below.
+    student.resolvedId = studentId;
   }
 
-  const assignmentId = 'demo-assignment-linear-equations-2026';
-  const existingAssignment = await db.select().from(assignments).where(eq(assignments.id, assignmentId)).limit(1);
-  if (existingAssignment.length === 0) {
-    await db.insert(assignments).values({
-      id: assignmentId,
+  // 5. Assignments + questions.
+  await db.insert(assignments).values([
+    {
+      id: ASSIGNMENT_PUBLISHED,
       classroomId: DEMO_CLASSROOM_ID,
       teacherId,
-      title: 'Linear Equations Diagnostic',
-      instructions: 'Solve each equation and show every step so misconceptions can be identified.',
+      title: 'Linear Equations — Step-by-Step Isolation',
+      instructions:
+        'Show every working step. Isolate the variable and check your answer by substitution.',
       subject: 'Mathematics',
       gradeLevel: 'SS2',
       published: true,
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      latePolicy: { allowed: true, deductionPercentage: 10 },
-      retakePolicy: { allowed: true, attempts: 2 },
-    });
-    await db.insert(assignmentQuestions).values([
-      { id: 'demo-assignment-question-1', assignmentId, questionId: 'q-lin-01', displayOrder: 1, marks: 5 },
-      { id: 'demo-assignment-question-2', assignmentId, questionId: 'q-dist-02', displayOrder: 2, marks: 5 },
-    ]);
-  }
+      dueDate: daysAgo(-2, 23),
+      latePolicy: { allowLate: true, penaltyPercent: 10 },
+      retakePolicy: { allowRetakes: true, maxAttempts: 3 },
+      createdAt: daysAgo(9),
+    },
+    {
+      id: ASSIGNMENT_DRAFT,
+      classroomId: DEMO_CLASSROOM_ID,
+      teacherId,
+      title: 'Graphing Linear Equations — Gradient & Intercepts',
+      instructions: 'Plot each line and label the gradient and both intercepts.',
+      subject: 'Mathematics',
+      gradeLevel: 'SS2',
+      published: false,
+      dueDate: daysAgo(-9, 23),
+      createdAt: daysAgo(2),
+    },
+  ]);
 
-  // A small synthetic misconception sample makes roster details and insight views useful.
-  const diagnosticFixtures = [
-    { attemptId: 'demo-attempt-aminat-2026', student: DEMO_STUDENTS[0], code: 'ALG_ARITHMETIC_ERROR', correct: true },
-    { attemptId: 'demo-attempt-tobi-2026', student: DEMO_STUDENTS[1], code: 'ALG_SIGN_FLIP', correct: false },
-    { attemptId: 'demo-attempt-zainab-2026', student: DEMO_STUDENTS[2], code: 'CORRECT', correct: true },
-  ];
-  for (const fixture of diagnosticFixtures) {
-    const existingAttempt = await db.select().from(diagnosticAttempts)
-      .where(eq(diagnosticAttempts.id, fixture.attemptId)).limit(1);
-    if (existingAttempt.length === 0) {
-      const timestamp = new Date().toISOString();
+  await db.insert(assignmentQuestions).values([
+    { id: 'seed-chinedu-q-01', assignmentId: ASSIGNMENT_PUBLISHED, questionId: 'q-lin-01', displayOrder: 1, marks: 10 },
+    { id: 'seed-chinedu-q-02', assignmentId: ASSIGNMENT_PUBLISHED, questionId: 'q-lin-02', displayOrder: 2, marks: 10 },
+    { id: 'seed-chinedu-q-03', assignmentId: ASSIGNMENT_PUBLISHED, questionId: 'q-lin-03', displayOrder: 3, marks: 10 },
+    { id: 'seed-chinedu-q-04', assignmentId: ASSIGNMENT_DRAFT, questionId: 'q-graph-01', displayOrder: 1, marks: 10 },
+  ]);
+
+  // 6. Diagnostic attempts, submissions and misconceptions.
+  const submissionDays = [6, 5, 4, 3, 2, 1, 2, 1];
+  let submissionIndex = 0;
+
+  for (const student of STUDENTS) {
+    const studentId = student.resolvedId || student.id;
+
+    for (let attemptNumber = 1; attemptNumber <= student.attempts; attemptNumber += 1) {
+      const attemptId = `seed-chinedu-att-${studentId}-${attemptNumber}`;
+      const isFirstAttempt = attemptNumber === 1;
+      const primaryMisconception =
+        isFirstAttempt && student.misconceptions.length > 0 ? student.misconceptions[0] : null;
+
+      // Match the diagnostic question to the misconception so the working trace
+      // and the detected pattern tell the same story.
+      let questionIndex = (attemptNumber - 1) % EQUATIONS.length;
+      if (primaryMisconception === 'ALG_INVALID_DISTRIB') questionIndex = 1;
+      if (primaryMisconception === 'ALG_PRECEDENCE_VIOLATION') questionIndex = 2;
+      const question = EQUATIONS[questionIndex];
+
+      const submittedDay = student.submits && isFirstAttempt ? submissionDays[submissionIndex] : null;
+      const timestamp = daysAgo(submittedDay ?? student.activeDaysAgo, 10 + attemptNumber);
+
+      const correct = student.misconceptions.length === 0 && (isFirstAttempt ? student.score >= 18 : true);
+      const workingSteps = buildWorkingSteps(questionIndex, primaryMisconception || undefined);
+      const finalStep = workingSteps[workingSteps.length - 1].mathExpression;
+      const finalAnswer = finalStep.includes('x =') ? finalStep : correct ? 'x = 7' : 'x = 4';
+
       await db.insert(diagnosticAttempts).values({
-        id: fixture.attemptId,
-        studentId: fixture.student.id,
-        questionId: 'q-lin-01',
+        id: attemptId,
+        studentId,
+        questionId: question.questionId,
         questionVersion: 1,
         engineVersion: '1.2',
-        equation: '3x - 7 = 14',
-        workingSteps: ['3x = 14 - 7', '3x = 7', 'x = 7 / 3'],
-        finalAnswer: fixture.correct ? '7' : '7/3',
-        payloadHash: `demo-${fixture.attemptId}`,
-        serverIsCorrect: fixture.correct,
-        serverPrimaryMisconception: fixture.code,
+        equation: question.equation,
+        workingSteps,
+        finalAnswer,
+        payloadHash: computeSHA256(`${attemptId}:${question.equation}:${workingSteps.length}`),
+        serverIsCorrect: correct,
+        serverPrimaryMisconception: primaryMisconception,
         validationStatus: 'VALIDATED',
         clientTimestamp: timestamp,
         serverTimestamp: timestamp,
       });
-      await db.insert(diagnosticMisconceptions).values({
-        id: generateUUID(),
-        attemptId: fixture.attemptId,
-        misconceptionCode: fixture.code,
-        confidenceScore: fixture.correct ? 88 : 96,
-        supportingEvidence: { source: 'synthetic demo fixture' },
-      });
+
+      if (isFirstAttempt && student.misconceptions.length > 0) {
+        for (const code of student.misconceptions) {
+          await db.insert(diagnosticMisconceptions).values({
+            id: `seed-chinedu-mis-${studentId}-${code}`,
+            attemptId,
+            misconceptionCode: code,
+            confidenceScore: 90 + ((student.xp + code.length) % 10),
+            supportingEvidence: MISCONCEPTION_EVIDENCE[code] || {},
+            createdAt: timestamp,
+          });
+        }
+      }
+
+      if (isFirstAttempt && student.submits && submittedDay !== null) {
+        await db.insert(assignmentSubmissions).values({
+          id: `seed-chinedu-sub-${studentId}-1`,
+          assignmentId: ASSIGNMENT_PUBLISHED,
+          studentId,
+          diagnosticAttemptId: attemptId,
+          status: 'submitted',
+          score: student.score,
+          totalMarks: 30,
+          xpEarned: student.score * 2,
+          submittedAt: timestamp,
+          isLate: false,
+          attemptNumber: 1,
+        });
+        submissionIndex += 1;
+      }
     }
   }
+
+  const counts = {
+    students: STUDENTS.length,
+    submitted: STUDENTS.filter((s) => s.submits).length,
+    attempts: STUDENTS.reduce((sum, s) => sum + s.attempts, 0),
+    misconceptions: STUDENTS.reduce((sum, s) => sum + s.misconceptions.length, 0),
+  };
+
+  console.log('Demo teacher data seeded.');
+  console.log(`  Teacher:   ${teacherId} (${DEMO_TEACHER_USERNAME} / teacher123)`);
+  console.log(`  Classroom: ${DEMO_CLASSROOM_ID} (invite code CHD4AL)`);
+  console.log(`  Students:  ${counts.students} (${counts.submitted} submitted)`);
+  console.log(`  Attempts:  ${counts.attempts}`);
+  console.log(`  Misconceptions: ${counts.misconceptions}`);
+  console.log(`  Student login example: aminat_diallo / ${STUDENT_PASSWORD}`);
 }

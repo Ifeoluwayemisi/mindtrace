@@ -252,6 +252,14 @@ export interface ClassAnalyticsSummary {
     range: string;
     percentage: number;
   }[];
+  workingStepsDistribution: {
+    range: string;
+    percentage: number;
+  }[];
+  attemptsPerStudentDistribution: {
+    range: string;
+    percentage: number;
+  }[];
   topMisconceptions: {
     code: MisconceptionCode;
     title: string;

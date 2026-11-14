@@ -1,11 +1,14 @@
 import { Router, Request, Response } from 'express';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, inArray } from 'drizzle-orm';
 import {
   db,
   classrooms,
+  classroomMemberships,
   assignments,
   assignmentQuestions,
   assignmentSubmissions,
+  diagnosticAttempts,
+  diagnosticMisconceptions,
   studentProfiles,
 } from '../db/index';
 import { requireAuth, requireApprovedTeacher } from '../middleware/authMiddleware';
@@ -190,10 +193,58 @@ teacherAssignmentRouter.get(
       .where(eq(assignmentSubmissions.assignmentId, assignmentId))
       .orderBy(desc(assignmentSubmissions.submittedAt));
 
+    // 3. Fetch the real diagnostic attempts and misconceptions behind each submission
+    const attemptIds = submissions.map((s: any) => s.diagnosticAttemptId).filter(Boolean);
+    const attempts = attemptIds.length
+      ? await db
+          .select({
+            id: diagnosticAttempts.id,
+            equation: diagnosticAttempts.equation,
+            workingSteps: diagnosticAttempts.workingSteps,
+            finalAnswer: diagnosticAttempts.finalAnswer,
+            serverIsCorrect: diagnosticAttempts.serverIsCorrect,
+            serverPrimaryMisconception: diagnosticAttempts.serverPrimaryMisconception,
+          })
+          .from(diagnosticAttempts)
+          .where(inArray(diagnosticAttempts.id, attemptIds))
+      : [];
+
+    const misconceptions = attemptIds.length
+      ? await db
+          .select({
+            attemptId: diagnosticMisconceptions.attemptId,
+            code: diagnosticMisconceptions.misconceptionCode,
+            confidence: diagnosticMisconceptions.confidenceScore,
+          })
+          .from(diagnosticMisconceptions)
+          .where(inArray(diagnosticMisconceptions.attemptId, attemptIds))
+      : [];
+
+    const attemptById = new Map(attempts.map((a: any) => [a.id, a]));
+    const enrichedSubmissions = submissions.map((submission: any) => ({
+      ...submission,
+      attempt: attemptById.get(submission.diagnosticAttemptId) || null,
+      misconceptions: misconceptions.filter(
+        (m: any) => m.attemptId === submission.diagnosticAttemptId
+      ),
+    }));
+
+    // 4. Active enrolment for the class, so the summary is not a placeholder.
+    const members = await db
+      .select({ studentId: classroomMemberships.studentId })
+      .from(classroomMemberships)
+      .where(
+        and(
+          eq(classroomMemberships.classroomId, assignmentRow[0].classroomId),
+          eq(classroomMemberships.status, 'active')
+        )
+      );
+
     res.json({
       success: true,
       assignment: assignmentRow[0],
-      submissions
+      totalStudents: members.length,
+      submissions: enrichedSubmissions,
     });
   } catch (err: any) {
     console.error('Error fetching assignment submissions:', err);

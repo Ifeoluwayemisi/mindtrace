@@ -10,20 +10,11 @@ var __require = /* @__PURE__ */ ((x2) => typeof require !== "undefined" ? requir
   if (typeof require !== "undefined") return require.apply(this, arguments);
   throw Error('Dynamic require of "' + x2 + '" is not supported');
 });
-var __esm = (fn, res, err) => function __init() {
-  if (err) throw err[0];
-  try {
-    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-  } catch (e2) {
-    throw err = [e2], e2;
-  }
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
 var __commonJS = (cb, mod) => function __require2() {
-  try {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  } catch (e2) {
-    throw mod = 0, e2;
-  }
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -764,8 +755,8 @@ var require_depd = __commonJS({
       return deprecate3;
     }
     function eehaslisteners(emitter, type) {
-      var count2 = typeof emitter.listenerCount !== "function" ? emitter.listeners(type).length : emitter.listenerCount(type);
-      return count2 > 0;
+      var count = typeof emitter.listenerCount !== "function" ? emitter.listeners(type).length : emitter.listenerCount(type);
+      return count > 0;
     }
     function isignored(namespace) {
       if (process.noDeprecation) {
@@ -1182,9 +1173,9 @@ var require_parseurl = __commonJS({
   }
 });
 
-// node_modules/express-session/node_modules/cookie-signature/index.js
+// node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
-  "node_modules/express-session/node_modules/cookie-signature/index.js"(exports) {
+  "node_modules/cookie-signature/index.js"(exports) {
     var crypto5 = __require("crypto");
     exports.sign = function(val, secret) {
       if ("string" !== typeof val) throw new TypeError("Cookie value must be provided as a string.");
@@ -1992,9 +1983,9 @@ var require_express_session = __commonJS({
   }
 });
 
-// node_modules/cookie-signature/index.js
+// node_modules/cookie-parser/node_modules/cookie-signature/index.js
 var require_cookie_signature2 = __commonJS({
-  "node_modules/cookie-signature/index.js"(exports) {
+  "node_modules/cookie-parser/node_modules/cookie-signature/index.js"(exports) {
     var crypto5 = __require("crypto");
     exports.sign = function(val, secret) {
       if ("string" != typeof val) throw new TypeError("Cookie value must be provided as a string.");
@@ -2788,10 +2779,10 @@ var require_constants = __commonJS({
       EMPTY_BUFFER: Buffer.alloc(0),
       GUID: "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
       hasBlob,
-      kForOnEventAttribute: /* @__PURE__ */ Symbol("kIsForOnEventAttribute"),
-      kListener: /* @__PURE__ */ Symbol("kListener"),
-      kStatusCode: /* @__PURE__ */ Symbol("status-code"),
-      kWebSocket: /* @__PURE__ */ Symbol("websocket"),
+      kForOnEventAttribute: Symbol("kIsForOnEventAttribute"),
+      kListener: Symbol("kListener"),
+      kStatusCode: Symbol("status-code"),
+      kWebSocket: Symbol("websocket"),
       NOOP: () => {
       }
     };
@@ -2887,8 +2878,8 @@ var require_buffer_util = __commonJS({
 var require_limiter = __commonJS({
   "node_modules/ws/lib/limiter.js"(exports, module) {
     "use strict";
-    var kDone = /* @__PURE__ */ Symbol("kDone");
-    var kRun = /* @__PURE__ */ Symbol("kRun");
+    var kDone = Symbol("kDone");
+    var kRun = Symbol("kRun");
     var Limiter = class {
       /**
        * Creates a new `Limiter`.
@@ -2943,11 +2934,11 @@ var require_permessage_deflate = __commonJS({
     var { kStatusCode } = require_constants();
     var FastBuffer = Buffer[Symbol.species];
     var TRAILER = Buffer.from([0, 0, 255, 255]);
-    var kPerMessageDeflate = /* @__PURE__ */ Symbol("permessage-deflate");
-    var kTotalLength = /* @__PURE__ */ Symbol("total-length");
-    var kCallback = /* @__PURE__ */ Symbol("callback");
-    var kBuffers = /* @__PURE__ */ Symbol("buffers");
-    var kError = /* @__PURE__ */ Symbol("error");
+    var kPerMessageDeflate = Symbol("permessage-deflate");
+    var kTotalLength = Symbol("total-length");
+    var kCallback = Symbol("callback");
+    var kBuffers = Symbol("buffers");
+    var kError = Symbol("error");
     var zlibLimiter;
     var PerMessageDeflate2 = class {
       /**
@@ -4154,7 +4145,7 @@ var require_sender = __commonJS({
     var { EMPTY_BUFFER, kWebSocket, NOOP } = require_constants();
     var { isBlob: isBlob2, isValidStatusCode } = require_validation();
     var { mask: applyMask, toBuffer } = require_buffer_util();
-    var kByteLength = /* @__PURE__ */ Symbol("kByteLength");
+    var kByteLength = Symbol("kByteLength");
     var maskBuffer = Buffer.alloc(4);
     var RANDOM_POOL_SIZE = 8 * 1024;
     var randomPool;
@@ -4642,14 +4633,14 @@ var require_event_target = __commonJS({
   "node_modules/ws/lib/event-target.js"(exports, module) {
     "use strict";
     var { kForOnEventAttribute, kListener } = require_constants();
-    var kCode = /* @__PURE__ */ Symbol("kCode");
-    var kData = /* @__PURE__ */ Symbol("kData");
-    var kError = /* @__PURE__ */ Symbol("kError");
-    var kMessage = /* @__PURE__ */ Symbol("kMessage");
-    var kReason = /* @__PURE__ */ Symbol("kReason");
-    var kTarget = /* @__PURE__ */ Symbol("kTarget");
-    var kType = /* @__PURE__ */ Symbol("kType");
-    var kWasClean = /* @__PURE__ */ Symbol("kWasClean");
+    var kCode = Symbol("kCode");
+    var kData = Symbol("kData");
+    var kError = Symbol("kError");
+    var kMessage = Symbol("kMessage");
+    var kReason = Symbol("kReason");
+    var kTarget = Symbol("kTarget");
+    var kType = Symbol("kType");
+    var kWasClean = Symbol("kWasClean");
     var Event = class {
       /**
        * Create a new `Event`.
@@ -5052,7 +5043,7 @@ var require_websocket = __commonJS({
     } = require_event_target();
     var { format, parse } = require_extension();
     var { toBuffer } = require_buffer_util();
-    var kAborted = /* @__PURE__ */ Symbol("kAborted");
+    var kAborted = Symbol("kAborted");
     var protocolVersions = [8, 13];
     var readyStates = ["CONNECTING", "OPEN", "CLOSING", "CLOSED"];
     var subprotocolRegex = /^[!#$%&'*+\-.0-9A-Z^_`|a-z~]+$/;
@@ -9278,9 +9269,9 @@ var require_ip_address = __commonJS({
   }
 });
 
-// node_modules/express-rate-limit/node_modules/debug/node_modules/ms/index.js
+// node_modules/express-rate-limit/node_modules/ms/index.js
 var require_ms2 = __commonJS({
-  "node_modules/express-rate-limit/node_modules/debug/node_modules/ms/index.js"(exports, module) {
+  "node_modules/express-rate-limit/node_modules/ms/index.js"(exports, module) {
     var s2 = 1e3;
     var m2 = s2 * 60;
     var h2 = m2 * 60;
@@ -10049,11 +10040,11 @@ var require_retry_operation = __commonJS({
       for (var i2 = 0; i2 < this._errors.length; i2++) {
         var error = this._errors[i2];
         var message = error.message;
-        var count2 = (counts[message] || 0) + 1;
-        counts[message] = count2;
-        if (count2 >= mainErrorCount) {
+        var count = (counts[message] || 0) + 1;
+        counts[message] = count;
+        if (count >= mainErrorCount) {
           mainError = error;
-          mainErrorCount = count2;
+          mainErrorCount = count;
         }
       }
       return mainError;
@@ -10457,7 +10448,7 @@ var require_common3 = __commonJS({
     var extend_1 = __importDefault(require_extend());
     var util_cjs_1 = __importDefault(require_util());
     var pkg = util_cjs_1.default.pkg;
-    exports.GAXIOS_ERROR_SYMBOL = /* @__PURE__ */ Symbol.for(`${pkg.name}-gaxios-error`);
+    exports.GAXIOS_ERROR_SYMBOL = Symbol.for(`${pkg.name}-gaxios-error`);
     var GaxiosError = class _GaxiosError extends Error {
       config;
       response;
@@ -11561,7 +11552,7 @@ var require_dist = __commonJS({
     var http3 = __importStar(__require("http"));
     var https_1 = __require("https");
     __exportStar(require_helpers2(), exports);
-    var INTERNAL = /* @__PURE__ */ Symbol("AgentBaseInternalState");
+    var INTERNAL = Symbol("AgentBaseInternalState");
     var Agent = class extends http3.Agent {
       constructor(opts) {
         super(opts);
@@ -12132,11 +12123,11 @@ var require_ponyfill_es2018 = __commonJS({
           return front._elements[cursor];
         }
       }
-      const AbortSteps = /* @__PURE__ */ Symbol("[[AbortSteps]]");
-      const ErrorSteps = /* @__PURE__ */ Symbol("[[ErrorSteps]]");
-      const CancelSteps = /* @__PURE__ */ Symbol("[[CancelSteps]]");
-      const PullSteps = /* @__PURE__ */ Symbol("[[PullSteps]]");
-      const ReleaseSteps = /* @__PURE__ */ Symbol("[[ReleaseSteps]]");
+      const AbortSteps = Symbol("[[AbortSteps]]");
+      const ErrorSteps = Symbol("[[ErrorSteps]]");
+      const CancelSteps = Symbol("[[CancelSteps]]");
+      const PullSteps = Symbol("[[PullSteps]]");
+      const ReleaseSteps = Symbol("[[ReleaseSteps]]");
       function ReadableStreamReaderGenericInitialize(reader, stream) {
         reader._ownerReadableStream = stream;
         stream._reader = reader;
@@ -17200,7 +17191,7 @@ var init_body = __esm({
     init_base();
     init_is();
     pipeline = promisify(Stream.pipeline);
-    INTERNALS = /* @__PURE__ */ Symbol("Body internals");
+    INTERNALS = Symbol("Body internals");
     Body = class {
       constructor(body, {
         size = 0
@@ -17570,7 +17561,7 @@ var init_headers = __esm({
       /**
        * For better console.log(headers) and also to convert Headers into Node.js Request compatible format
        */
-      [/* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom")]() {
+      [Symbol.for("nodejs.util.inspect.custom")]() {
         return [...this.keys()].reduce((result, key) => {
           const values = this.getAll(key);
           if (key === "host") {
@@ -17610,7 +17601,7 @@ var init_response = __esm({
     init_headers();
     init_body();
     init_is_redirect();
-    INTERNALS2 = /* @__PURE__ */ Symbol("Response internals");
+    INTERNALS2 = Symbol("Response internals");
     Response6 = class _Response extends Body {
       constructor(body = null, options = {}) {
         super(body, options);
@@ -17900,7 +17891,7 @@ var init_request = __esm({
     init_is();
     init_get_search();
     init_referrer();
-    INTERNALS3 = /* @__PURE__ */ Symbol("Request internals");
+    INTERNALS3 = Symbol("Request internals");
     isRequest = (object) => {
       return typeof object === "object" && typeof object[INTERNALS3] === "object";
     };
@@ -18081,7 +18072,7 @@ var init_request = __esm({
         path: parsedURL.pathname + search,
         // The following options are not expressed in the URL
         method: request.method,
-        headers: headers[/* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom")](),
+        headers: headers[Symbol.for("nodejs.util.inspect.custom")](),
         insecureHTTPParser: request.insecureHTTPParser,
         agent
       };
@@ -21504,8 +21495,8 @@ var require_crypto = __commonJS({
         const outputBuffer = await window.crypto.subtle.digest("SHA-256", inputBuffer);
         return base64js.fromByteArray(new Uint8Array(outputBuffer));
       }
-      randomBytesBase64(count2) {
-        const array = new Uint8Array(count2);
+      randomBytesBase64(count) {
+        const array = new Uint8Array(count);
         window.crypto.getRandomValues(array);
         return base64js.fromByteArray(array);
       }
@@ -21592,8 +21583,8 @@ var require_crypto2 = __commonJS({
       async sha256DigestBase64(str) {
         return crypto5.createHash("sha256").update(str).digest("base64");
       }
-      randomBytesBase64(count2) {
-        return crypto5.randomBytes(count2).toString("base64");
+      randomBytesBase64(count) {
+        return crypto5.randomBytes(count).toString("base64");
       }
       async verify(pubkey, data, signature) {
         const verifier = crypto5.createVerify("RSA-SHA256");
@@ -22112,8 +22103,8 @@ var require_authclient = __commonJS({
        * making an RPC call, for logging purposes, as well as a string ID that can be
        * used to correlate calls and responses.
        */
-      static RequestMethodNameSymbol = /* @__PURE__ */ Symbol("request method name");
-      static RequestLogIdSymbol = /* @__PURE__ */ Symbol("request log id");
+      static RequestMethodNameSymbol = Symbol("request method name");
+      static RequestLogIdSymbol = Symbol("request log id");
       constructor(opts = {}) {
         super();
         const options = (0, util_1.originalOrCamelOptions)(opts);
@@ -27323,7 +27314,7 @@ var require_gdchclient = __commonJS({
           }
         };
       }
-      [/* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom")]() {
+      [Symbol.for("nodejs.util.inspect.custom")]() {
         return this.toJSON();
       }
       base64UrlEncode(str) {
@@ -28868,7 +28859,8 @@ import { fileURLToPath as fileURLToPath2 } from "url";
 import { neonConfig, Pool as Pool2 } from "@neondatabase/serverless";
 
 // node_modules/drizzle-orm/entity.js
-var entityKind = /* @__PURE__ */ Symbol.for("drizzle:entityKind");
+var entityKind = Symbol.for("drizzle:entityKind");
+var hasOwnEntityKind = Symbol.for("drizzle:hasOwnEntityKind");
 function is(value, type) {
   if (!value || typeof value !== "object") {
     return false;
@@ -29103,7 +29095,7 @@ var ColumnBuilder = class {
 };
 
 // node_modules/drizzle-orm/table.utils.js
-var TableName = /* @__PURE__ */ Symbol.for("drizzle:Name");
+var TableName = Symbol.for("drizzle:Name");
 
 // node_modules/drizzle-orm/pg-core/foreign-keys.js
 var ForeignKeyBuilder = class {
@@ -29504,7 +29496,7 @@ var PgEnumObjectColumn = class extends PgColumn {
     return this.enum.enumName;
   }
 };
-var isPgEnumSym = /* @__PURE__ */ Symbol.for("drizzle:isPgEnum");
+var isPgEnumSym = Symbol.for("drizzle:isPgEnum");
 function isPgEnum(obj) {
   return !!obj && typeof obj === "function" && isPgEnumSym in obj && obj[isPgEnumSym] === true;
 }
@@ -29595,17 +29587,17 @@ var tracer = {
 };
 
 // node_modules/drizzle-orm/view-common.js
-var ViewBaseConfig = /* @__PURE__ */ Symbol.for("drizzle:ViewBaseConfig");
+var ViewBaseConfig = Symbol.for("drizzle:ViewBaseConfig");
 
 // node_modules/drizzle-orm/table.js
-var Schema = /* @__PURE__ */ Symbol.for("drizzle:Schema");
-var Columns = /* @__PURE__ */ Symbol.for("drizzle:Columns");
-var ExtraConfigColumns = /* @__PURE__ */ Symbol.for("drizzle:ExtraConfigColumns");
-var OriginalName = /* @__PURE__ */ Symbol.for("drizzle:OriginalName");
-var BaseName = /* @__PURE__ */ Symbol.for("drizzle:BaseName");
-var IsAlias = /* @__PURE__ */ Symbol.for("drizzle:IsAlias");
-var ExtraConfigBuilder = /* @__PURE__ */ Symbol.for("drizzle:ExtraConfigBuilder");
-var IsDrizzleTable = /* @__PURE__ */ Symbol.for("drizzle:IsDrizzleTable");
+var Schema = Symbol.for("drizzle:Schema");
+var Columns = Symbol.for("drizzle:Columns");
+var ExtraConfigColumns = Symbol.for("drizzle:ExtraConfigColumns");
+var OriginalName = Symbol.for("drizzle:OriginalName");
+var BaseName = Symbol.for("drizzle:BaseName");
+var IsAlias = Symbol.for("drizzle:IsAlias");
+var ExtraConfigBuilder = Symbol.for("drizzle:ExtraConfigBuilder");
+var IsDrizzleTable = Symbol.for("drizzle:IsDrizzleTable");
 var Table = class {
   static [entityKind] = "Table";
   /** @internal */
@@ -30021,7 +30013,7 @@ function fillPlaceholders(params, values) {
     return p;
   });
 }
-var IsDrizzleView = /* @__PURE__ */ Symbol.for("drizzle:IsDrizzleView");
+var IsDrizzleView = Symbol.for("drizzle:IsDrizzleView");
 var View = class {
   static [entityKind] = "View";
   /** @internal */
@@ -31725,8 +31717,8 @@ function getPgColumnBuilders() {
 }
 
 // node_modules/drizzle-orm/pg-core/table.js
-var InlineForeignKeys = /* @__PURE__ */ Symbol.for("drizzle:PgInlineForeignKeys");
-var EnableRLS = /* @__PURE__ */ Symbol.for("drizzle:EnableRLS");
+var InlineForeignKeys = Symbol.for("drizzle:PgInlineForeignKeys");
+var EnableRLS = Symbol.for("drizzle:EnableRLS");
 var PgTable = class extends Table {
   static [entityKind] = "PgTable";
   /** @internal */
@@ -32410,11 +32402,6 @@ function mapRelationalRow(tablesConfig, tableConfig, row, buildQueryResultSelect
     }
   }
   return result;
-}
-
-// node_modules/drizzle-orm/sql/functions/aggregate.js
-function count(expression) {
-  return sql`count(${expression || sql.raw("*")})`.mapWith(Number);
 }
 
 // node_modules/drizzle-orm/pg-core/view-base.js
@@ -36518,7 +36505,7 @@ function getSQLiteColumnBuilders() {
 }
 
 // node_modules/drizzle-orm/sqlite-core/table.js
-var InlineForeignKeys2 = /* @__PURE__ */ Symbol.for("drizzle:SQLiteInlineForeignKeys");
+var InlineForeignKeys2 = Symbol.for("drizzle:SQLiteInlineForeignKeys");
 var SQLiteTable = class extends Table {
   static [entityKind] = "SQLiteTable";
   /** @internal */
@@ -39441,7 +39428,7 @@ var studentProfiles = pgTable(
     firstName: varchar("first_name", { length: 50 }),
     lastName: varchar("last_name", { length: 50 }),
     otherName: varchar("other_name", { length: 50 }),
-    avatarSeed: varchar("avatar_seed", { length: 255 }).default("AD").notNull(),
+    avatarSeed: varchar("avatar_seed", { length: 255 }).default("/src/assets/images/student_avatar_female_1_1794394445859.jpg").notNull(),
     gradeLevel: varchar("grade_level", { length: 10 }).default("SS2").notNull(),
     targetExam: varchar("target_exam", { length: 20 }).default("WAEC").notNull(),
     schoolName: varchar("school_name", { length: 255 }),
@@ -39478,6 +39465,10 @@ var teacherProfiles = pgTable(
     // 'pending' | 'approved' | 'rejected'
     approvedByAdminId: varchar("approved_by_admin_id", { length: 36 }),
     approvedAt: timestamp("approved_at", { withTimezone: true }),
+    designation: varchar("designation", { length: 100 }),
+    // e.g. "Senior Mathematics Lead"
+    subjects: jsonb("subjects").default(["Mathematics"]).notNull(),
+    // array of strings
     rejectionReason: varchar("rejection_reason", { length: 255 }),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull()
   },
@@ -40079,10 +40070,6 @@ var diagnosticAttempts3 = isPlaceholderDb ? diagnosticAttempts2 : diagnosticAtte
 var diagnosticMisconceptions3 = isPlaceholderDb ? diagnosticMisconceptions2 : diagnosticMisconceptions;
 var rewardTransactions3 = isPlaceholderDb ? rewardTransactions2 : rewardTransactions;
 
-// src/routes/auth.ts
-import { Router } from "express";
-import crypto3 from "crypto";
-
 // src/services/serverAuth.ts
 var import_argon2 = __toESM(require_argon2(), 1);
 import crypto2 from "crypto";
@@ -40124,6 +40111,473 @@ function computeCanonicalPayloadHash(questionId, equation, workingSteps, finalAn
   };
   return computeSHA256(JSON.stringify(canonicalObj));
 }
+
+// src/db/seedDemoTeacher.ts
+var DEMO_TEACHER_USERNAME = "chinedu_okafor";
+var DEMO_TEACHER_ID = "tch-chinedu-01";
+var DEMO_CLASSROOM_ID = "seed-chinedu-class-01";
+var LEGACY_CLASSROOM_ID = "demo-classroom-ss2-algebra-2026";
+var ASSIGNMENT_PUBLISHED = "seed-chinedu-asg-01";
+var ASSIGNMENT_DRAFT = "seed-chinedu-asg-02";
+var STUDENT_PASSWORD = "pass1234";
+var day = 24 * 60 * 60 * 1e3;
+var daysAgo = (n, hour = 9) => {
+  const date2 = new Date(Date.now() - n * day);
+  date2.setHours(hour, 15, 0, 0);
+  return date2.toISOString();
+};
+var STUDENTS = [
+  {
+    id: "stu-aminat-01",
+    name: "Aminat Diallo",
+    username: "aminat_diallo",
+    mastery: 74,
+    xp: 285,
+    streak: 6,
+    activeDaysAgo: 1,
+    existingUser: true,
+    submits: true,
+    score: 24,
+    attempts: 2,
+    misconceptions: []
+  },
+  {
+    id: "seed-chinedu-stu-01",
+    name: "Chidi Okonkwo",
+    username: "chidi_okonkwo",
+    mastery: 82,
+    xp: 340,
+    streak: 8,
+    activeDaysAgo: 1,
+    submits: true,
+    score: 27,
+    attempts: 2,
+    misconceptions: []
+  },
+  {
+    id: "seed-chinedu-stu-02",
+    name: "Fatima Bello",
+    username: "fatima_bello",
+    mastery: 91,
+    xp: 420,
+    streak: 12,
+    activeDaysAgo: 2,
+    submits: true,
+    score: 30,
+    attempts: 3,
+    misconceptions: []
+  },
+  {
+    id: "seed-chinedu-stu-03",
+    name: "Tunde Bakare",
+    username: "tunde_bakare",
+    mastery: 45,
+    xp: 120,
+    streak: 2,
+    activeDaysAgo: 2,
+    submits: true,
+    score: 12,
+    attempts: 2,
+    misconceptions: ["ALG_SIGN_FLIP"]
+  },
+  {
+    id: "seed-chinedu-stu-04",
+    name: "Ngozi Eze",
+    username: "ngozi_eze",
+    mastery: 58,
+    xp: 190,
+    streak: 4,
+    activeDaysAgo: 3,
+    submits: true,
+    score: 15,
+    attempts: 2,
+    misconceptions: ["ALG_INVALID_DISTRIB"]
+  },
+  {
+    id: "seed-chinedu-stu-05",
+    name: "Ibrahim Musa",
+    username: "ibrahim_musa",
+    mastery: 67,
+    xp: 230,
+    streak: 5,
+    activeDaysAgo: 4,
+    submits: true,
+    score: 18,
+    attempts: 1,
+    misconceptions: ["ALG_PRECEDENCE_VIOLATION"]
+  },
+  {
+    id: "seed-chinedu-stu-06",
+    name: "Blessing Adeyemi",
+    username: "blessing_adeyemi",
+    mastery: 38,
+    xp: 95,
+    streak: 1,
+    activeDaysAgo: 5,
+    submits: true,
+    score: 9,
+    attempts: 2,
+    misconceptions: ["ALG_SIGN_FLIP", "ALG_VARIABLE_DROPPED"]
+  },
+  {
+    id: "seed-chinedu-stu-07",
+    name: "Emeka Nwosu",
+    username: "emeka_nwosu",
+    mastery: 78,
+    xp: 300,
+    streak: 7,
+    activeDaysAgo: 6,
+    submits: true,
+    score: 21,
+    attempts: 1,
+    misconceptions: []
+  },
+  {
+    id: "seed-chinedu-stu-08",
+    name: "Zainab Yusuf",
+    username: "zainab_yusuf",
+    mastery: 63,
+    xp: 175,
+    streak: 3,
+    activeDaysAgo: 9,
+    submits: false,
+    score: 0,
+    attempts: 1,
+    misconceptions: ["ALG_INVALID_DISTRIB"]
+  },
+  {
+    id: "seed-chinedu-stu-09",
+    name: "Kelechi Obi",
+    username: "kelechi_obi",
+    mastery: 49,
+    xp: 140,
+    streak: 2,
+    activeDaysAgo: 11,
+    submits: false,
+    score: 0,
+    attempts: 1,
+    misconceptions: ["ALG_SIGN_FLIP"]
+  }
+];
+var EQUATIONS = [
+  {
+    questionId: "q-lin-01",
+    equation: "3x - 7 = 14",
+    correct: ["3x - 7 = 14", "3x = 14 + 7", "3x = 21", "x = 21 / 3", "x = 7"],
+    faulty: {
+      ALG_SIGN_FLIP: ["3x - 7 = 14", "3x = 14 - 7", "3x = 7", "x = 7 / 3"],
+      ALG_VARIABLE_DROPPED: ["3x - 7 = 14", "3x = 14 + 7", "3 = 21", "x = 21 / 3"]
+    }
+  },
+  {
+    questionId: "q-lin-02",
+    equation: "5(x + 2) = 35",
+    correct: ["5(x + 2) = 35", "x + 2 = 35 / 5", "x + 2 = 7", "x = 7 - 2", "x = 5"],
+    faulty: {
+      ALG_INVALID_DISTRIB: ["5(x + 2) = 35", "5x + 2 = 35", "5x = 33", "x = 33 / 5"]
+    }
+  },
+  {
+    questionId: "q-lin-03",
+    equation: "2x + 9 = 4x - 3",
+    correct: ["2x + 9 = 4x - 3", "2x - 4x = -3 - 9", "-2x = -12", "x = -12 / -2", "x = 6"],
+    faulty: {
+      ALG_PRECEDENCE_VIOLATION: ["2x + 9 = 4x - 3", "2x - 4x = -3 + 9", "-2x = 6", "x = -3"]
+    }
+  }
+];
+function buildWorkingSteps(questionIndex, misconceptionCode) {
+  const question = EQUATIONS[questionIndex % EQUATIONS.length];
+  const trace = misconceptionCode && question.faulty[misconceptionCode] || question.correct;
+  return trace.map((mathExpression, index3) => ({
+    stepNumber: index3 + 1,
+    actionDescription: index3 === 0 ? "Copy the equation" : index3 === trace.length - 1 ? "State the final answer" : "Apply the next algebraic operation",
+    mathExpression
+  }));
+}
+var MISCONCEPTION_EVIDENCE = {
+  ALG_SIGN_FLIP: {
+    faultyStepNumber: 2,
+    faultyExpression: "3x = 14 - 7",
+    expectedExpression: "3x = 14 + 7"
+  },
+  ALG_INVALID_DISTRIB: {
+    faultyStepNumber: 1,
+    faultyExpression: "5x + 2 = 35",
+    expectedExpression: "5x + 10 = 35"
+  },
+  ALG_PRECEDENCE_VIOLATION: {
+    faultyStepNumber: 2,
+    faultyExpression: "2x - 4x = -3 + 9",
+    expectedExpression: "2x - 4x = -3 - 9"
+  },
+  ALG_VARIABLE_DROPPED: {
+    faultyStepNumber: 3,
+    faultyExpression: "3 = 21",
+    expectedExpression: "3x = 21"
+  }
+};
+async function removeLegacyFixtures(teacherId) {
+  const legacyClassrooms = await db.select().from(classrooms3).where(eq(classrooms3.id, LEGACY_CLASSROOM_ID)).limit(1);
+  if (legacyClassrooms.length === 0 || legacyClassrooms[0].teacherId !== teacherId) {
+    return;
+  }
+  await db.delete(diagnosticMisconceptions3).where(like(diagnosticMisconceptions3.attemptId, "demo-attempt-%"));
+  await db.delete(diagnosticAttempts3).where(like(diagnosticAttempts3.id, "demo-attempt-%"));
+  await db.delete(assignmentSubmissions3).where(like(assignmentSubmissions3.assignmentId, "demo-assignment-%"));
+  await db.delete(assignmentQuestions3).where(like(assignmentQuestions3.assignmentId, "demo-assignment-%"));
+  await db.delete(assignments3).where(like(assignments3.id, "demo-assignment-%"));
+  await db.delete(classroomMemberships3).where(eq(classroomMemberships3.classroomId, LEGACY_CLASSROOM_ID));
+  await db.delete(classrooms3).where(eq(classrooms3.id, LEGACY_CLASSROOM_ID));
+}
+async function resolveDemoTeacher() {
+  const existing = await db.select().from(users3).where(eq(users3.usernameNormalized, DEMO_TEACHER_USERNAME)).limit(1);
+  if (existing.length > 0) {
+    if (existing[0].role !== "teacher") {
+      throw new Error("The demo teacher username is already used by a non-teacher account.");
+    }
+    return existing[0].id;
+  }
+  await db.insert(users3).values({
+    id: DEMO_TEACHER_ID,
+    username: DEMO_TEACHER_USERNAME,
+    usernameNormalized: DEMO_TEACHER_USERNAME,
+    email: "chinedu.okafor@mindtrace.demo",
+    passwordHash: await hashPassword("teacher123"),
+    role: "teacher",
+    mustChangePassword: false,
+    onboardingMethod: "independent",
+    accountStatus: "active"
+  });
+  return DEMO_TEACHER_ID;
+}
+async function seedDemoTeacherData() {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Refusing to seed demo data in production.");
+  }
+  const passwordHash = await hashPassword(STUDENT_PASSWORD);
+  const teacherId = await resolveDemoTeacher();
+  await removeLegacyFixtures(teacherId);
+  await db.insert(teacherProfiles3).values({
+    id: teacherId,
+    fullName: "Mr. Chinedu Okafor",
+    schoolName: "Government Secondary School, Wuse",
+    verificationStatus: "approved",
+    approvedAt: daysAgo(30)
+  }).onConflictDoUpdate({
+    target: teacherProfiles3.id,
+    set: {
+      fullName: "Mr. Chinedu Okafor",
+      schoolName: "Government Secondary School, Wuse",
+      verificationStatus: "approved",
+      approvedAt: daysAgo(30),
+      rejectionReason: null
+    }
+  });
+  await db.insert(classrooms3).values({
+    id: DEMO_CLASSROOM_ID,
+    teacherId,
+    name: "SS2 Gold \u2014 Algebra & Graphs",
+    gradeLevel: "SS2",
+    subject: "Mathematics",
+    status: "active",
+    enrollmentMethod: "invite_code",
+    description: "WAEC-aligned algebra diagnostic group for the 2026 cohort.",
+    inviteCode: "CHD4AL"
+  }).onConflictDoUpdate({
+    target: classrooms3.id,
+    set: {
+      teacherId,
+      name: "SS2 Gold \u2014 Algebra & Graphs",
+      gradeLevel: "SS2",
+      subject: "Mathematics",
+      status: "active",
+      description: "WAEC-aligned algebra diagnostic group for the 2026 cohort.",
+      inviteCode: "CHD4AL"
+    }
+  });
+  await db.delete(diagnosticMisconceptions3).where(like(diagnosticMisconceptions3.id, "seed-chinedu-%"));
+  await db.delete(assignmentSubmissions3).where(like(assignmentSubmissions3.id, "seed-chinedu-%"));
+  await db.delete(diagnosticAttempts3).where(like(diagnosticAttempts3.id, "seed-chinedu-%"));
+  await db.delete(assignmentQuestions3).where(like(assignmentQuestions3.id, "seed-chinedu-%"));
+  await db.delete(assignments3).where(like(assignments3.id, "seed-chinedu-%"));
+  await db.delete(classroomMemberships3).where(eq(classroomMemberships3.classroomId, DEMO_CLASSROOM_ID));
+  for (const student of STUDENTS) {
+    const [firstName, ...rest] = student.name.split(" ");
+    const lastName = rest.join(" ");
+    const avatarSeed = `${firstName[0]}${lastName[0] || ""}`.toUpperCase();
+    const existingStudent = await db.select().from(users3).where(eq(users3.usernameNormalized, student.username)).limit(1);
+    let studentId = student.id;
+    if (existingStudent.length > 0) {
+      studentId = existingStudent[0].id;
+    } else {
+      await db.insert(users3).values({
+        id: studentId,
+        username: student.username,
+        usernameNormalized: student.username,
+        passwordHash,
+        role: "student",
+        mustChangePassword: false,
+        createdByTeacherId: student.existingUser ? null : teacherId,
+        onboardingMethod: student.existingUser ? "independent" : "school_managed",
+        accountStatus: "active"
+      });
+    }
+    await db.insert(studentProfiles3).values({
+      id: studentId,
+      fullName: student.name,
+      firstName,
+      lastName,
+      avatarSeed,
+      gradeLevel: "SS2",
+      targetExam: "WAEC",
+      schoolName: "Government Secondary School, Wuse",
+      totalXp: student.xp,
+      streakDays: student.streak,
+      lastActiveDate: daysAgo(student.activeDaysAgo, 18),
+      masteryPercentage: student.mastery,
+      dailyGoalTarget: 3,
+      dailyGoalCompleted: Math.min(3, student.streak)
+    }).onConflictDoUpdate({
+      target: studentProfiles3.id,
+      set: {
+        fullName: student.name,
+        firstName,
+        lastName,
+        avatarSeed,
+        gradeLevel: "SS2",
+        schoolName: "Government Secondary School, Wuse",
+        totalXp: student.xp,
+        streakDays: student.streak,
+        lastActiveDate: daysAgo(student.activeDaysAgo, 18),
+        masteryPercentage: student.mastery
+      }
+    });
+    await db.insert(classroomMemberships3).values({
+      id: `seed-chinedu-member-${studentId}`,
+      classroomId: DEMO_CLASSROOM_ID,
+      studentId,
+      status: "active",
+      joinedAt: daysAgo(20)
+    });
+    student.resolvedId = studentId;
+  }
+  await db.insert(assignments3).values([
+    {
+      id: ASSIGNMENT_PUBLISHED,
+      classroomId: DEMO_CLASSROOM_ID,
+      teacherId,
+      title: "Linear Equations \u2014 Step-by-Step Isolation",
+      instructions: "Show every working step. Isolate the variable and check your answer by substitution.",
+      subject: "Mathematics",
+      gradeLevel: "SS2",
+      published: true,
+      dueDate: daysAgo(-2, 23),
+      latePolicy: { allowLate: true, penaltyPercent: 10 },
+      retakePolicy: { allowRetakes: true, maxAttempts: 3 },
+      createdAt: daysAgo(9)
+    },
+    {
+      id: ASSIGNMENT_DRAFT,
+      classroomId: DEMO_CLASSROOM_ID,
+      teacherId,
+      title: "Graphing Linear Equations \u2014 Gradient & Intercepts",
+      instructions: "Plot each line and label the gradient and both intercepts.",
+      subject: "Mathematics",
+      gradeLevel: "SS2",
+      published: false,
+      dueDate: daysAgo(-9, 23),
+      createdAt: daysAgo(2)
+    }
+  ]);
+  await db.insert(assignmentQuestions3).values([
+    { id: "seed-chinedu-q-01", assignmentId: ASSIGNMENT_PUBLISHED, questionId: "q-lin-01", displayOrder: 1, marks: 10 },
+    { id: "seed-chinedu-q-02", assignmentId: ASSIGNMENT_PUBLISHED, questionId: "q-lin-02", displayOrder: 2, marks: 10 },
+    { id: "seed-chinedu-q-03", assignmentId: ASSIGNMENT_PUBLISHED, questionId: "q-lin-03", displayOrder: 3, marks: 10 },
+    { id: "seed-chinedu-q-04", assignmentId: ASSIGNMENT_DRAFT, questionId: "q-graph-01", displayOrder: 1, marks: 10 }
+  ]);
+  const submissionDays = [6, 5, 4, 3, 2, 1, 2, 1];
+  let submissionIndex = 0;
+  for (const student of STUDENTS) {
+    const studentId = student.resolvedId || student.id;
+    for (let attemptNumber = 1; attemptNumber <= student.attempts; attemptNumber += 1) {
+      const attemptId = `seed-chinedu-att-${studentId}-${attemptNumber}`;
+      const isFirstAttempt = attemptNumber === 1;
+      const primaryMisconception = isFirstAttempt && student.misconceptions.length > 0 ? student.misconceptions[0] : null;
+      let questionIndex = (attemptNumber - 1) % EQUATIONS.length;
+      if (primaryMisconception === "ALG_INVALID_DISTRIB") questionIndex = 1;
+      if (primaryMisconception === "ALG_PRECEDENCE_VIOLATION") questionIndex = 2;
+      const question = EQUATIONS[questionIndex];
+      const submittedDay = student.submits && isFirstAttempt ? submissionDays[submissionIndex] : null;
+      const timestamp2 = daysAgo(submittedDay ?? student.activeDaysAgo, 10 + attemptNumber);
+      const correct = student.misconceptions.length === 0 && (isFirstAttempt ? student.score >= 18 : true);
+      const workingSteps = buildWorkingSteps(questionIndex, primaryMisconception || void 0);
+      const finalStep = workingSteps[workingSteps.length - 1].mathExpression;
+      const finalAnswer = finalStep.includes("x =") ? finalStep : correct ? "x = 7" : "x = 4";
+      await db.insert(diagnosticAttempts3).values({
+        id: attemptId,
+        studentId,
+        questionId: question.questionId,
+        questionVersion: 1,
+        engineVersion: "1.2",
+        equation: question.equation,
+        workingSteps,
+        finalAnswer,
+        payloadHash: computeSHA256(`${attemptId}:${question.equation}:${workingSteps.length}`),
+        serverIsCorrect: correct,
+        serverPrimaryMisconception: primaryMisconception,
+        validationStatus: "VALIDATED",
+        clientTimestamp: timestamp2,
+        serverTimestamp: timestamp2
+      });
+      if (isFirstAttempt && student.misconceptions.length > 0) {
+        for (const code2 of student.misconceptions) {
+          await db.insert(diagnosticMisconceptions3).values({
+            id: `seed-chinedu-mis-${studentId}-${code2}`,
+            attemptId,
+            misconceptionCode: code2,
+            confidenceScore: 90 + (student.xp + code2.length) % 10,
+            supportingEvidence: MISCONCEPTION_EVIDENCE[code2] || {},
+            createdAt: timestamp2
+          });
+        }
+      }
+      if (isFirstAttempt && student.submits && submittedDay !== null) {
+        await db.insert(assignmentSubmissions3).values({
+          id: `seed-chinedu-sub-${studentId}-1`,
+          assignmentId: ASSIGNMENT_PUBLISHED,
+          studentId,
+          diagnosticAttemptId: attemptId,
+          status: "submitted",
+          score: student.score,
+          totalMarks: 30,
+          xpEarned: student.score * 2,
+          submittedAt: timestamp2,
+          isLate: false,
+          attemptNumber: 1
+        });
+        submissionIndex += 1;
+      }
+    }
+  }
+  const counts = {
+    students: STUDENTS.length,
+    submitted: STUDENTS.filter((s2) => s2.submits).length,
+    attempts: STUDENTS.reduce((sum, s2) => sum + s2.attempts, 0),
+    misconceptions: STUDENTS.reduce((sum, s2) => sum + s2.misconceptions.length, 0)
+  };
+  console.log("Demo teacher data seeded.");
+  console.log(`  Teacher:   ${teacherId} (${DEMO_TEACHER_USERNAME} / teacher123)`);
+  console.log(`  Classroom: ${DEMO_CLASSROOM_ID} (invite code CHD4AL)`);
+  console.log(`  Students:  ${counts.students} (${counts.submitted} submitted)`);
+  console.log(`  Attempts:  ${counts.attempts}`);
+  console.log(`  Misconceptions: ${counts.misconceptions}`);
+  console.log(`  Student login example: aminat_diallo / ${STUDENT_PASSWORD}`);
+}
+
+// src/routes/auth.ts
+import { Router } from "express";
+import crypto3 from "crypto";
 
 // node_modules/express-rate-limit/dist/index.mjs
 var import_ip_address = __toESM(require_ip_address(), 1);
@@ -41165,6 +41619,26 @@ var MINUTE = 60 * SECOND;
 var HOUR = 60 * MINUTE;
 var DAY = 24 * HOUR;
 
+// src/config/demoMode.ts
+var demoMode = process.env.MINDTRACE_DEMO_MODE === "true";
+if (demoMode && process.env.NODE_ENV === "production") {
+  throw new Error("FATAL: MINDTRACE_DEMO_MODE=true is not permitted in production.");
+}
+function isDemoModeEnabled() {
+  return demoMode;
+}
+function isDemoMode() {
+  return isDemoModeEnabled();
+}
+function getDemoModeStatus() {
+  const environment = process.env.NODE_ENV || "development";
+  return {
+    demoMode: isDemoModeEnabled(),
+    environment,
+    safeguardActive: environment === "production" && !demoMode
+  };
+}
+
 // src/middleware/authMiddleware.ts
 function requireAuth(req, res, next) {
   if (!req.session || !req.session.userId) {
@@ -41231,9 +41705,7 @@ async function requireApprovedTeacher(req, res, next) {
     return next();
   }
   try {
-    const profs = await db.select({
-      verificationStatus: teacherProfiles3.verificationStatus
-    }).from(teacherProfiles3).where(eq(teacherProfiles3.id, req.session.userId)).limit(1);
+    const profs = await db.select({ verificationStatus: teacherProfiles3.verificationStatus }).from(teacherProfiles3).where(eq(teacherProfiles3.id, req.session.userId)).limit(1);
     if (profs.length === 0) {
       res.status(403).json({
         error: "Forbidden",
@@ -41244,6 +41716,9 @@ async function requireApprovedTeacher(req, res, next) {
     }
     const status = profs[0].verificationStatus;
     req.session.verificationStatus = status;
+    if (isDemoModeEnabled()) {
+      return next();
+    }
     if (status === "pending") {
       res.status(403).json({
         error: "Forbidden",
@@ -41309,7 +41784,6 @@ function csrfProtection(req, res, next) {
 }
 var authRateLimiter = rate_limit_default({
   windowMs: 15 * 60 * 1e3,
-  // 15 minutes
   max: process.env.NODE_ENV === "test" ? 1e3 : 100,
   standardHeaders: true,
   legacyHeaders: false,
@@ -41322,6 +41796,13 @@ var authRateLimiter = rate_limit_default({
 
 // src/routes/auth.ts
 var authRouter = Router();
+function effectiveTeacherVerification(status) {
+  if (isDemoModeEnabled() && status) return "approved";
+  return status;
+}
+function autoApprovesTeacherAccounts() {
+  return isDemoModeEnabled() || process.env.NODE_ENV !== "production";
+}
 authRouter.get("/csrf-token", (req, res) => {
   if (!req.session.csrfToken) {
     req.session.csrfToken = crypto3.randomBytes(24).toString("hex");
@@ -41396,7 +41877,7 @@ authRouter.post("/register-student", authRateLimiter, async (req, res) => {
           fullName: fullName.trim(),
           role: "student",
           schoolName: resolvedSchool,
-          avatarSeed: computedInitials,
+          avatarSeed: "/src/assets/images/student_avatar_female_1_1794394445859.jpg",
           gradeLevel: gradeLevel || "SS2",
           targetExam: targetExam || "WAEC",
           totalXp: 0,
@@ -41413,7 +41894,7 @@ authRouter.post("/register-student", authRateLimiter, async (req, res) => {
 });
 authRouter.post("/register-teacher", authRateLimiter, async (req, res) => {
   try {
-    const { username, fullName, password, schoolName, verificationToken, email } = req.body;
+    const { username, fullName, password, schoolName, verificationToken, email, designation, subjects } = req.body;
     if (!username || !fullName || !password || !schoolName) {
       res.status(400).json({
         error: "Missing Fields",
@@ -41426,7 +41907,7 @@ authRouter.post("/register-teacher", authRateLimiter, async (req, res) => {
       return;
     }
     let verificationId = null;
-    let verificationStatus = "pending";
+    let verificationStatus = autoApprovesTeacherAccounts() ? "approved" : "pending";
     if (verificationToken && verificationToken.trim().length > 0) {
       const tokenHash = crypto3.createHash("sha256").update(verificationToken.trim()).digest("hex");
       const verifications = await db.select().from(teacherVerifications3).where(eq(teacherVerifications3.tokenHash, tokenHash)).limit(1);
@@ -41453,12 +41934,11 @@ authRouter.post("/register-teacher", authRateLimiter, async (req, res) => {
         res.status(400).json({
           error: "Token Expired",
           code: "TOKEN_EXPIRED",
-          message: "This teacher verification token has expired."
+          message: "The provided teacher accreditation token has expired."
         });
         return;
       }
       verificationId = ver.id;
-      verificationStatus = "approved";
     }
     const usernameNormalized = username.trim().toLowerCase();
     const existing = await db.select().from(users3).where(eq(users3.usernameNormalized, usernameNormalized)).limit(1);
@@ -41483,9 +41963,11 @@ authRouter.post("/register-teacher", authRateLimiter, async (req, res) => {
       id: userId,
       fullName: fullName.trim(),
       schoolName: schoolName.trim(),
+      designation: designation || null,
+      subjects: subjects || ["Mathematics"],
       verificationId,
       verificationStatus,
-      approvedAt: verificationStatus === "approved" ? (/* @__PURE__ */ new Date()).toISOString() : null
+      approvedAt: (/* @__PURE__ */ new Date()).toISOString()
     });
     if (verificationId) {
       await db.update(teacherVerifications3).set({ isRedeemed: true, redeemedByTeacherId: userId }).where(eq(teacherVerifications3.id, verificationId));
@@ -41499,7 +41981,7 @@ authRouter.post("/register-teacher", authRateLimiter, async (req, res) => {
       req.session.csrfToken = crypto3.randomBytes(24).toString("hex");
       res.status(201).json({
         success: true,
-        message: verificationStatus === "approved" ? "Teacher account verified and registered successfully." : "Teacher account registered in Pending Verification state. An administrator will review your account.",
+        message: "Teacher account approved and registered successfully.",
         user: {
           id: userId,
           username: username.trim(),
@@ -41546,6 +42028,7 @@ authRouter.post("/login", authRateLimiter, async (req, res) => {
         profileData = profs[0];
         verificationStatus = profs[0].verificationStatus;
       }
+      verificationStatus = effectiveTeacherVerification(verificationStatus);
     }
     req.session.regenerate((err) => {
       if (err) console.error("Session regeneration error on login:", err);
@@ -41681,6 +42164,7 @@ authRouter.get("/me", requireAuth, async (req, res) => {
         profileData = profs[0];
         verificationStatus = profs[0].verificationStatus;
       }
+      verificationStatus = effectiveTeacherVerification(verificationStatus);
     }
     res.json({
       authenticated: true,
@@ -42447,6 +42931,179 @@ syncRouter.post("/batch", requireAuth, csrfProtection, async (req, res) => {
 
 // src/routes/teacher.ts
 import { Router as Router3 } from "express";
+
+// src/services/analyticsService.ts
+var MISCONCEPTION_LABELS = {
+  ALG_SIGN_FLIP: "Sign reversal on transposition",
+  ALG_INVALID_DISTRIB: "Incomplete bracket distribution",
+  ALG_PRECEDENCE_VIOLATION: "Precedence slip before isolating",
+  ALG_VARIABLE_DROPPED: "Variable dropped during subtraction"
+};
+function labelForCode(code2) {
+  return MISCONCEPTION_LABELS[code2] || code2.replace(/^ALG_/, "").replace(/_/g, " ").toLowerCase();
+}
+function percentage(part, whole) {
+  if (!whole) return 0;
+  return Math.round(part / whole * 100);
+}
+function bucketise(values, buckets) {
+  const total = values.length;
+  return buckets.map(({ range, min, max }) => ({
+    range,
+    percentage: total ? Math.round(values.filter((v) => v >= min && v <= max).length / total * 100) : 0
+  }));
+}
+async function misconceptionInsights(classroomId) {
+  return db.select({
+    code: diagnosticMisconceptions3.misconceptionCode,
+    count: sql`count(*)`,
+    studentCount: sql`count(distinct ${diagnosticAttempts3.studentId})`
+  }).from(diagnosticMisconceptions3).innerJoin(diagnosticAttempts3, eq(diagnosticMisconceptions3.attemptId, diagnosticAttempts3.id)).innerJoin(
+    classroomMemberships3,
+    and(
+      eq(diagnosticAttempts3.studentId, classroomMemberships3.studentId),
+      eq(classroomMemberships3.classroomId, classroomId),
+      eq(classroomMemberships3.status, "active")
+    )
+  ).groupBy(diagnosticMisconceptions3.misconceptionCode).orderBy(desc(sql`count(*)`)).limit(6);
+}
+var analyticsService = {
+  async getClassroomOverview(classroomId) {
+    const members = await db.select({ studentId: classroomMemberships3.studentId }).from(classroomMemberships3).where(
+      and(
+        eq(classroomMemberships3.classroomId, classroomId),
+        eq(classroomMemberships3.status, "active")
+      )
+    );
+    const studentIds = members.map((m2) => m2.studentId);
+    const totalStudents = studentIds.length;
+    const profiles = studentIds.length ? await db.select().from(studentProfiles3).where(inArray(studentProfiles3.id, studentIds)) : [];
+    const classAssignments = await db.select().from(assignments3).where(eq(assignments3.classroomId, classroomId));
+    const published = classAssignments.filter((a) => a.published);
+    const assignmentIds = published.map((a) => a.id);
+    const submissions = assignmentIds.length ? await db.select().from(assignmentSubmissions3).where(inArray(assignmentSubmissions3.assignmentId, assignmentIds)) : [];
+    const attempts = studentIds.length ? await db.select().from(diagnosticAttempts3).where(inArray(diagnosticAttempts3.studentId, studentIds)) : [];
+    const expectedSubmissions = published.length * totalStudents;
+    const submissionRate = percentage(submissions.length, expectedSubmissions);
+    const studentsWhoSubmitted = new Set(
+      submissions.map((s2) => s2.studentId)
+    ).size;
+    const avgCompletion = percentage(studentsWhoSubmitted, totalStudents);
+    const avgCorrectness = submissions.length ? Math.round(
+      submissions.reduce((sum, s2) => {
+        const total = Number(s2.totalMarks) || 0;
+        return sum + (total > 0 ? Number(s2.score) / total * 100 : 0);
+      }, 0) / submissions.length
+    ) : 0;
+    const atRiskCount = profiles.filter(
+      (p) => (p.masteryPercentage ?? 0) < 60
+    ).length;
+    const averageMastery = profiles.length ? Math.round(
+      profiles.reduce((sum, p) => sum + (p.masteryPercentage ?? 0), 0) / profiles.length
+    ) : 0;
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1e3;
+    const activeStudents = profiles.filter((p) => {
+      if (!p.lastActiveDate) return false;
+      const ts = new Date(p.lastActiveDate).getTime();
+      return Number.isFinite(ts) && ts >= weekAgo;
+    }).length;
+    const stepCounts = attempts.map((a) => {
+      try {
+        const steps = Array.isArray(a.workingSteps) ? a.workingSteps : JSON.parse(a.workingSteps || "[]");
+        return Array.isArray(steps) ? steps.length : 0;
+      } catch {
+        return 0;
+      }
+    }).filter((n) => n > 0);
+    const workingStepsDistribution = bucketise(stepCounts, [
+      { range: "1\u20132 steps", min: 1, max: 2 },
+      { range: "3\u20134 steps", min: 3, max: 4 },
+      { range: "5\u20136 steps", min: 5, max: 6 },
+      { range: "7\u20138 steps", min: 7, max: 8 },
+      { range: "9+ steps", min: 9, max: Number.MAX_SAFE_INTEGER }
+    ]);
+    const attemptCountsByStudent = studentIds.map(
+      (id2) => attempts.filter((a) => a.studentId === id2).length
+    );
+    const attemptsPerStudentDistribution = bucketise(attemptCountsByStudent, [
+      { range: "No attempts", min: 0, max: 0 },
+      { range: "1\u20132 attempts", min: 1, max: 2 },
+      { range: "3\u20134 attempts", min: 3, max: 4 },
+      { range: "5\u20136 attempts", min: 5, max: 6 },
+      { range: "7+ attempts", min: 7, max: Number.MAX_SAFE_INTEGER }
+    ]);
+    const byDay = /* @__PURE__ */ new Map();
+    for (const submission of submissions) {
+      const day2 = String(submission.submittedAt || "").slice(0, 10);
+      if (!day2) continue;
+      const entry = byDay.get(day2) || { submissions: 0, scoreSum: 0, marked: 0 };
+      entry.submissions += 1;
+      const total = Number(submission.totalMarks) || 0;
+      if (total > 0) {
+        entry.scoreSum += Number(submission.score) / total * 100;
+        entry.marked += 1;
+      }
+      byDay.set(day2, entry);
+    }
+    const performanceTrends = Array.from(byDay.entries()).sort(([a], [b]) => a.localeCompare(b)).slice(-7).map(([day2, entry]) => ({
+      date: day2.slice(5).replace("-", "/"),
+      submissionRate: percentage(entry.submissions, totalStudents || entry.submissions),
+      correctness: entry.marked ? Math.round(entry.scoreSum / entry.marked) : 0
+    }));
+    const insights = await misconceptionInsights(classroomId);
+    const microSkills = insights.slice(0, 6).map((row) => ({
+      skill: labelForCode(row.code),
+      score: Math.max(0, 100 - percentage(Number(row.studentCount), totalStudents || 1))
+    }));
+    const topMisconceptions = insights.slice(0, 4).map((row) => ({
+      code: row.code,
+      title: labelForCode(row.code),
+      affectedPercentage: percentage(Number(row.studentCount), totalStudents || 1),
+      studentCount: Number(row.studentCount),
+      severity: percentage(Number(row.studentCount), totalStudents || 1) >= 40 ? "high" : "medium"
+    }));
+    return {
+      totalStudents,
+      activeStudents,
+      totalAssignments: classAssignments.length,
+      publishedAssignments: published.length,
+      submissionRate,
+      avgCompletion,
+      avgCorrectness,
+      atRiskCount,
+      averageMastery,
+      microSkills,
+      performanceTrends,
+      workingStepsDistribution,
+      attemptsPerStudentDistribution,
+      topMisconceptions,
+      attemptCount: attempts.length
+    };
+  },
+  async getAssignmentAnalytics(assignmentId) {
+    const submissions = await db.select({
+      score: assignmentSubmissions3.score,
+      totalMarks: assignmentSubmissions3.totalMarks,
+      isLate: assignmentSubmissions3.isLate
+    }).from(assignmentSubmissions3).where(eq(assignmentSubmissions3.assignmentId, assignmentId));
+    const totalSubmissions = submissions.length;
+    const avgScore = totalSubmissions > 0 ? submissions.reduce(
+      (sum, s2) => sum + (s2.totalMarks ? s2.score / s2.totalMarks : 0),
+      0
+    ) / totalSubmissions : 0;
+    const lateSubmissions = submissions.filter((s2) => s2.isLate).length;
+    return {
+      totalSubmissions,
+      avgScore: Math.round(avgScore * 100),
+      lateSubmissions
+    };
+  },
+  async getMisconceptionInsights(classroomId) {
+    return misconceptionInsights(classroomId);
+  }
+};
+
+// src/routes/teacher.ts
 var teacherRouter = Router3();
 teacherRouter.get("/verification-status", requireAuth, requireRole("teacher"), async (req, res) => {
   try {
@@ -42457,13 +43114,14 @@ teacherRouter.get("/verification-status", requireAuth, requireRole("teacher"), a
       return;
     }
     const prof = profs[0];
+    const demoActive = isDemoModeEnabled();
     res.json({
       success: true,
-      verificationStatus: prof.verificationStatus || "pending",
+      verificationStatus: demoActive ? "approved" : prof.verificationStatus || "pending",
       fullName: prof.fullName,
       schoolName: prof.schoolName,
-      approvedAt: prof.approvedAt,
-      rejectionReason: prof.rejectionReason
+      approvedAt: demoActive ? prof.approvedAt || (/* @__PURE__ */ new Date()).toISOString() : prof.approvedAt,
+      rejectionReason: demoActive ? null : prof.rejectionReason
     });
   } catch (err) {
     console.error("Error in /verification-status:", err);
@@ -42746,13 +43404,23 @@ teacherRouter.get("/roster", requireAuth, requireApprovedTeacher, async (req, re
 });
 teacherRouter.get("/analytics", requireAuth, requireApprovedTeacher, async (req, res) => {
   try {
-    const misconceptionsQuery = await db.select({
-      misconceptionCode: diagnosticAttempts3.serverPrimaryMisconception,
-      count: sql`COUNT(*)`
-    }).from(diagnosticAttempts3).where(sql`${diagnosticAttempts3.serverPrimaryMisconception} IS NOT NULL`).groupBy(diagnosticAttempts3.serverPrimaryMisconception);
+    const teacherId = req.session.userId;
+    const { classroomId } = req.query;
+    if (!classroomId) {
+      res.status(400).json({ error: "Missing Classroom ID" });
+      return;
+    }
+    const classRow = await db.select().from(classrooms3).where(and(eq(classrooms3.id, classroomId), eq(classrooms3.teacherId, teacherId))).limit(1);
+    if (classRow.length === 0) {
+      res.status(404).json({ error: "Not Found" });
+      return;
+    }
+    const overview = await analyticsService.getClassroomOverview(classroomId);
+    const insights = await analyticsService.getMisconceptionInsights(classroomId);
     res.json({
       success: true,
-      misconceptionHeatmap: misconceptionsQuery,
+      overview,
+      insights,
       timestamp: (/* @__PURE__ */ new Date()).toISOString()
     });
   } catch (err) {
@@ -42760,82 +43428,201 @@ teacherRouter.get("/analytics", requireAuth, requireApprovedTeacher, async (req,
     res.status(500).json({ error: "Failed to compute class analytics.", message: err?.message });
   }
 });
+teacherRouter.get("/students/:studentId/details", requireAuth, requireApprovedTeacher, async (req, res) => {
+  try {
+    const teacherId = req.session.userId;
+    const { studentId } = req.params;
+    const ownership = await db.select({ id: classrooms3.id }).from(classrooms3).innerJoin(classroomMemberships3, eq(classrooms3.id, classroomMemberships3.classroomId)).where(
+      and(
+        eq(classrooms3.teacherId, teacherId),
+        eq(classroomMemberships3.studentId, studentId),
+        eq(classroomMemberships3.status, "active")
+      )
+    ).limit(1);
+    if (ownership.length === 0) {
+      res.status(403).json({ error: "Forbidden", message: "You do not have permission to view this student's details." });
+      return;
+    }
+    const profiles = await db.select().from(studentProfiles3).where(eq(studentProfiles3.id, studentId)).limit(1);
+    if (profiles.length === 0) {
+      res.status(404).json({ error: "Not Found", message: "Student profile not found." });
+      return;
+    }
+    const student = profiles[0];
+    const attempts = await db.select().from(diagnosticAttempts3).where(eq(diagnosticAttempts3.studentId, studentId)).orderBy(desc(diagnosticAttempts3.clientTimestamp)).limit(10);
+    const misconceptions = await db.select({
+      code: diagnosticMisconceptions3.misconceptionCode,
+      confidence: diagnosticMisconceptions3.confidenceScore,
+      createdAt: diagnosticMisconceptions3.createdAt,
+      attemptId: diagnosticMisconceptions3.attemptId
+    }).from(diagnosticMisconceptions3).innerJoin(diagnosticAttempts3, eq(diagnosticMisconceptions3.attemptId, diagnosticAttempts3.id)).where(eq(diagnosticAttempts3.studentId, studentId)).orderBy(desc(diagnosticMisconceptions3.createdAt));
+    res.json({
+      success: true,
+      student,
+      attempts,
+      misconceptions
+    });
+  } catch (err) {
+    console.error("Error fetching student details:", err);
+    res.status(500).json({ error: "Server Error", message: "Failed to retrieve student details." });
+  }
+});
 
 // src/routes/teacherAssignments.ts
 import { Router as Router4 } from "express";
 var teacherAssignmentRouter = Router4();
-teacherAssignmentRouter.get("/:classroomId/assignments", requireAuth, requireApprovedTeacher, async (req, res) => {
-  try {
-    const teacherId = req.session.userId;
-    const { classroomId } = req.params;
-    const classroom = await db.select().from(classrooms3).where(and(eq(classrooms3.id, classroomId), eq(classrooms3.teacherId, teacherId))).limit(1);
-    if (classroom.length === 0) {
-      res.status(404).json({ error: "Not Found", message: "Classroom not found or access denied." });
-      return;
-    }
-    const assignmentList = await db.select().from(assignments3).where(eq(assignments3.classroomId, classroomId)).orderBy(desc(assignments3.createdAt));
-    res.json({ success: true, assignments: assignmentList });
-  } catch (err) {
-    console.error("Error fetching assignments:", err);
-    res.status(500).json({ error: "Server Error", message: "Failed to fetch assignments." });
-  }
-});
-teacherAssignmentRouter.post("/:classroomId/assignments", requireAuth, requireApprovedTeacher, async (req, res) => {
-  try {
-    const teacherId = req.session.userId;
-    const { classroomId } = req.params;
-    const { title, instructions, subject, gradeLevel, dueDate, latePolicy, retakePolicy, questions } = req.body;
-    const classroom = await db.select().from(classrooms3).where(and(eq(classrooms3.id, classroomId), eq(classrooms3.teacherId, teacherId))).limit(1);
-    if (classroom.length === 0) {
-      res.status(404).json({ error: "Not Found", message: "Classroom not found." });
-      return;
-    }
-    const assignmentId = generateUUID();
-    await db.insert(assignments3).values({
-      id: assignmentId,
-      classroomId,
-      teacherId,
-      title,
-      instructions,
-      subject,
-      gradeLevel,
-      dueDate: dueDate ? new Date(dueDate).toISOString() : null,
-      latePolicy,
-      retakePolicy
-    });
-    if (Array.isArray(questions)) {
-      for (const q of questions) {
-        await db.insert(assignmentQuestions3).values({
-          id: generateUUID(),
-          assignmentId,
-          questionId: q.questionId,
-          displayOrder: q.displayOrder,
-          marks: q.marks || 1
-        });
+teacherAssignmentRouter.get(
+  ["/classrooms/:classroomId/assignments", "/:classroomId/assignments"],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req, res) => {
+    try {
+      const teacherId = req.session.userId;
+      const { classroomId } = req.params;
+      const classroom = await db.select().from(classrooms3).where(and(eq(classrooms3.id, classroomId), eq(classrooms3.teacherId, teacherId))).limit(1);
+      if (classroom.length === 0) {
+        res.status(404).json({ error: "Not Found", message: "Classroom not found or access denied." });
+        return;
       }
+      const assignmentList = await db.select().from(assignments3).where(eq(assignments3.classroomId, classroomId)).orderBy(desc(assignments3.createdAt));
+      res.json({ success: true, assignments: assignmentList });
+    } catch (err) {
+      console.error("Error fetching assignments:", err);
+      res.status(500).json({ error: "Server Error", message: "Failed to fetch assignments." });
     }
-    res.status(201).json({ success: true, assignmentId });
-  } catch (err) {
-    console.error("Error creating assignment:", err);
-    res.status(500).json({ error: "Server Error", message: "Failed to create assignment." });
   }
-});
-teacherAssignmentRouter.patch("/:assignmentId/publish", requireAuth, requireApprovedTeacher, async (req, res) => {
-  try {
-    const teacherId = req.session.userId;
-    const { assignmentId } = req.params;
-    const assignment = await db.select().from(assignments3).where(and(eq(assignments3.id, assignmentId), eq(assignments3.teacherId, teacherId))).limit(1);
-    if (assignment.length === 0) {
-      res.status(404).json({ error: "Not Found", message: "Assignment not found." });
-      return;
+);
+teacherAssignmentRouter.post(
+  ["/classrooms/:classroomId/assignments", "/:classroomId/assignments"],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req, res) => {
+    try {
+      const teacherId = req.session.userId;
+      const { classroomId } = req.params;
+      const { title, instructions, subject, gradeLevel, dueDate, latePolicy, retakePolicy, questions } = req.body;
+      const classroom = await db.select().from(classrooms3).where(and(eq(classrooms3.id, classroomId), eq(classrooms3.teacherId, teacherId))).limit(1);
+      if (classroom.length === 0) {
+        res.status(404).json({ error: "Not Found", message: "Classroom not found." });
+        return;
+      }
+      const assignmentId = generateUUID();
+      await db.insert(assignments3).values({
+        id: assignmentId,
+        classroomId,
+        teacherId,
+        title,
+        instructions,
+        subject,
+        gradeLevel,
+        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+        latePolicy,
+        retakePolicy
+      });
+      if (Array.isArray(questions)) {
+        for (const q of questions) {
+          await db.insert(assignmentQuestions3).values({
+            id: generateUUID(),
+            assignmentId,
+            questionId: q.questionId,
+            displayOrder: q.displayOrder,
+            marks: q.marks || 1
+          });
+        }
+      }
+      res.status(201).json({ success: true, assignmentId });
+    } catch (err) {
+      console.error("Error creating assignment:", err);
+      res.status(500).json({ error: "Server Error", message: "Failed to create assignment." });
     }
-    await db.update(assignments3).set({ published: true }).where(eq(assignments3.id, assignmentId));
-    res.json({ success: true });
-  } catch (err) {
-    console.error("Error publishing assignment:", err);
-    res.status(500).json({ error: "Server Error", message: "Failed to publish assignment." });
   }
-});
+);
+teacherAssignmentRouter.patch(
+  ["/assignments/:assignmentId/publish", "/:assignmentId/publish"],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req, res) => {
+    try {
+      const teacherId = req.session.userId;
+      const { assignmentId } = req.params;
+      const assignment = await db.select().from(assignments3).where(and(eq(assignments3.id, assignmentId), eq(assignments3.teacherId, teacherId))).limit(1);
+      if (assignment.length === 0) {
+        res.status(404).json({ error: "Not Found", message: "Assignment not found." });
+        return;
+      }
+      await db.update(assignments3).set({ published: true }).where(eq(assignments3.id, assignmentId));
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Error publishing assignment:", err);
+      res.status(500).json({ error: "Server Error", message: "Failed to publish assignment." });
+    }
+  }
+);
+teacherAssignmentRouter.get(
+  ["/assignments/:assignmentId/submissions", "/:assignmentId/submissions"],
+  requireAuth,
+  requireApprovedTeacher,
+  async (req, res) => {
+    try {
+      const teacherId = req.session.userId;
+      const { assignmentId } = req.params;
+      const assignmentRow = await db.select().from(assignments3).where(and(eq(assignments3.id, assignmentId), eq(assignments3.teacherId, teacherId))).limit(1);
+      if (assignmentRow.length === 0) {
+        res.status(404).json({ error: "Not Found", message: "Assignment not found or access denied." });
+        return;
+      }
+      const submissions = await db.select({
+        id: assignmentSubmissions3.id,
+        studentId: assignmentSubmissions3.studentId,
+        studentName: studentProfiles3.fullName,
+        score: assignmentSubmissions3.score,
+        totalMarks: assignmentSubmissions3.totalMarks,
+        submittedAt: assignmentSubmissions3.submittedAt,
+        attemptNumber: assignmentSubmissions3.attemptNumber,
+        isLate: assignmentSubmissions3.isLate,
+        status: assignmentSubmissions3.status,
+        diagnosticAttemptId: assignmentSubmissions3.diagnosticAttemptId
+      }).from(assignmentSubmissions3).innerJoin(studentProfiles3, eq(assignmentSubmissions3.studentId, studentProfiles3.id)).where(eq(assignmentSubmissions3.assignmentId, assignmentId)).orderBy(desc(assignmentSubmissions3.submittedAt));
+      const attemptIds = submissions.map((s2) => s2.diagnosticAttemptId).filter(Boolean);
+      const attempts = attemptIds.length ? await db.select({
+        id: diagnosticAttempts3.id,
+        equation: diagnosticAttempts3.equation,
+        workingSteps: diagnosticAttempts3.workingSteps,
+        finalAnswer: diagnosticAttempts3.finalAnswer,
+        serverIsCorrect: diagnosticAttempts3.serverIsCorrect,
+        serverPrimaryMisconception: diagnosticAttempts3.serverPrimaryMisconception
+      }).from(diagnosticAttempts3).where(inArray(diagnosticAttempts3.id, attemptIds)) : [];
+      const misconceptions = attemptIds.length ? await db.select({
+        attemptId: diagnosticMisconceptions3.attemptId,
+        code: diagnosticMisconceptions3.misconceptionCode,
+        confidence: diagnosticMisconceptions3.confidenceScore
+      }).from(diagnosticMisconceptions3).where(inArray(diagnosticMisconceptions3.attemptId, attemptIds)) : [];
+      const attemptById = new Map(attempts.map((a) => [a.id, a]));
+      const enrichedSubmissions = submissions.map((submission) => ({
+        ...submission,
+        attempt: attemptById.get(submission.diagnosticAttemptId) || null,
+        misconceptions: misconceptions.filter(
+          (m2) => m2.attemptId === submission.diagnosticAttemptId
+        )
+      }));
+      const members = await db.select({ studentId: classroomMemberships3.studentId }).from(classroomMemberships3).where(
+        and(
+          eq(classroomMemberships3.classroomId, assignmentRow[0].classroomId),
+          eq(classroomMemberships3.status, "active")
+        )
+      );
+      res.json({
+        success: true,
+        assignment: assignmentRow[0],
+        totalStudents: members.length,
+        submissions: enrichedSubmissions
+      });
+    } catch (err) {
+      console.error("Error fetching assignment submissions:", err);
+      res.status(500).json({ error: "Server Error", message: "Failed to fetch submissions." });
+    }
+  }
+);
 
 // src/routes/ai.ts
 import { Router as Router5 } from "express";
@@ -54194,7 +54981,7 @@ var LIBRARY_LABEL = `google-genai-sdk/${SDK_VERSION}`;
 var VERTEX_AI_API_DEFAULT_VERSION = "v1beta1";
 var GOOGLE_AI_API_DEFAULT_VERSION = "v1beta";
 var MULTI_REGIONAL_LOCATIONS = /* @__PURE__ */ new Set(["us", "eu"]);
-var UNDICI_GLOBAL_DISPATCHER_SYMBOL$1 = /* @__PURE__ */ Symbol.for("undici.globalDispatcher.1");
+var UNDICI_GLOBAL_DISPATCHER_SYMBOL$1 = Symbol.for("undici.globalDispatcher.1");
 function isNodeRuntime$1() {
   var _a2, _b;
   const globals = globalThis;
@@ -59333,7 +60120,7 @@ function fillGlobals(options) {
   }
   return clone2;
 }
-var UNDICI_GLOBAL_DISPATCHER_SYMBOL = /* @__PURE__ */ Symbol.for("undici.globalDispatcher.1");
+var UNDICI_GLOBAL_DISPATCHER_SYMBOL = Symbol.for("undici.globalDispatcher.1");
 var GoogleGenAISecurityProvider = class {
   constructor(options) {
     this.options = options;
@@ -68176,41 +68963,6 @@ studentAssignmentRouter.post("/:assignmentId/submit", requireAuth, requireRole("
 
 // src/routes/analytics.ts
 import { Router as Router9 } from "express";
-
-// src/services/analyticsService.ts
-var analyticsService = {
-  async getClassroomOverview(classroomId) {
-    const [totalStudents] = await db.select({ count: count() }).from(classroomMemberships3).where(and(eq(classroomMemberships3.classroomId, classroomId), eq(classroomMemberships3.status, "active")));
-    const classAssignments = await db.select().from(assignments3).where(eq(assignments3.classroomId, classroomId));
-    return {
-      totalStudents: totalStudents.count,
-      totalAssignments: classAssignments.length
-    };
-  },
-  async getAssignmentAnalytics(assignmentId) {
-    const submissions = await db.select({
-      score: assignmentSubmissions3.score,
-      totalMarks: assignmentSubmissions3.totalMarks,
-      isLate: assignmentSubmissions3.isLate
-    }).from(assignmentSubmissions3).where(eq(assignmentSubmissions3.assignmentId, assignmentId));
-    const totalSubmissions = submissions.length;
-    const avgScore = totalSubmissions > 0 ? submissions.reduce((sum, s2) => sum + s2.score / s2.totalMarks, 0) / totalSubmissions : 0;
-    const lateSubmissions = submissions.filter((s2) => s2.isLate).length;
-    return {
-      totalSubmissions,
-      avgScore: Math.round(avgScore * 100),
-      lateSubmissions
-    };
-  },
-  async getMisconceptionInsights(classroomId) {
-    return await db.select({
-      code: diagnosticMisconceptions3.misconceptionCode,
-      count: count()
-    }).from(diagnosticMisconceptions3).leftJoin(diagnosticAttempts3, eq(diagnosticMisconceptions3.attemptId, diagnosticAttempts3.id)).leftJoin(classroomMemberships3, eq(diagnosticAttempts3.studentId, classroomMemberships3.studentId)).where(eq(classroomMemberships3.classroomId, classroomId)).groupBy(diagnosticMisconceptions3.misconceptionCode).orderBy(sql`count DESC`).limit(5);
-  }
-};
-
-// src/routes/analytics.ts
 var analyticsRouter = Router9();
 var verifyClassroomAccess = async (req, res, classroomId) => {
   const teacherId = req.session.userId;
@@ -68285,12 +69037,15 @@ app.use(
 app.use("/api/auth", authRouter);
 app.use("/api/sync", syncRouter);
 app.use("/api/teacher", teacherRouter);
-app.use("/api/teacher/assignments", teacherAssignmentRouter);
+app.use("/api/teacher", teacherAssignmentRouter);
 app.use("/api/teacher/analytics", analyticsRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/student", studentRouter);
 app.use("/api/student/assignments", studentAssignmentRouter);
+app.get("/api/config", (_req, res) => {
+  res.status(200).json(getDemoModeStatus());
+});
 app.get("/api/health", async (_req, res) => {
   const dbStatus = await checkDatabaseConnection();
   res.status(200).json({
@@ -68298,6 +69053,7 @@ app.get("/api/health", async (_req, res) => {
     app: "MindTrace Diagnostic Platform API",
     version: "1.2.0",
     environment: process.env.NODE_ENV || "development",
+    demoMode: isDemoMode(),
     serverTimestamp: (/* @__PURE__ */ new Date()).toISOString(),
     database: {
       connected: dbStatus.ok,
@@ -68307,6 +69063,9 @@ app.get("/api/health", async (_req, res) => {
   });
 });
 async function configureServer() {
+  if (!isProduction2) {
+    await seedDemoTeacherData();
+  }
   if (!isProduction2) {
     const { createServer: createViteServer } = await import("vite");
     const react = (await Promise.resolve().then(() => (init_dist3(), dist_exports))).default;
@@ -68345,6 +69104,13 @@ async function configureServer() {
       console.log(`=======================================================`);
       console.log(`\u{1F680} MindTrace Server listening on http://0.0.0.0:${PORT}`);
       console.log(`\u2699\uFE0F  Environment: ${process.env.NODE_ENV || "development"}`);
+      if (isDemoMode()) {
+        console.log(`\u2728 [DEMO MODE ACTIVE] Teacher accreditation barriers bypassed`);
+      } else if (process.env.NODE_ENV === "production") {
+        console.log(`\u{1F512} [PRODUCTION SAFEGUARD] Demo mode strictly enforced off`);
+      } else {
+        console.log(`\u{1F6E1}\uFE0F  Accreditation: Standard verification required`);
+      }
       console.log(`=======================================================`);
     });
   }

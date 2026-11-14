@@ -20,6 +20,15 @@ function effectiveTeacherVerification(
 }
 
 /**
+ * Evaluator builds should not block on manual accreditation. New teacher
+ * accounts are activated immediately in demo mode and in local development;
+ * production deployments keep the pending-approval workflow.
+ */
+function autoApprovesTeacherAccounts(): boolean {
+  return isDemoModeEnabled() || process.env.NODE_ENV !== 'production';
+}
+
+/**
  * GET /api/auth/csrf-token
  * Issues or retrieves a session CSRF token
  */
@@ -159,7 +168,9 @@ authRouter.post('/register-teacher', authRateLimiter, async (req: Request, res: 
     }
 
     let verificationId: string | null = null;
-    const verificationStatus: 'approved' = 'approved';
+    let verificationStatus: 'pending' | 'approved' | 'rejected' = autoApprovesTeacherAccounts()
+      ? 'approved'
+      : 'pending';
 
     // Continue to reject invalid, redeemed, or expired tokens when one is provided.
     if (verificationToken && verificationToken.trim().length > 0) {

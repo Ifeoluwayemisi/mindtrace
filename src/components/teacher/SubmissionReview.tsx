@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  AlertTriangle,
   CheckCircle2,
   ChevronLeft,
   Clock,
@@ -19,6 +20,7 @@ export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
 }) => {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [assignment, setAssignment] = useState<any>(null);
+  const [totalStudents, setTotalStudents] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedSubmission, setSelectedSubmission] = useState<any | null>(null);
 
@@ -29,6 +31,9 @@ export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
     if (res.ok && res.data) {
       setSubmissions(res.data.submissions || []);
       setAssignment(res.data.assignment);
+      setTotalStudents(
+        typeof res.data.totalStudents === 'number' ? res.data.totalStudents : null
+      );
     }
     setLoading(false);
   };
@@ -45,6 +50,24 @@ export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
       </div>
     );
   }
+
+  const attempt = selectedSubmission?.attempt || null;
+  let workingSteps: any[] = [];
+  if (attempt) {
+    const raw = attempt.workingSteps;
+    if (Array.isArray(raw)) {
+      workingSteps = raw;
+    } else if (typeof raw === 'string') {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) workingSteps = parsed;
+      } catch {
+        // Leave as empty when the stored working is unreadable.
+      }
+    }
+  }
+  const misconceptions: any[] = selectedSubmission?.misconceptions || [];
+  const isCorrect = attempt?.serverIsCorrect;
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -63,7 +86,9 @@ export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="card-modern p-5 space-y-2">
           <span className="eyebrow">Total enrolled</span>
-          <div className="text-2xl font-display font-bold text-[#0F172A]">--</div>
+          <div className="text-2xl font-display font-bold text-[#0F172A] tabular-nums">
+            {totalStudents === null ? '--' : totalStudents}
+          </div>
         </div>
         <div className="card-modern p-5 space-y-2">
           <span className="eyebrow text-[#047857]">Submitted</span>
@@ -187,39 +212,89 @@ export const SubmissionReview: React.FC<SubmissionReviewProps> = ({
                   <div className="text-[11px] text-[#64748B] font-semibold uppercase tracking-[0.08em] mb-2">
                     Equation solved
                   </div>
-                  <div className="font-mono text-xl font-semibold text-[#0F172A]">3x - 7 = 14</div>
+                  <div className="font-mono text-xl font-semibold text-[#0F172A]">
+                    {attempt?.equation || 'Diagnostic attempt not available'}
+                  </div>
+                  {attempt?.finalAnswer && (
+                    <div className="mt-2 text-[12px] text-[#475569]">
+                      Submitted answer:{' '}
+                      <span className="font-mono font-semibold text-[#0F172A]">
+                        {attempt.finalAnswer}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2.5">
                   <div className="text-[11px] text-[#64748B] font-semibold uppercase tracking-[0.08em]">
                     Working steps provided
                   </div>
-                  <div className="space-y-2">
-                    {[
-                      '3x = 14 + 7',
-                      '3x = 21',
-                      'x = 7',
-                    ].map((step, idx) => (
-                      <div
-                        key={step}
-                        className="math-step math-step-completed px-3 py-2.5 flex justify-between items-center gap-2"
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="math-step-badge math-step-badge-completed">{idx + 1}</span>
-                          <span className="font-mono text-[13px] text-[#0F172A] truncate">{step}</span>
+                  {workingSteps.length === 0 ? (
+                    <p className="text-[12px] text-[#64748B]">
+                      No working steps were recorded for this attempt.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {workingSteps.map((step, idx) => (
+                        <div
+                          key={`${step.stepNumber ?? idx}-${idx}`}
+                          className="math-step math-step-completed px-3 py-2.5 flex justify-between items-center gap-2"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="math-step-badge math-step-badge-completed">
+                              {step.stepNumber ?? idx + 1}
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block font-mono text-[13px] text-[#0F172A] truncate">
+                                {step.mathExpression || '—'}
+                              </span>
+                              {step.actionDescription && (
+                                <span className="block text-[11px] text-[#64748B] truncate">
+                                  {step.actionDescription}
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                          <CheckCircle2
+                            className="w-4 h-4 text-[#059669] shrink-0"
+                            aria-label="Step recorded"
+                          />
                         </div>
-                        <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0" aria-label="Step verified" />
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-[#059669] shrink-0" aria-hidden="true" />
-                  <div className="text-[13px] text-[#065F46] font-semibold">
-                    Mastery confirmed: no misconceptions detected.
+                {misconceptions.length > 0 ? (
+                  <div className="p-4 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] space-y-2">
+                    <div className="flex items-center gap-2 text-[13px] text-[#92400E] font-semibold">
+                      <AlertTriangle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      <span>Misconception detected</span>
+                    </div>
+                    <ul className="space-y-1">
+                      {misconceptions.map((mis: any) => (
+                        <li
+                          key={mis.code}
+                          className="text-[12px] text-[#92400E] flex justify-between gap-3"
+                        >
+                          <span className="font-mono font-semibold">{mis.code.replace(/_/g, ' ')}</span>
+                          <span>Confidence: {mis.confidence}%</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
+                ) : isCorrect === true ? (
+                  <div className="p-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-[#059669] shrink-0" aria-hidden="true" />
+                    <div className="text-[13px] text-[#065F46] font-semibold">
+                      Correct working: no misconception detected.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[13px] text-[#475569]">
+                    This attempt was not marked correct, but no misconception pattern was matched.
+                  </div>
+                )}
               </div>
             </div>
 

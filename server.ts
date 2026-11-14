@@ -77,7 +77,6 @@ app.use('/api/auth', authRouter);
 app.use('/api/sync', syncRouter);
 app.use('/api/teacher', teacherRouter);
 app.use('/api/teacher', teacherAssignmentRouter);
-app.use('/api/teacher/assignments', teacherAssignmentRouter);
 app.use('/api/teacher/analytics', analyticsRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/admin', adminRouter);

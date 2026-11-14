@@ -30,8 +30,8 @@ async function runTeacherEvaluatorFlowTest() {
   assert.ok(roster.length >= 3, 'demo classroom should have a populated student roster');
 
   const demoAssignments = await db.select().from(assignments).where(eq(assignments.classroomId, DEMO_CLASSROOM_ID));
-  assert.ok(demoAssignments.some((assignment) => assignment.published), 'demo teacher should have a published assignment');
-  const questions = await db.select().from(assignmentQuestions).where(eq(assignmentQuestions.assignmentId, 'demo-assignment-linear-equations-2026'));
+  assert.ok(demoAssignments.some((assignment: { published: boolean }) => assignment.published), 'demo teacher should have a published assignment');
+  const questions = await db.select().from(assignmentQuestions).where(eq(assignmentQuestions.assignmentId, 'seed-chinedu-asg-01'));
   assert.ok(questions.length >= 2, 'demo assignment should include sample questions');
 
   const attempts = await db.select().from(diagnosticAttempts).where(eq(diagnosticAttempts.studentId, roster[0].studentId));

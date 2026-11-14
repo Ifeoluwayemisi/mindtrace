@@ -18,9 +18,8 @@ import { ChalkboardScriptModal } from './ChalkboardScriptModal';
 import { StudentDetailModal } from './StudentDetailModal';
 import { ClassroomManagerModal } from './ClassroomManagerModal';
 import { storageService } from '../../services/storageService';
-import { authService } from '../../services/authService';
-import { apiRequest, fetchAppConfig } from '../../services/apiClient';
-import { Download, ShieldCheck, Key, RefreshCw } from 'lucide-react';
+import { apiRequest } from '../../services/apiClient';
+import { Download, RefreshCw } from 'lucide-react';
 import { AssignmentManager } from './AssignmentManager';
 import { SubmissionReview } from './SubmissionReview';
 import { resolveAvatarSrc, getInitials } from '../../utils/avatar';
@@ -48,6 +47,8 @@ const INITIAL_CLASS_ANALYTICS: ClassAnalyticsSummary = {
   performanceTrends: [],
   timeSpentDistribution: [],
   hintsUsedDistribution: [],
+  workingStepsDistribution: [],
+  attemptsPerStudentDistribution: [],
   topMisconceptions: [],
 };
 
@@ -79,41 +80,6 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [isDemoMode, setIsDemoMode] = useState(false);
-  const [currentVerification, setCurrentVerification] = useState<'pending' | 'approved' | 'rejected'>(
-    teacher.verificationStatus || 'pending'
-  );
-
-  useEffect(() => {
-    fetchAppConfig().then((cfg) => {
-      if (cfg?.demoMode) {
-        setIsDemoMode(true);
-        setCurrentVerification('approved');
-      }
-    });
-  }, []);
-
-  const [redemptionToken, setRedemptionToken] = useState('');
-  const [isRedeeming, setIsRedeeming] = useState(false);
-  const [redemptionError, setRedemptionError] = useState<string | null>(null);
-
-  const handleRedeemToken = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!redemptionToken.trim()) return;
-    setIsRedeeming(true);
-    setRedemptionError(null);
-    const res = await authService.redeemTeacherToken(redemptionToken.trim());
-    setIsRedeeming(false);
-    if (res.success) {
-      setCurrentVerification('approved');
-      showToast('Accreditation verified! Full educator permissions granted.');
-      setRedemptionToken('');
-      fetchClassrooms(); // Refresh classrooms after approval
-    } else {
-      setRedemptionError(res.message || 'Invalid or expired accreditation token.');
-    }
-  };
-
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
@@ -135,12 +101,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   };
 
   useEffect(() => {
-    if (currentVerification === 'approved') {
-      fetchClassrooms();
-    } else {
-      setIsLoading(false);
-    }
-  }, [currentVerification]);
+    fetchClassrooms();
+  }, []);
 
   useEffect(() => {
     if (selectedClassId) {
@@ -165,20 +127,29 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
         const analyticsRes = await apiRequest(`/api/teacher/analytics?classroomId=${selectedClassId}`);
         if (analyticsRes.ok) {
           const { overview, insights } = analyticsRes.data;
-          // Map partial data to summary
           setRealAnalytics({
             ...INITIAL_CLASS_ANALYTICS,
-            totalStudents: overview.totalStudents || 0,
-            submissionRate: 100, // Placeholder if not computed yet
-            avgCorrectness: 75, // Placeholder
-            atRiskCount: 0, // Should be calculated from roster
-            topMisconceptions: (insights || []).map((i: any) => ({
-              code: i.code,
-              title: i.code.replace(/_/g, ' '),
-              affectedPercentage: Math.round((i.count / (overview.totalStudents || 1)) * 100),
-              studentCount: i.count,
-              severity: 'medium',
-            }))
+            totalStudents: overview.totalStudents ?? 0,
+            activeStudents: overview.activeStudents ?? 0,
+            submissionRate: overview.submissionRate ?? 0,
+            avgCompletion: overview.avgCompletion ?? 0,
+            avgCorrectness: overview.avgCorrectness ?? 0,
+            atRiskCount: overview.atRiskCount ?? 0,
+            microSkills: overview.microSkills ?? [],
+            performanceTrends: overview.performanceTrends ?? [],
+            workingStepsDistribution: overview.workingStepsDistribution ?? [],
+            attemptsPerStudentDistribution: overview.attemptsPerStudentDistribution ?? [],
+            topMisconceptions:
+              overview.topMisconceptions ??
+              (insights || []).map((i: any) => ({
+                code: i.code,
+                title: i.code.replace(/_/g, ' '),
+                affectedPercentage: Math.round(
+                  ((i.studentCount ?? i.count) / (overview.totalStudents || 1)) * 100
+                ),
+                studentCount: i.studentCount ?? i.count,
+                severity: 'medium',
+              })),
           });
         }
       };
@@ -212,84 +183,6 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
     if (statusFilter === 'mastered') return matchesSearch && s.status === 'Mastered';
     return matchesSearch;
   });
-
-  // Verification Wall View (Bypassed in Demo Mode)
-  if (!isDemoMode && (currentVerification === 'pending' || currentVerification === 'rejected')) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 py-12 space-y-7 animate-fade-in">
-        <div className="w-full max-w-2xl text-center space-y-4">
-          <div
-            className={`mx-auto w-16 h-16 rounded-2xl flex items-center justify-center border ${
-              currentVerification === 'pending'
-                ? 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]'
-                : 'bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]'
-            }`}
-          >
-            <ShieldCheck className="w-8 h-8" aria-hidden="true" />
-          </div>
-          <span
-            className={`badge ${currentVerification === 'pending' ? 'badge-diagnostic' : 'badge-danger'}`}
-          >
-            {currentVerification === 'pending' ? 'Awaiting approval' : 'Account rejected'}
-          </span>
-          <h1 className="page-title">
-            {currentVerification === 'pending' ? 'Verification required' : 'Account rejected'}
-          </h1>
-          <p className="body-text max-w-lg mx-auto">
-            {currentVerification === 'pending'
-              ? 'Your educator profile is pending approval. To protect student data, classroom analytics and assignment publishing are restricted to verified teachers.'
-              : `Your teacher account has been rejected by the administrator. Reason: ${teacher.rejectionReason || 'No reason provided.'}`}
-          </p>
-        </div>
-
-        <div className="w-full max-w-md card-modern p-6 space-y-5">
-          <div className="space-y-3">
-            <h2 className="section-title flex items-center gap-2">
-              <Key className="w-5 h-5 text-[#B45309]" aria-hidden="true" />
-              <span>Redeem accreditation token</span>
-            </h2>
-            <p className="text-[13px] text-[#475569]">
-              If your school administrator issued an MTR token, enter it below for instant activation.
-            </p>
-            <form onSubmit={handleRedeemToken} className="space-y-3">
-              <div>
-                <label htmlFor="accreditation-token" className="label-modern">
-                  Accreditation token
-                </label>
-                <input
-                  id="accreditation-token"
-                  type="text"
-                  value={redemptionToken}
-                  onChange={(e) => setRedemptionToken(e.target.value.toUpperCase().trim())}
-                  placeholder="MTR-XXXX-XXXX"
-                  autoComplete="off"
-                  className="input-modern input-mono uppercase tracking-[0.12em] placeholder:tracking-normal placeholder:font-sans placeholder:font-normal"
-                />
-              </div>
-              {redemptionError && (
-                <p role="alert" className="text-[12px] text-[#92400E] font-medium">
-                  {redemptionError}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={isRedeeming || !redemptionToken.trim()}
-                className="btn-primary w-full"
-              >
-                {isRedeeming ? 'Verifying…' : 'Redeem & activate workspace'}
-              </button>
-            </form>
-          </div>
-
-          <div className="pt-4 border-t border-[#E2E8F0]">
-            <p className="text-[12px] text-[#64748B] text-center">
-              No token? Contact your school's IT coordinator or the MindTrace support portal.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Loading State
   if (isLoading) {
@@ -360,6 +253,28 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
       tone: 'text-[#047857]',
     },
   ];
+
+  const radarSkills = realAnalytics.microSkills.slice(0, 6);
+  const radarPoint = (index: number, ratio: number) => {
+    const angle = (Math.PI * 2 * index) / Math.max(1, radarSkills.length) - Math.PI / 2;
+    return [
+      150 + Math.cos(angle) * 92 * ratio,
+      150 + Math.sin(angle) * 92 * ratio,
+    ];
+  };
+  const radarPolygon = radarSkills
+    .map((skill, index) => radarPoint(index, Math.max(0, Math.min(100, skill.score)) / 100).join(','))
+    .join(' ');
+
+  const trendSeries = realAnalytics.performanceTrends;
+  const trendPoints = (key: 'submissionRate' | 'correctness') =>
+    trendSeries
+      .map((entry, index) => {
+        const x = 60 + (index * 360) / Math.max(1, trendSeries.length - 1);
+        const value = Math.max(0, Math.min(100, entry[key]));
+        return `${Math.round(x)},${Math.round(170 - (value / 100) * 120)}`;
+      })
+      .join(' ');
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
@@ -543,28 +458,55 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                   <span className="text-[11px] text-[#64748B] font-mono">Class aggregate</span>
                 </div>
                 <div className="relative h-64 flex items-center justify-center">
-                  <svg viewBox="0 0 300 300" className="w-full h-full max-w-[280px]" role="img" aria-label="Radar chart of micro-skill performance: linear 88%, graph 68%, word 54%">
-                    {[25, 50, 75, 100].map((r) => (
+                  {radarSkills.length < 3 ? (
+                    <p className="text-[13px] text-[#64748B] text-center max-w-[240px]">
+                      No misconception data yet for this class. Micro-skill performance appears after students submit working.
+                    </p>
+                  ) : (
+                    <svg
+                      viewBox="0 0 300 300"
+                      className="w-full h-full max-w-[280px]"
+                      role="img"
+                      aria-label={`Radar chart of micro-skill performance: ${radarSkills
+                        .map((s) => `${s.skill} ${s.score}%`)
+                        .join(', ')}`}
+                    >
+                      {[25, 50, 75, 100].map((ring) => (
+                        <polygon
+                          key={ring}
+                          points={radarSkills
+                            .map((_, index) => radarPoint(index, ring / 100).join(','))
+                            .join(' ')}
+                          fill="none"
+                          stroke="#E2E8F0"
+                          strokeWidth="1"
+                        />
+                      ))}
                       <polygon
-                        key={r}
-                        points="150,50 236,100 236,200 150,250 64,200 64,100"
-                        fill="none"
-                        stroke="#E2E8F0"
-                        strokeWidth="1"
-                        transform={`scale(${r / 100})`}
-                        style={{ transformOrigin: '150px 150px' }}
+                        points={radarPolygon}
+                        fill="rgba(37, 99, 235, 0.14)"
+                        stroke="#2563EB"
+                        strokeWidth="2.5"
                       />
-                    ))}
-                    <polygon
-                      points="150,62 215,115 202,180 150,212 90,185 82,112"
-                      fill="rgba(37, 99, 235, 0.14)"
-                      stroke="#2563EB"
-                      strokeWidth="2.5"
-                    />
-                    <text x="150" y="38" textAnchor="middle" fill="#475569" fontSize="9" fontWeight="700">Linear (88%)</text>
-                    <text x="245" y="98" textAnchor="start" fill="#475569" fontSize="9" fontWeight="700">Graph (68%)</text>
-                    <text x="245" y="208" textAnchor="start" fill="#475569" fontSize="9" fontWeight="700">Word (54%)</text>
-                  </svg>
+                      {radarSkills.map((skill, index) => {
+                        const [x, y] = radarPoint(index, 1.22);
+                        return (
+                          <text
+                            key={skill.skill}
+                            x={x}
+                            y={y}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fill="#475569"
+                            fontSize="8.5"
+                            fontWeight="700"
+                          >
+                            {skill.skill.length > 22 ? `${skill.skill.slice(0, 21)}…` : skill.skill} ({skill.score}%)
+                          </text>
+                        );
+                      })}
+                    </svg>
+                  )}
                 </div>
               </section>
 
@@ -586,51 +528,96 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                   </div>
                 </div>
                 <div className="h-64 pt-4">
-                  <svg viewBox="0 0 500 200" className="w-full h-full overflow-visible" role="img" aria-label="Line chart of sync rate and correctness trends">
-                    <polyline fill="none" stroke="#2563EB" strokeWidth="3" points="60,150 120,125 180,105 240,86 300,75 360,65 420,51" />
-                    <polyline fill="none" stroke="#059669" strokeWidth="3" points="60,156 120,131 180,107 240,97 300,103 360,111 420,64" />
-                  </svg>
+                  {trendSeries.length < 2 ? (
+                    <div className="h-full flex items-center justify-center">
+                      <p className="text-[13px] text-[#64748B] text-center max-w-[240px]">
+                        Trends appear once students submit at least two assignments.
+                      </p>
+                    </div>
+                  ) : (
+                    <svg
+                      viewBox="0 0 500 200"
+                      className="w-full h-full overflow-visible"
+                      role="img"
+                      aria-label="Line chart of submission rate and correctness trends"
+                    >
+                      {[0, 25, 50, 75, 100].map((grid) => (
+                        <line
+                          key={grid}
+                          x1="60"
+                          x2="420"
+                          y1={170 - (grid / 100) * 120}
+                          y2={170 - (grid / 100) * 120}
+                          stroke="#E2E8F0"
+                          strokeWidth="1"
+                        />
+                      ))}
+                      <polyline fill="none" stroke="#2563EB" strokeWidth="3" points={trendPoints('submissionRate')} />
+                      <polyline fill="none" stroke="#059669" strokeWidth="3" points={trendPoints('correctness')} />
+                      {trendSeries.map((entry, index) => (
+                        <text
+                          key={`${entry.date}-${index}`}
+                          x={60 + (index * 360) / Math.max(1, trendSeries.length - 1)}
+                          y="192"
+                          textAnchor="middle"
+                          fill="#64748B"
+                          fontSize="9"
+                          fontWeight="600"
+                        >
+                          {entry.date}
+                        </text>
+                      ))}
+                    </svg>
+                  )}
                 </div>
               </section>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <section className="card-modern p-5 space-y-4" aria-labelledby="time-spent-heading">
-                <h2 id="time-spent-heading" className="eyebrow">
-                  Time spent
+              <section className="card-modern p-5 space-y-4" aria-labelledby="working-steps-heading">
+                <h2 id="working-steps-heading" className="eyebrow">
+                  Working steps per attempt
                 </h2>
-                <div className="space-y-3">
-                  {realAnalytics.timeSpentDistribution.map((item, idx) => (
-                    <div key={idx} className="space-y-1.5">
-                      <div className="flex justify-between text-[12px]">
-                        <span className="text-[#475569]">{item.range}</span>
-                        <span className="text-[#0F172A] font-mono font-semibold">{item.percentage}%</span>
+                {realAnalytics.workingStepsDistribution.every((item) => item.percentage === 0) ? (
+                  <p className="text-[12px] text-[#64748B]">No submitted working yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {realAnalytics.workingStepsDistribution.map((item, idx) => (
+                      <div key={idx} className="space-y-1.5">
+                        <div className="flex justify-between text-[12px]">
+                          <span className="text-[#475569]">{item.range}</span>
+                          <span className="text-[#0F172A] font-mono font-semibold">{item.percentage}%</span>
+                        </div>
+                        <div className="progress-track h-1.5">
+                          <div className="progress-fill" style={{ width: `${item.percentage}%` }} />
+                        </div>
                       </div>
-                      <div className="progress-track h-1.5">
-                        <div className="progress-fill" style={{ width: `${item.percentage}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </section>
 
-              <section className="card-modern p-5 space-y-4" aria-labelledby="hints-heading">
-                <h2 id="hints-heading" className="eyebrow">
-                  Hints used
+              <section className="card-modern p-5 space-y-4" aria-labelledby="attempts-heading">
+                <h2 id="attempts-heading" className="eyebrow">
+                  Attempts per student
                 </h2>
-                <div className="space-y-3">
-                  {realAnalytics.hintsUsedDistribution.map((item, idx) => (
-                    <div key={idx} className="space-y-1.5">
-                      <div className="flex justify-between text-[12px]">
-                        <span className="text-[#475569]">{item.range}</span>
-                        <span className="text-[#0F172A] font-mono font-semibold">{item.percentage}%</span>
+                {realAnalytics.attemptsPerStudentDistribution.every((item) => item.percentage === 0) ? (
+                  <p className="text-[12px] text-[#64748B]">No diagnostic attempts recorded yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {realAnalytics.attemptsPerStudentDistribution.map((item, idx) => (
+                      <div key={idx} className="space-y-1.5">
+                        <div className="flex justify-between text-[12px]">
+                          <span className="text-[#475569]">{item.range}</span>
+                          <span className="text-[#0F172A] font-mono font-semibold">{item.percentage}%</span>
+                        </div>
+                        <div className="progress-track h-1.5">
+                          <div className="progress-fill progress-fill-diagnostic" style={{ width: `${item.percentage}%` }} />
+                        </div>
                       </div>
-                      <div className="progress-track h-1.5">
-                        <div className="progress-fill progress-fill-diagnostic" style={{ width: `${item.percentage}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </section>
 
               <section className="card-modern p-5 space-y-3" aria-labelledby="misconceptions-heading">
@@ -638,15 +625,21 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                   Top misconceptions
                 </h2>
                 <div className="space-y-2">
-                  {realAnalytics.topMisconceptions.map((mis, idx) => (
-                    <div key={idx} className="p-3 rounded-lg bg-[#FFFBEB] border border-[#FDE68A] space-y-1">
-                      <div className="text-[12px] font-semibold text-[#92400E]">{mis.title}</div>
-                      <div className="flex justify-between text-[11px] text-[#92400E]">
-                        <span>{mis.affectedPercentage}% affected</span>
-                        <span className="text-[#1D4ED8] font-semibold cursor-pointer">Script →</span>
+                  {realAnalytics.topMisconceptions.length === 0 ? (
+                    <p className="text-[12px] text-[#64748B]">
+                      No misconceptions detected yet. They appear after students submit working.
+                    </p>
+                  ) : (
+                    realAnalytics.topMisconceptions.map((mis, idx) => (
+                      <div key={idx} className="p-3 rounded-lg bg-[#FFFBEB] border border-[#FDE68A] space-y-1">
+                        <div className="text-[12px] font-semibold text-[#92400E]">{mis.title}</div>
+                        <div className="flex justify-between text-[11px] text-[#92400E]">
+                          <span>{mis.affectedPercentage}% affected</span>
+                          <span className="text-[#1D4ED8] font-semibold cursor-pointer">Script →</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </section>
             </div>
